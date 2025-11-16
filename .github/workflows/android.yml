@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ "osp-master" ]
+    branches: [ "exp/proguard-fix" ]
   pull_request:
-    branches: [ "osp-master" ]
+    branches: [ "exp/proguard-fix" ]
   workflow_dispatch:
 
 jobs:
