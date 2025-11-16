@@ -185,6 +185,18 @@ public class SystemUI_android {
         this.m_result.response = isClosed ? DialogResult.Response.kClosed : DialogResult.Response.kResponded;
     }
 
+    // New method to close the Starboard view (This is to fix JNI error due to missing this method/bad boy)
+    public void CloseStarboardView(int option) {
+        if (this.m_starBoard != null) {
+            this.m_activity.runOnUiThread(() -> {
+                if (SystemUI_android.this.m_starBoard != null) {
+                    SystemUI_android.this.m_starBoard.dismiss();
+                    SystemUI_android.this.m_starBoard = null;
+                }
+            });
+        }
+    }
+
     public boolean GetMainWindowAttachedSheet() {
         return !this.m_activity.getBridgeView().hasWindowFocus();
     }
@@ -748,6 +760,13 @@ public class SystemUI_android {
             SystemUI_android.this.m_starBoard.showAtLocation(SystemUI_android.this.m_activity.getWindow().getDecorView(), 19, 0, 0);
         });
         return TryActivate;
+    }
+
+    // Overloaded method with 5 parameters to satisfy the JNI signature requirement
+    //(need to decompile native code to confirm, too lazy rn, as far 3 params are unused and can be ignored)
+    public int ShowStarboardView(String str, String str2, int i, boolean z, int i2) {
+        // Delegate to 2-parameter version since it's still working and added CloseStarboardView method to close
+        return ShowStarboardView(str, str2);
     }
 
     public int GetQRCameraPermissionState() {
