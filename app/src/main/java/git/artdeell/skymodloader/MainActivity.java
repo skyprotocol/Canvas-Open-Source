@@ -35,6 +35,7 @@ import git.artdeell.skymodloader.elfmod.ElfRefcountLoader;
 import git.artdeell.skymodloader.iconloader.IconLoader;
 
 public class MainActivity extends Activity {
+    private static final String DEFAULT_BUILD_KEY = com.tgc.sky.BuildConfig.SKY_BUILD_ACCESS_KEY;
     private SharedPreferences sharedPreferences;
     private boolean ceserverEnabled;
     private boolean hideCanvasMenu;
@@ -153,6 +154,16 @@ public class MainActivity extends Activity {
                 BuildConfig.SKY_SERVER_HOSTNAME = sharedPreferences.getString("server_host",
                         BuildConfig.SKY_SERVER_HOSTNAME);
                 MainActivity.customServer(BuildConfig.SKY_SERVER_HOSTNAME);
+            }
+
+            // Custom build access key override
+            if (sharedPreferences.getBoolean("custom_build_key", false)) {
+                String customKey = sharedPreferences.getString("build_access_key", "");
+                if (customKey != null && !customKey.trim().isEmpty()) {
+                    BuildConfig.SKY_BUILD_ACCESS_KEY = customKey;
+                } else {
+                    BuildConfig.SKY_BUILD_ACCESS_KEY = DEFAULT_BUILD_KEY;
+                }
             }
 
             new ElfRefcountLoader(libPath + ":/system/lib64", modsDir).load();
@@ -277,7 +288,7 @@ public class MainActivity extends Activity {
 
         // Only show the toast for versions below API level 33 (Android 13)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            Toast.makeText(this, "Stack trace copied to clipboard", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.stack_trace_copied), Toast.LENGTH_SHORT).show();
         }
     }
 

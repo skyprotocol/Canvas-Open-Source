@@ -3,6 +3,8 @@ package git.artdeell.skymodloader.elfmod;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +47,7 @@ import git.artdeell.skymodloader.updater.ModUpdaterService;
 import git.artdeell.skymodloader.updater.VersionNumber;
 
 public class ModManagerActivity extends Activity implements LoadingListener, ModUpdater {
+    private static final String DEFAULT_BUILD_KEY = com.tgc.sky.BuildConfig.SKY_BUILD_ACCESS_KEY;
     private static final int REQUEST_MOD = 1024 * 121;
     @SuppressLint("StaticFieldLeak")
     private static ElfUIBackbone loader;
@@ -205,9 +209,15 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     }
 
     public void setServerUrl(String url) {
-
         sharedPreferences.edit().putString("server_host", url).apply();
+    }
 
+    public void setCustomBuildKey(boolean flag) {
+        sharedPreferences.edit().putBoolean("custom_build_key", flag).apply();
+    }
+
+    public void setBuildAccessKey(String key) {
+        sharedPreferences.edit().putString("build_access_key", key).apply();
     }
 
     public void onAddMod(View v) {
@@ -389,6 +399,8 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         SwitchMaterial enableCeserver = new SwitchMaterial(this);
         SwitchMaterial enableServer = new SwitchMaterial(this);
         TextInputEditText serverSelector = new TextInputEditText(this);
+        SwitchMaterial enableCustomBuildKey = new SwitchMaterial(this);
+        TextInputEditText buildKeyInput = new TextInputEditText(this);
 
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -423,11 +435,15 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         enableServer.setLayoutParams(layoutParams);
         enableServer.setText(R.string.switch_custom_server);
         enableServer.setChecked(sharedPreferences.getBoolean("custom_server", false));
-        enableServer.setOnCheckedChangeListener((buttonView, isChecked) -> setCustomServer(isChecked));
+        enableServer.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            setCustomServer(isChecked);
+            serverSelector.setEnabled(isChecked);
+        });
 
         serverSelector.setText(sharedPreferences.getString("server_host", "insert-url"));
         serverSelector.setSingleLine(true);
         serverSelector.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        serverSelector.setEnabled(enableServer.isChecked());
         serverSelector.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -440,11 +456,87 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             }
         });
 
+        // Create paste button first so it can be referenced in toggle listener
+        ImageView pasteButton = new ImageView(this);
+        pasteButton.setImageResource(R.drawable.content_paste_24);
+        pasteButton.setPadding(dpToPixels(8), dpToPixels(8), dpToPixels(8), dpToPixels(8));
+        pasteButton.setOnClickListener(v -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null && clipboard.hasPrimaryClip()) {
+                ClipData clip = clipboard.getPrimaryClip();
+                if (clip != null && clip.getItemCount() > 0) {
+                    CharSequence pastedText = clip.getItemAt(0).getText();
+                    if (pastedText != null) {
+                        buildKeyInput.setText(pastedText);
+                        Toast.makeText(this, getString(R.string.pasted_from_clipboard), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        // Create restore button to reset to default key
+        ImageView restoreButton = new ImageView(this);
+        restoreButton.setImageResource(R.drawable.restore_24);
+        restoreButton.setPadding(dpToPixels(8), dpToPixels(8), dpToPixels(8), dpToPixels(8));
+        restoreButton.setOnClickListener(v -> {
+            buildKeyInput.setText(DEFAULT_BUILD_KEY);
+            Toast.makeText(this, getString(R.string.restored_default_key), Toast.LENGTH_SHORT).show();
+        });
+
+        enableCustomBuildKey.setTextSize(15);
+        enableCustomBuildKey.setLayoutParams(layoutParams);
+        enableCustomBuildKey.setText(R.string.switch_custom_build_key);
+        enableCustomBuildKey.setChecked(sharedPreferences.getBoolean("custom_build_key", false));
+        enableCustomBuildKey.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            setCustomBuildKey(isChecked);
+            buildKeyInput.setEnabled(isChecked);
+            pasteButton.setEnabled(isChecked);
+            pasteButton.setAlpha(isChecked ? 1.0f : 0.4f);
+            restoreButton.setEnabled(isChecked);
+            restoreButton.setAlpha(isChecked ? 1.0f : 0.4f);
+        });
+
+        buildKeyInput.setText(sharedPreferences.getString("build_access_key", DEFAULT_BUILD_KEY));
+        buildKeyInput.setHint(R.string.build_key_hint);
+        buildKeyInput.setSingleLine(true);
+        buildKeyInput.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        buildKeyInput.setEnabled(enableCustomBuildKey.isChecked());
+        pasteButton.setEnabled(enableCustomBuildKey.isChecked());
+        pasteButton.setAlpha(enableCustomBuildKey.isChecked() ? 1.0f : 0.4f);
+        restoreButton.setEnabled(enableCustomBuildKey.isChecked());
+        restoreButton.setAlpha(enableCustomBuildKey.isChecked() ? 1.0f : 0.4f);
+        buildKeyInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                String key = s.toString();
+                setBuildAccessKey(key);
+            }
+        });
+
+        // Create horizontal layout for build key input + buttons
+        LinearLayout buildKeyRow = new LinearLayout(this);
+        buildKeyRow.setOrientation(LinearLayout.HORIZONTAL);
+        buildKeyRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+
+        LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        buildKeyInput.setLayoutParams(inputParams);
+
+        buildKeyRow.addView(buildKeyInput);
+        buildKeyRow.addView(pasteButton);
+        buildKeyRow.addView(restoreButton);
+
         dialogY.container.addView(hideCanvasMenu, layoutParams);
         dialogY.container.addView(bypassUpdate, layoutParams);
         dialogY.container.addView(enableCeserver, layoutParams);
         dialogY.container.addView(enableServer, layoutParams);
         dialogY.container.addView(serverSelector, layoutParams);
+        dialogY.container.addView(enableCustomBuildKey, layoutParams);
+        dialogY.container.addView(buildKeyRow, layoutParams);
         dialogY.dialog.show();
     }
 

@@ -56,6 +56,11 @@
     <string name="switch_skip_updates">Bypass Game Updates</string>
     <string name="enable_cheat_engine_server">Enable Cheat Engine Server</string>
     <string name="switch_custom_server">Enable Custom Server</string>
+    <string name="switch_custom_build_key">Use custom build access key</string>
+    <string name="build_key_hint">Build access key</string>
+    <string name="pasted_from_clipboard">Pasted from clipboard</string>
+    <string name="restored_default_key">Restored default key</string>
+    <string name="stack_trace_copied">Stack trace copied to clipboard</string>
 
     <string name="close">Close</string>
     <string name="mod_icon">mod icon</string>
