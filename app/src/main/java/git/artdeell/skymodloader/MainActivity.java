@@ -26,10 +26,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import dalvik.system.DexClassLoader;
 import git.artdeell.skymodloader.elfmod.ElfRefcountLoader;
 import git.artdeell.skymodloader.iconloader.IconLoader;
 
@@ -57,17 +59,10 @@ public class MainActivity extends Activity {
         ceserverEnabled = sharedPreferences.getBoolean("ceserver", false);
         hideCanvasMenu = sharedPreferences.getBoolean("hide_canvas_menu", false);
 
-        if (sharedPreferences.getBoolean("custom_build_key", false)) {
-            String buildKey = sharedPreferences.getString("build_access_key", "");
-            if (!buildKey.isEmpty()) {
-                BuildConfig.SKY_BUILD_ACCESS_KEY = buildKey;
-                Log.i("MainActivity", "Applied custom build key: " + buildKey.substring(0, Math.min(20, buildKey.length())) + "...");
-            }
-        }
-
         sharedPreferences.edit().putString("sky_package_name", SKY_PACKAGE_NAME).apply();
         skyPackages = new HashMap<>();
         skyPackages.put("com.tgc.sky.android", 0);
+        skyPackages.put("com.tgc.sky.vn.android", 0);
         skyPackages.put("com.tgc.sky.android.huawei", 1);
         loadGame();
     }
@@ -83,6 +78,29 @@ public class MainActivity extends Activity {
             Log.d("MainActivity", "Logcat monitoring started");
         } catch (Exception e) {
             Log.e("MainActivity", "Failed to start logcat monitoring", e);
+        }
+    }
+
+    private String getSkyBuildAccessKey() {
+        try {
+            ApplicationInfo skyInfo = getPackageManager().getApplicationInfo(
+                SKY_PACKAGE_NAME, PackageManager.GET_META_DATA
+            );
+            DexClassLoader skyLoader = new DexClassLoader(
+                skyInfo.sourceDir,
+                getCacheDir().getAbsolutePath(),
+                skyInfo.nativeLibraryDir,
+                ClassLoader.getSystemClassLoader()
+            );
+            Class<?> buildConfig = skyLoader.loadClass("com.tgc.sky.BuildConfig");
+            Field field = buildConfig.getDeclaredField("SKY_BUILD_ACCESS_KEY");
+            field.setAccessible(true);
+            String key = (String) field.get(null);
+            Log.i("MainActivity", "SkyBuildKey loaded from Sky BuildConfig");
+            return key;
+        } catch (Exception e) {
+            Log.e("MainActivity", "getSkyBuildAccessKey failed: " + e.getMessage());
+            return null;
         }
     }
 
@@ -144,6 +162,16 @@ public class MainActivity extends Activity {
             ElfLoader loader = new ElfLoader(libPath + ":/system/lib64");
             loader.loadLib("libBootloader.so");
             System.loadLibrary("ciphered");
+
+            String buildKey = getSkyBuildAccessKey();
+            if (buildKey != null) {
+                BuildConfig.SKY_BUILD_ACCESS_KEY = buildKey;
+                nativeSetSkyBuildKey(buildKey);
+                Log.i("MainActivity", "BuildKey applied: " + buildKey.substring(0, Math.min(20, buildKey.length())) + "...");
+            } else {
+                Log.w("MainActivity", "NOT FOUND, DEFAULT INSTEAD: " + BuildConfig.SKY_BUILD_ACCESS_KEY);
+            }
+
             setDeviceInfoNative(
                 deviceInfo.xdpi,
                 deviceInfo.ydpi,
@@ -325,4 +353,5 @@ public class MainActivity extends Activity {
     public static native void customServer(String url);
     public static native void lateInitUserLibs();
     public static native void getSysetemUI(Object systemUI);
+    private static native void nativeSetSkyBuildKey(String key);
 }

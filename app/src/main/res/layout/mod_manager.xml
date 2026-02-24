@@ -54,6 +54,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:textSize="11sp"
+            android:alpha="0.6"
             app:layout_constraintBottom_toTopOf="@+id/mm_loadBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -72,21 +74,21 @@
                 android:id="@+id/box_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal|center_vertical"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="5dp">
+                android:paddingLeft="12dp"
+                android:paddingTop="10dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="10dp">
 
                 <LinearLayout
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:background="@drawable/logo_bg">
 
                     <ImageView
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:scaleX="1.3"
                         android:scaleY="1.3"
                         android:src="@drawable/icon_fg" />
@@ -96,195 +98,197 @@
                     android:id="@+id/title_header_separator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="3dp"
-                    android:paddingRight="3dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
                     android:text="|"
                     android:textColor="@color/text"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:alpha="0.4"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"
+                        android:textColor="@color/text"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mod Manager"
+                        android:textColor="@color/text"
+                        android:alpha="0.55"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/mm_extraSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onExtraSettingsDialog"
+                    android:padding="6dp">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:alpha="0.7"
+                        android:src="@drawable/settings" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separator" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:text="@string/app_name"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="@string/play"
                     android:textColor="@color/text"
-                    android:textSize="20sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="end|center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        android:text="Mod Manager"
-                        android:textColor="@color/text"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginRight="10dp"
-                android:animateLayoutChanges="true"
-                android:gravity="center_horizontal|center_vertical"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="5dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/separator"
-                    android:orientation="horizontal"
-                    android:padding="8dp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/play"
-                        android:textColor="@color/text"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="5dp"
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
                     android:layout_marginRight="20dp"
                     android:layout_weight="1"
-                    android:background="@drawable/separator"
-                    android:orientation="horizontal"
-                    android:padding="8dp" />
+                    android:background="@drawable/separator" />
+
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="14dp"
+                android:layout_marginTop="8dp">
 
                 <Button
                     android:id="@+id/mm_launch_live"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginBottom="7dp"
                     android:background="@drawable/buttons"
-                    android:text="@string/live" />
+                    android:gravity="center"
+                    android:text="GOOGLE PLAY STORE | GLOBAL VERSION\nPLAY"
+                    android:textSize="12sp"
+                    android:maxLines="2" />
+
+                <Button
+                    android:id="@+id/mm_launch_chplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginBottom="7dp"
+                    android:background="@drawable/buttons"
+                    android:gravity="center"
+                    android:text="Cửa Hàng Play | VIETNAMESE VERSION\nphát"
+                    android:textSize="12sp"
+                    android:maxLines="2" />
 
                 <Button
                     android:id="@+id/mm_launch_huawei"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
                     android:background="@drawable/buttons"
-                    android:text="@string/huawei" />
+                    android:gravity="center"
+                    android:text="APP GALLERY | HUAWEI VERSION\nPLAY"
+                    android:textSize="12sp"
+                    android:maxLines="2" />
 
             </LinearLayout>
-			
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center_vertical"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginRight="10dp"
-                android:animateLayoutChanges="true"
-                android:gravity="center_horizontal|center_vertical"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="5dp"
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
-                    android:background="@drawable/separator"
-                    android:orientation="horizontal"
-                    android:padding="8dp" />
+                    android:background="@drawable/separator" />
 
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:orientation="horizontal">
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="@string/mods"
+                    android:textColor="@color/text"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/mods"
-                        android:textColor="@color/text"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="5dp"
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
                     android:layout_marginRight="20dp"
                     android:layout_weight="1"
-                    android:background="@drawable/separator"
-                    android:orientation="horizontal"
-                    android:padding="8dp" />
+                    android:background="@drawable/separator" />
+
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <Button
                     android:id="@+id/mm_addMod"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginRight="50dp"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/buttons"
                     android:onClick="onAddMod"
-                    android:text="@string/add_mod" />
+                    android:text="@string/add_mod"
+                    android:textSize="13sp"
+                    android:gravity="center" />
 
-                <LinearLayout
-                    android:id="@+id/mm_extraSettings"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_weight="1"
-                    android:onClick="onExtraSettingsDialog"
-                    android:gravity="right">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/settings" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/mm_modInfo"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:background="@drawable/buttons"
+                    android:text="?"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:onClick="onModInfo" />
 
             </LinearLayout>
 

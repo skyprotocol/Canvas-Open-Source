@@ -116,6 +116,7 @@
 
     <queries>
         <package android:name="com.tgc.sky.android" />
+		<package android:name="com.tgc.sky.vn.android" />
         <package android:name="com.tgc.sky.android.huawei" />
     </queries>
 

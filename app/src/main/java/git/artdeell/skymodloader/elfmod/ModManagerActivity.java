@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,8 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.android.material.textfield.TextInputEditText;
-import android.view.inputmethod.EditorInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,6 +56,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     private View loadingBar;
     private Button btnLaunchLive;
     private Button btnLaunchHuawei;
+    private Button btnLaunchChplay;
     private String skyPackageName;
     private SharedPreferences sharedPreferences;
     private ArrayList<String> skyPackages;
@@ -70,6 +72,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         loadingBar = findViewById(R.id.mm_loadBar);
         btnLaunchLive = findViewById(R.id.mm_launch_live);
         btnLaunchHuawei = findViewById(R.id.mm_launch_huawei);
+        btnLaunchChplay = findViewById(R.id.mm_launch_chplay);
         ((TextView) findViewById(R.id.mm_versionName)).setText(getString(R.string.mod_canvas_version, BuildConfig.VERSION_NAME));
         initializeSkyPackages();
         sharedPreferences = getSharedPreferences("package_configs", Context.MODE_PRIVATE);
@@ -89,7 +92,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
 
     public void startModUpdater(ElfModUIMetadata metadata) {
         Log.i("MMA", "Starting mod update...");
-        if(mDialogManager.isConnected()) {
+        if (mDialogManager.isConnected()) {
             Toast.makeText(this, R.string.updater_busy, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -107,6 +110,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     private void initializeSkyPackages() {
         skyPackages = new ArrayList<>();
         skyPackages.add("com.tgc.sky.android");
+        skyPackages.add("com.tgc.sky.vn.android");
         skyPackages.add("com.tgc.sky.android.huawei");
         SMLApplication.skyPName = skyPackages.get(0);
     }
@@ -119,7 +123,8 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         }
 
         setButtonTextColor(btnLaunchLive, skyPackages.get(0));
-        setButtonTextColor(btnLaunchHuawei, skyPackages.get(1));
+        setButtonTextColor(btnLaunchChplay, skyPackages.get(1));
+        setButtonTextColor(btnLaunchHuawei, skyPackages.get(2));
     }
 
     private void setButtonTextColor(Button button, String packageName) {
@@ -149,8 +154,12 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             skyPackageName = skyPackages.get(0);
             launchGame();
         });
-        btnLaunchHuawei.setOnClickListener(view -> {
+        btnLaunchChplay.setOnClickListener(view -> {
             skyPackageName = skyPackages.get(1);
+            launchGame();
+        });
+        btnLaunchHuawei.setOnClickListener(view -> {
+            skyPackageName = skyPackages.get(2);
             launchGame();
         });
     }
@@ -160,8 +169,12 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             setSkyPackageName(skyPackages.get(0));
             return true;
         });
-        btnLaunchHuawei.setOnLongClickListener(view -> {
+        btnLaunchChplay.setOnLongClickListener(view -> {
             setSkyPackageName(skyPackages.get(1));
+            return true;
+        });
+        btnLaunchHuawei.setOnLongClickListener(view -> {
+            setSkyPackageName(skyPackages.get(2));
             return true;
         });
     }
@@ -221,6 +234,51 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         startActivityForResult(intent, REQUEST_MOD);
     }
 
+    public void onModInfo(View v) {
+        SpannableString message = new SpannableString(
+            "How to add a mod:\n\n" +
+            "① Download a compatible .so file\n\n" +
+            "② Tap on \"Add Mod\" and select the file\n\n" +
+            "③ You can activate or disable the mod with the toggle\n\n" +
+            "④ Start the game\n\n" +
+            "⚠︎ Sometimes mods are broken/need to be updated!\n\n" +
+            "───────────────────\n\n" +
+            "Community\n\n" +
+            "Discord  |  Telegram"
+        );
+
+        String full = message.toString();
+
+        int discordStart = full.indexOf("Discord");
+        int discordEnd = discordStart + "Discord".length();
+        int telegramStart = full.indexOf("Telegram");
+        int telegramEnd = telegramStart + "Telegram".length();
+
+        message.setSpan(new URLSpan("https://discord.gg/ekpUFWcCFN") {
+            @Override
+            public void onClick(View widget) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://discord.gg/ekpUFWcCFN")));
+            }
+        }, discordStart, discordEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        message.setSpan(new URLSpan("https://t.me/skyautowax") {
+            @Override
+            public void onClick(View widget) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/skyautowax")));
+            }
+        }, telegramStart, telegramEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+            .setTitle("Info & Community")
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .create();
+
+        dialog.show();
+        ((TextView) dialog.findViewById(android.R.id.message))
+            .setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -238,6 +296,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         loadingBar.setVisibility(enable ? View.VISIBLE : View.GONE);
         addModButton.setEnabled(!enable);
         btnLaunchLive.setEnabled(!enable);
+        btnLaunchChplay.setEnabled(!enable);
         btnLaunchHuawei.setEnabled(!enable);
         modListView.setClickable(!enable);
     }
@@ -325,7 +384,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         dialogY.positiveButton.setVisibility(View.GONE);
         dialogY.title.setText(R.string.mod_add_unable);
         dialogY.content.setText(message);
-        dialogY.negativeButton.setOnClickListener((v)->dialogY.dialog.dismiss());
+        dialogY.negativeButton.setOnClickListener((view) -> dialogY.dialog.dismiss());
         dialogY.dialog.setCancelable(true);
         dialogY.dialog.show();
     }
@@ -389,11 +448,6 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         bindService(updaterService, new CanvasUpdaterConnection(this), BIND_AUTO_CREATE);
     }
 
-    private int dpToPixels(int dp) {
-        float scale = getResources().getDisplayMetrics().density;
-        return (int) (dp * scale + 0.5f);
-    }
-
     public void onClearAppData(View view) {
         clearAppDataSelective();
     }
@@ -410,8 +464,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             .setPositiveButton("Clear", (dialog, which) -> {
                 new Thread(() -> {
                     try {
-                        boolean isEmulator = getPackageName().equals("com.tgc.sky.android.sml");
-                        String packageName = isEmulator ? "com.tgc.sky.android.sml" : "git.artdeell.skymodloader";
+                        String packageName = getPackageName();
                         File dataDir = new File("/data/data/" + packageName);
                         File filesDir = getFilesDir();
                         File externalDataDir = new File("/sdcard/Android/data/" + packageName);
@@ -476,9 +529,9 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
                         });
                     } catch (Exception e) {
                         Log.e("ClearData", "Error clearing data", e);
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Error clearing data: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        });
+                        runOnUiThread(() ->
+                            Toast.makeText(this, "Error clearing data: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                        );
                     }
                 }).start();
             })

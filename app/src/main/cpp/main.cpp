@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <thread>
 #include <unistd.h>
+#include <string>
 #include "include/misc/Logger.h"
 #include "main.h"
 #include "Core/imgui/imgui.h"
@@ -22,7 +23,7 @@ extern "C" {
 #include "Core/ceserver/ceserver.h"
 }
 
-
+static std::string g_skyBuildKey;
 
 void do_scroll();
 void fsel_setup(JNIEnv*);
@@ -117,13 +118,13 @@ PRIVATE_API void DrawMods() {
 #include <sstream>
 std::string formatUserLibInfo(const Canvas::UserLib& _userLib) {
     std::ostringstream oss;
-    oss << _userLib.Name << ": " << _userLib.Version << "\n";
+    oss << _userLib.Name << ": " << _userLib.Version << "\\n";
     if (!_userLib.Author.empty()) {
-        oss << "Author: " << _userLib.Author << "\n";
+        oss << "Author: " << _userLib.Author << "\\n";
     }
 
     if (!_userLib.Description.empty()) {
-        oss << "---------\nDescription:\n" << _userLib.Description << "\n";
+        oss << "---------\\nDescription:\\n" << _userLib.Description << "\\n";
     }
     return oss.str();
 }
@@ -210,10 +211,9 @@ Java_git_artdeell_skymodloader_MainActivity_settle(
         jboolean _ceserver_enabled,
         jboolean _hideCanvasMenu
         ) {
-    //env->GetJavaVM(&Canvas::javaVM);
     fsel_setup(env);
     Canvas::MainActivity = clazz;
-    Canvas::CeserverEnabled = _ceserver_enabled;    // This config is set in case it would ever be needed
+    Canvas::CeserverEnabled = _ceserver_enabled;
     Canvas::hideCanvasMenu = _hideCanvasMenu;
     Canvas::gameVersion = _gameVersion;
     Canvas::gameType = _gameType;
@@ -233,7 +233,6 @@ Java_git_artdeell_skymodloader_MainActivity_settle(
 
 typedef void (*func)();
 PRIVATE_API void *UserThread(Canvas::UserLib *pUserLib){
-    // Canvas::UserLib *pUserLib = (Canvas::UserLib *)Ulib;
     func (*Start)() = (func(*)())pUserLib->Start;
     pUserLib->Draw = (void (*)(bool *))Start();
     if(Canvas::hideCanvasMenu) {
@@ -243,7 +242,6 @@ PRIVATE_API void *UserThread(Canvas::UserLib *pUserLib){
         Canvas::pushUserLib(*pUserLib);
     }
     delete pUserLib;
-    // pthread_exit(nullptr);
     return nullptr;
 }
 
@@ -295,11 +293,6 @@ Java_git_artdeell_skymodloader_LibrarySelectorListener_onModLibrary(
     func (*InitLate)() = (func (*)()) dlsym( dl_entry, "InitLate");
     pUserLib->InitLate = (void (*)(void))InitLate;
 
-    // pthread_t pid;
-    // pthread_create(&pid, nullptr, UserThread, (void *)pUserLib);
-
-    // Do NOT run in a separate thread.
-    // Initialize mods BEFORE sky initializes bootloader
     UserThread(pUserLib);
 }
 
@@ -334,6 +327,7 @@ Java_git_artdeell_skymodloader_MainActivity_setDeviceInfoNative(
     Canvas::deviceInfo.deviceManufacturer = env->GetStringUTFChars(_manufacturer, nullptr);
     Canvas::deviceInfo.deviceModel = env->GetStringUTFChars(_model, nullptr);
 }
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_git_artdeell_skymodloader_MainActivity_lateInitUserLibs(JNIEnv *env, jclass clazz) {
@@ -349,13 +343,12 @@ Java_git_artdeell_skymodloader_MainActivity_lateInitUserLibs(JNIEnv *env, jclass
     });
     lateInitThread.detach();
 }
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_git_artdeell_skymodloader_MainActivity_customServer(JNIEnv *env, jclass clazz, jstring url) {
-    //?? ?? ?? 52 E2 03 1F AA ?? ?? ?? 94 ?? ?? ?? F9 ?? ?? ?? 52
-    uintptr_t ssl = (new CipherUtils())->CipherScan("\x00\x00\x00\x52\xE2\x03\x1F\xAA\x00\x00\x00\x94\x00\x00\x00\xF9\x00\x00\x00\x52", "???xxxxx???x???x???x");
+    uintptr_t ssl = (new CipherUtils())->CipherScan("\\x00\\x00\\x00\\x52\\xE2\\x03\\x1F\\xAA\\x00\\x00\\x00\\x94\\x00\\x00\\x00\\xF9\\x00\\x00\\x00\\x52", "???xxxxx???x???x???x");
     LOGD("scanner %p", ssl);
-   // (new CipherPatch())->set_Opcode("01008052")->set_Address(ssl, false)->Fire();
 }
 
 extern "C"
@@ -366,4 +359,19 @@ Java_git_artdeell_skymodloader_MainActivity_getSysetemUI(
         jobject systemUI
 ) {
     Canvas::systemUI = env->NewGlobalRef(systemUI);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_git_artdeell_skymodloader_MainActivity_nativeSetSkyBuildKey(
+        JNIEnv *env,
+        jclass clazz,
+        jstring key
+) {
+    const char* keyStr = env->GetStringUTFChars(key, nullptr);
+    if (keyStr) {
+        g_skyBuildKey = std::string(keyStr);
+        env->ReleaseStringUTFChars(key, keyStr);
+        LOGI("SkyBuildKey set: %s", g_skyBuildKey.c_str());
+    }
 }
