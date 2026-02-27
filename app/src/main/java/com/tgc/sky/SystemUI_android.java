@@ -222,7 +222,6 @@ public class SystemUI_android {
 //        this.m_arCameraHandler.update();
     }
 
-
     void AttemptRotationToDeviceOrientation() {
         int i = this.m_useSensorOrientation ? 4 : 6;
         if (i == this.m_activity.getRequestedOrientation() || this.m_activity.portraitOnResume || IsOrientationLocked()) {
@@ -358,7 +357,6 @@ public class SystemUI_android {
                 }
                 dialogInterface.dismiss();
             });
-
             builder.setNegativeButton(LocalizeString4, (dialogInterface, i3) -> {
                 SystemUI_android.this.SetResult(null, 0, true);
                 dialogInterface.dismiss();
@@ -419,7 +417,6 @@ public class SystemUI_android {
                     SystemUI_android.this.SetResult(null, 0, true);
                     dialogInterface.dismiss();
                 });
-
                 builder.setOnCancelListener(dialogInterface -> SystemUI_android.this.SetResult(null, 0, true));
                 AlertDialog create = builder.create();
                 GameActivity.hideNavigationFullScreen(Objects.requireNonNull(create.getWindow()).getDecorView());
@@ -1232,6 +1229,10 @@ public class SystemUI_android {
 
     public boolean IsVietnameseBuild() {
         return IsPreferredSupportedLanguageVietnamese();
+    }
+
+    public boolean IsVietnameseBuildOrLanguage() {
+        return false;
     }
 
     public void SetGameInputConfig(boolean z, boolean z2, boolean z3, boolean z4, boolean z5, boolean z6, boolean z7, String[] strArr, String[] strArr2) {

@@ -206,7 +206,7 @@
                     android:layout_marginBottom="7dp"
                     android:background="@drawable/buttons"
                     android:gravity="center"
-                    android:text="Cửa Hàng Play | VIETNAMESE VERSION\nphát"
+                    android:text="Cửa Hàng Play | VIETNAMESE VERSION\nchơi"
                     android:textSize="12sp"
                     android:maxLines="2" />
 

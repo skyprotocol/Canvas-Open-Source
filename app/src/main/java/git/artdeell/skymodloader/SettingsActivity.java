@@ -15,20 +15,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tgc.sky.BuildConfig;
-
 import java.io.File;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "ClearAppData";
-    private Switch skipUpdateSwitch;
     private Switch hideCanvasMenuSwitch;
     private Switch ceserverSwitch;
     private Switch customServerSwitch;
-    private Switch buildKeySwitch;
     private Switch logcatSwitch;
     private EditText serverUrlInput;
-    private EditText buildKeyInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,24 +31,14 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.setting_layout);
 
         ImageView backButton = findViewById(R.id.back_button);
-        skipUpdateSwitch = findViewById(R.id.mm_enableSkipUpdate);
         hideCanvasMenuSwitch = findViewById(R.id.mm_hideCanvasMenu);
         ceserverSwitch = findViewById(R.id.mm_enableCeserver);
         customServerSwitch = findViewById(R.id.mm_enableCustomServer);
-        buildKeySwitch = findViewById(R.id.mm_enableBuildKey);
         logcatSwitch = findViewById(R.id.mm_enableLogcat);
         serverUrlInput = findViewById(R.id.server_url_input);
-        buildKeyInput = findViewById(R.id.build_key_input);
         Button btnClearAppData = findViewById(R.id.btn_clear_app_data);
 
         backButton.setOnClickListener(v -> finish());
-
-        skipUpdateSwitch.setChecked(getSharedPreferences("package_configs", MODE_PRIVATE)
-            .getBoolean("skip_updates", false));
-        skipUpdateSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
-            getSharedPreferences("package_configs", MODE_PRIVATE)
-                .edit().putBoolean("skip_updates", isChecked).apply()
-        );
 
         hideCanvasMenuSwitch.setChecked(getSharedPreferences("package_configs", MODE_PRIVATE)
             .getBoolean("hide_canvas_menu", false));
@@ -92,46 +77,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        buildKeySwitch.setChecked(getSharedPreferences("package_configs", MODE_PRIVATE)
-            .getBoolean("custom_build_key", false));
-        buildKeySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            getSharedPreferences("package_configs", MODE_PRIVATE)
-                .edit().putBoolean("custom_build_key", isChecked).apply();
-            if (isChecked) {
-                String buildKey = buildKeyInput.getText().toString().trim();
-                if (buildKey.isEmpty()) {
-                    Toast.makeText(this, "Please enter a build key first", Toast.LENGTH_SHORT).show();
-                    buildKeySwitch.setChecked(false);
-                    return;
-                }
-
-                applyBuildKey(buildKey);
-            } else {
-                BuildConfig.SKY_BUILD_ACCESS_KEY = "";
-                Toast.makeText(this, "Build key disabled", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        buildKeyInput.setText(getSharedPreferences("package_configs", MODE_PRIVATE)
-            .getString("build_access_key", ""));
-        buildKeyInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String buildKey = s.toString().trim();
-                getSharedPreferences("package_configs", MODE_PRIVATE)
-                    .edit().putString("build_access_key", buildKey).apply();
-                if (buildKeySwitch.isChecked() && !buildKey.isEmpty()) {
-                    applyBuildKey(buildKey);
-                }
-            }
-        });
-
         logcatSwitch.setChecked(getSharedPreferences("package_configs", MODE_PRIVATE)
             .getBoolean("logcat_enabled", false));
         logcatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -155,12 +100,6 @@ public class SettingsActivity extends AppCompatActivity {
         btnClearAppData.setOnClickListener(v -> clearAppDataComplete());
     }
 
-    private void applyBuildKey(String buildKey) {
-        BuildConfig.SKY_BUILD_ACCESS_KEY = buildKey;
-        Log.i("BuildKey", "Applied build key: " + buildKey.substring(0, Math.min(20, buildKey.length())) + "...");
-        Toast.makeText(this, "Build key applied", Toast.LENGTH_SHORT).show();
-    }
-
     private void clearAppDataComplete() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("⚠️ Clear App Data");
@@ -171,9 +110,7 @@ public class SettingsActivity extends AppCompatActivity {
                 int deletedFiles = 0;
                 int deletedDirs = 0;
                 try {
-                    Log.i(TAG, "========================================");
                     Log.i(TAG, "Starting Complete Clear App Data");
-                    Log.i(TAG, "========================================");
 
                     File externalFilesDir = getExternalFilesDir(null);
                     if (externalFilesDir != null) {
@@ -198,9 +135,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                     final int totalFiles = deletedFiles;
                     final int totalDirs = deletedDirs;
-                    Log.i(TAG, "========================================");
                     Log.i(TAG, "TOTAL DELETED: " + totalFiles + " files, " + totalDirs + " dirs");
-                    Log.i(TAG, "========================================");
 
                     runOnUiThread(() -> {
                         String message = "Cleared " + totalFiles + " files, " + totalDirs + " dirs\nRestarting...";
