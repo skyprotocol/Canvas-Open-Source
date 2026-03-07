@@ -2,6 +2,7 @@ package com.tgc.sky.ui.text;
 
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.text.SpannableStringBuilder;
 
 import androidx.constraintlayout.core.motion.utils.TypedValues;
 import androidx.core.app.FrameMetricsAggregator;
@@ -114,6 +115,10 @@ public class LocalizationManager {
         }
         return GetIETFLanguageTag(language);
     }
+	
+	public static LocalizationManager getInstance() {
+    return g_instance;
+	}
 
     public static String GetIETFLanguageTag(String str) {
         String str2 = DEFAULT_COUNTRY_CODES.get(str);
@@ -472,6 +477,52 @@ public class LocalizationManager {
                 localizedStringArgs.compounded = null;
             }
         });
+    }
+
+    public static SpannableStringBuilder ApplyTextArgs(SpannableStringBuilder sb, ArrayList<Object> args) {
+    if (args == null || args.size() == 0) return sb;
+    String[] placeholders = {"{{1}}", "{{2}}", "{{3}}"};
+    for (int i = 0; i < args.size() && i < placeholders.length; i++) {
+        String replacement = args.get(i) != null ? args.get(i).toString() : "";
+        int pos = 0;
+        while (true) {
+            String s = sb.toString();
+            int idx = s.indexOf(placeholders[i], pos);
+            if (idx == -1) break;
+            sb.replace(idx, idx + 5, replacement);
+            pos = idx + replacement.length();
+        }
+    }
+    return sb;
+}
+
+private SpannableStringBuilder GetLocalizedTextFromTextIdRecursive(int i) {
+    int idx = GetAllocatedTextIdx(i);
+    if (idx >= kMaxLocalizedStrings) return null;
+
+    LocalizedStringArgs args = m_localizedStrings.get(idx);
+
+    if (args.localizedString != null) {
+        SpannableStringBuilder sb = new SpannableStringBuilder(args.localizedString);
+        return ApplyTextArgs(sb, args.args);
+    }
+
+    if (args.compounded != null) {
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        for (int id : args.compounded) {
+            SpannableStringBuilder part = GetLocalizedTextFromTextIdRecursive(id);
+            if (part != null) sb.append(part);
+        }
+        return sb.length() > 0 ? sb : null;
+    }
+
+    return null;
+	}
+
+    public String GetLocalizedTextFromTextId(int textId) {
+        SpannableStringBuilder result = GetLocalizedTextFromTextIdRecursive(textId);
+        if (result == null) return null;
+        return result.toString();
     }
 
     private int GetAllocatedTextIdx(int i) {

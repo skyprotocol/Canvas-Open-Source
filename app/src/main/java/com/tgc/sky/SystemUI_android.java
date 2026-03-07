@@ -157,13 +157,11 @@ public class SystemUI_android {
         return this.m_localizationManager.HasLocalizedString(str);
     }
 
-    public String GetLocalizedTextFromTextId(int textId) {
-        String textKey = "text_" + textId;
-        if (HasLocalizedString(textKey)) {
-            return LocalizeString(textKey);
-        }
-        return "";
-    }
+   public String GetLocalizedTextFromTextId(int textId) {
+    LocalizationManager lm = LocalizationManager.getInstance();
+    if (lm == null) return null;
+    return lm.GetLocalizedTextFromTextId(textId);
+	}
 
     public SpannableStringBuilder GetMarkedUpString(String str, ArrayList<Object> arrayList, boolean z) {
         return this.m_markup.GetMarkedUpString(str, arrayList, z);

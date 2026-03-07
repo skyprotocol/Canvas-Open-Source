@@ -596,12 +596,13 @@ public class SystemIO_android {
         }
     }
 
-    boolean StartRecording(String str, int i, int i2, int i3, int i4, boolean z, int i5, boolean z2) {
-        this.m_isGameRecorder = true;
-        String str2 = C115312.$SwitchMap$com$tgc$sky$SystemIO_android$VideoCodec[VideoCodec.values()[i3].ordinal()] != 2 ? "video/avc" : "video/hevc";
-        this.m_isRecording = true;
-        return this.m_videoRecorder.startRecordingWithFilename(str, i, i2,str2, i4, z, i5, z2);
-    }
+    boolean StartRecording(String str, int i, int i2, int i3, boolean z, int i4, boolean z2, int i5, boolean z3) {
+    this.m_isGameRecorder = true;
+    String str2 = C115312.$SwitchMap$com$tgc$sky$SystemIO_android$VideoCodec[VideoCodec.values()[i3].ordinal()] != 2 ? "video/avc" : "video/hevc";
+    this.m_isRecording = true;
+    return this.m_videoRecorder.startRecordingWithFilename(str, i, i2, str2, i4, z2, i5, z3);
+	}
+
 
     static /* synthetic */ class C115312 {
         static final /* synthetic */ int[] $SwitchMap$com$tgc$sky$SystemIO_android$VideoCodec;
