@@ -114,28 +114,32 @@ public class MainActivity extends Activity {
             String versionName = info.versionName;
             BuildConfig.SKY_VERSION = versionName.substring(0, versionName.indexOf(' ')).trim();
             BuildConfig.VERSION_CODE = info.versionCode;
-            String nativeLibraryDir = info.applicationInfo.nativeLibraryDir;
-            String libPath = nativeLibraryDir;
-            File libDir = new File(nativeLibraryDir);
-            if (!libDir.exists() || libDir.listFiles() == null || libDir.listFiles().length == 0) {
-                libPath = extractLibrariesFromApk(info.applicationInfo);
-            }
+
+            String libPath = resolveLibPath(info.applicationInfo);
+
+            String elfLibPath = resolveElfLibPath(info.applicationInfo, libPath);
 
             File modsDir = new File(getFilesDir(), "mods");
             File configDir = new File(getFilesDir(), "config");
             if (!configDir.isDirectory() && !configDir.mkdirs())
                 throw new IOException("Failed to create mod configuration directory");
-            android.util.Log.i("MainActivity", "Pre-loading FMOD dependencies from: " + libPath);
+
+            Log.i("MainActivity", "Pre-loading FMOD dependencies from: " + libPath);
             org.fmod.FMOD.init(this);
-            File fmodLibDir = new File(libPath);
-            android.util.Log.i("MainActivity", "Listing all files in: " + libPath);
-            File[] allFiles = fmodLibDir.listFiles();
-            if (allFiles != null) {
-                for (File f : allFiles) {
-                    android.util.Log.i("MainActivity", "Found file: " + f.getName());
+
+            if (!libPath.contains("!/lib")) {
+                File fmodLibDir = new File(libPath);
+                Log.i("MainActivity", "Listing all files in: " + libPath);
+                File[] allFiles = fmodLibDir.listFiles();
+                if (allFiles != null) {
+                    for (File f : allFiles) {
+                        Log.i("MainActivity", "Found file: " + f.getName());
+                    }
+                } else {
+                    Log.e("MainActivity", "Directory is empty or doesn't exist!");
                 }
             } else {
-                android.util.Log.e("MainActivity", "Directory is empty or doesn't exist!");
+                Log.i("MainActivity", "Loading libs directly from APK (no extraction)");
             }
 
             String[] libsToLoad = {
@@ -144,22 +148,29 @@ public class MainActivity extends Activity {
                 "libfmod.so",
                 "libfmodstudio.so"
             };
+
             for (String libName : libsToLoad) {
-                File lib = new File(fmodLibDir, libName);
-                if (lib.exists()) {
-                    try {
-                        android.util.Log.i("MainActivity", "Loading: " + libName);
+                try {
+                    if (libPath.contains("!/lib")) {
+                        String fullApkLibPath = libPath + "/" + libName;
+                        Log.i("MainActivity", "Loading from APK: " + fullApkLibPath);
+                        System.load(fullApkLibPath);
+                    } else {
+                        File lib = new File(libPath, libName);
+                        if (!lib.exists()) {
+                            Log.w("MainActivity", "Not found: " + libName + " at " + lib.getAbsolutePath());
+                            continue;
+                        }
+                        Log.i("MainActivity", "Loading: " + libName);
                         System.load(lib.getAbsolutePath());
-                        android.util.Log.i("MainActivity", "Successfully loaded: " + libName);
-                    } catch (Throwable e) {
-                        android.util.Log.e("MainActivity", "Failed to load " + libName + ": " + e.getMessage());
-                        e.printStackTrace();
                     }
-                } else {
-                    android.util.Log.w("MainActivity", "Not found: " + libName + " at " + lib.getAbsolutePath());
+                    Log.i("MainActivity", "Successfully loaded: " + libName);
+                } catch (Throwable e) {
+                    Log.e("MainActivity", "Failed to load " + libName + ": " + e.getMessage());
                 }
             }
-            ElfLoader loader = new ElfLoader(libPath + ":/system/lib64");
+
+            ElfLoader loader = new ElfLoader(elfLibPath + ":/system/lib64");
             loader.loadLib("libBootloader.so");
             System.loadLibrary("ciphered");
 
@@ -197,14 +208,103 @@ public class MainActivity extends Activity {
                 MainActivity.customServer(BuildConfig.SKY_SERVER_HOSTNAME);
             }
 
-            new ElfRefcountLoader(libPath + ":/system/lib64", modsDir).load();
+            new ElfRefcountLoader(elfLibPath + ":/system/lib64", modsDir).load();
             BuildConfig.APPLICATION_ID = SKY_PACKAGE_NAME;
             startActivity(new Intent(this, GameActivity.class));
+
         } catch (PackageManager.NameNotFoundException e) {
             alertDialog(getString(R.string.sky_not_installed));
         } catch (Throwable e) {
             alertDialog(e);
         }
+    }
+
+    private String resolveLibPath(ApplicationInfo appInfo) throws IOException {
+        File libDir = new File(appInfo.nativeLibraryDir);
+        if (libDir.exists() && libDir.listFiles() != null && libDir.listFiles().length > 0) {
+            Log.i("MainActivity", "Using nativeLibraryDir: " + appInfo.nativeLibraryDir);
+            return appInfo.nativeLibraryDir;
+        }
+
+        String apkDirectPath = tryGetApkDirectPath(appInfo);
+        if (apkDirectPath != null) {
+            Log.i("MainActivity", "Using direct APK path: " + apkDirectPath);
+            return apkDirectPath;
+        }
+
+        Log.w("MainActivity", "Libs are compressed, falling back to extraction");
+        return extractLibrariesFromApk(appInfo);
+    }
+
+    private String tryGetApkDirectPath(ApplicationInfo appInfo) {
+        String[] splitDirs = appInfo.splitSourceDirs;
+        if (splitDirs != null) {
+            for (String splitApk : splitDirs) {
+                if (splitApk.contains("arm64_v8a") || splitApk.contains("config.arm64") || splitApk.contains("arm64")) {
+                    if (areLibsStoredUncompressed(splitApk)) {
+                        Log.i("MainActivity", "Found stored libs in split APK: " + splitApk);
+                        return splitApk + "!/lib/arm64-v8a";
+                    }
+                    break;
+                }
+            }
+        }
+        if (areLibsStoredUncompressed(appInfo.sourceDir)) {
+            Log.i("MainActivity", "Found stored libs in base APK: " + appInfo.sourceDir);
+            return appInfo.sourceDir + "!/lib/arm64-v8a";
+        }
+        return null;
+    }
+
+    private boolean areLibsStoredUncompressed(String apkPath) {
+        try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(apkPath)) {
+            java.util.Enumeration<? extends java.util.zip.ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                java.util.zip.ZipEntry entry = entries.nextElement();
+                if (entry.getName().startsWith("lib/arm64-v8a/") && entry.getName().endsWith(".so")) {
+                    boolean stored = entry.getMethod() == java.util.zip.ZipEntry.STORED;
+                    Log.d("MainActivity", entry.getName() + " compression=" + (stored ? "STORED" : "DEFLATED"));
+                    return stored;
+                }
+            }
+        } catch (IOException e) {
+            Log.e("MainActivity", "areLibsStoredUncompressed failed for " + apkPath + ": " + e.getMessage());
+        }
+        return false;
+    }
+
+    private String resolveElfLibPath(ApplicationInfo appInfo, String mainLibPath) throws IOException {
+        if (!mainLibPath.contains("!/lib")) {
+            return mainLibPath;
+        }
+
+        File extractDir = new File(getFilesDir(), "extracted_libs");
+        if (!extractDir.exists() && !extractDir.mkdirs()) {
+            throw new IOException("Failed to create extraction directory");
+        }
+
+        File bootloaderFile = new File(extractDir, "libBootloader.so");
+        if (!bootloaderFile.exists()) {
+            String apkPath = mainLibPath.substring(0, mainLibPath.indexOf("!/lib"));
+            Log.i("MainActivity", "Extracting only libBootloader.so from: " + apkPath);
+            try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(apkPath)) {
+                java.util.zip.ZipEntry entry = zipFile.getEntry("lib/arm64-v8a/libBootloader.so");
+                if (entry == null) throw new IOException("libBootloader.so not found in APK");
+                try (java.io.InputStream in = zipFile.getInputStream(entry);
+                     java.io.FileOutputStream out = new java.io.FileOutputStream(bootloaderFile)) {
+                    byte[] buf = new byte[8192];
+                    int read;
+                    while ((read = in.read(buf)) != -1) out.write(buf, 0, read);
+                }
+                bootloaderFile.setExecutable(true);
+                bootloaderFile.setReadable(true);
+                Log.i("MainActivity", "libBootloader.so extracted for ElfLoader");
+            }
+        } else {
+            Log.d("MainActivity", "libBootloader.so already exists for ElfLoader");
+        }
+
+        return extractDir.getAbsolutePath();
     }
 
     private String extractLibrariesFromApk(ApplicationInfo appInfo) throws IOException {
@@ -213,21 +313,21 @@ public class MainActivity extends Activity {
             throw new IOException("Failed to create extraction directory");
         }
 
-        android.util.Log.i("MainActivity", "Looking for split APKs...");
-        android.util.Log.i("MainActivity", "sourceDir: " + appInfo.sourceDir);
+        Log.i("MainActivity", "Looking for split APKs...");
+        Log.i("MainActivity", "sourceDir: " + appInfo.sourceDir);
         String[] splitSourceDirs = appInfo.splitSourceDirs;
         if (splitSourceDirs != null) {
-            android.util.Log.i("MainActivity", "Found " + splitSourceDirs.length + " split APKs");
+            Log.i("MainActivity", "Found " + splitSourceDirs.length + " split APKs");
             for (String splitApk : splitSourceDirs) {
-                android.util.Log.i("MainActivity", "Checking split APK: " + splitApk);
+                Log.i("MainActivity", "Checking split APK: " + splitApk);
                 if (splitApk.contains("arm64_v8a") || splitApk.contains("config.arm64") || splitApk.contains("arm64")) {
-                    android.util.Log.i("MainActivity", "Found ARM64 split APK: " + splitApk);
+                    Log.i("MainActivity", "Found ARM64 split APK: " + splitApk);
                     extractLibsFromZip(splitApk, extractDir);
                     break;
                 }
             }
         } else {
-            android.util.Log.w("MainActivity", "No split APKs found, trying base APK");
+            Log.w("MainActivity", "No split APKs found, trying base APK");
             extractLibsFromZip(appInfo.sourceDir, extractDir);
         }
 
@@ -235,7 +335,7 @@ public class MainActivity extends Activity {
     }
 
     private void extractLibsFromZip(String apkPath, File destDir) throws IOException {
-        android.util.Log.i("MainActivity", "Extracting libs from: " + apkPath);
+        Log.i("MainActivity", "Extracting libs from: " + apkPath);
         java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(apkPath);
         java.util.Enumeration<? extends java.util.zip.ZipEntry> entries = zipFile.entries();
         int libCount = 0;
@@ -257,14 +357,14 @@ public class MainActivity extends Activity {
                     destFile.setExecutable(true);
                     destFile.setReadable(true);
                     libCount++;
-                    android.util.Log.i("MainActivity", "Extracted: " + libName);
+                    Log.i("MainActivity", "Extracted: " + libName);
                 } else {
-                    android.util.Log.d("MainActivity", "Already exists: " + libName);
+                    Log.d("MainActivity", "Already exists: " + libName);
                 }
             }
         }
         zipFile.close();
-        android.util.Log.i("MainActivity", "Extracted " + libCount + " libraries");
+        Log.i("MainActivity", "Extracted " + libCount + " libraries");
     }
 
     @Override
@@ -322,9 +422,8 @@ public class MainActivity extends Activity {
         if (deviceInfo.deviceName == null || deviceInfo.deviceName.isEmpty()) {
             deviceInfo.deviceName = Settings.Secure.getString(getContentResolver(), "bluetooth_name");
         }
-
-        deviceInfo.deviceName = (deviceInfo.deviceName == null || deviceInfo.deviceName.isEmpty()) ? "NO_DEVICE_NAME"
-            : deviceInfo.deviceName;
+        deviceInfo.deviceName = (deviceInfo.deviceName == null || deviceInfo.deviceName.isEmpty())
+            ? "NO_DEVICE_NAME" : deviceInfo.deviceName;
         deviceInfo.deviceManufacturer = Build.MANUFACTURER;
         deviceInfo.deviceModel = Build.MODEL;
         return deviceInfo;
