@@ -7,21 +7,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import git.artdeell.skymodloader.AboutDialogHelper;
 import git.artdeell.skymodloader.BuildConfig;
 import git.artdeell.skymodloader.DialogY;
 import git.artdeell.skymodloader.LogcatMonitorService;
@@ -229,57 +226,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     }
 
     public void onModInfo(View v) {
-        android.app.Dialog dialog = new android.app.Dialog(this);
-        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.about_dialog);
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.getWindow().setLayout(
-            (int) (getResources().getDisplayMetrics().widthPixels * 0.92),
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-
-        ((TextView) dialog.findViewById(R.id.about_version))
-            .setText("v" + BuildConfig.VERSION_NAME);
-
-        loadAvatar(dialog, R.id.avatar_lukas0x1,  "lukas0x1");
-        loadAvatar(dialog, R.id.avatar_artdell,  "artdeell");
-        loadAvatar(dialog, R.id.avatar_RomanChamelo,   "RomanChamelo");
-        loadAvatar(dialog, R.id.avatar_Kiojeen, "Kiojeen");
-        loadAvatar(dialog, R.id.avatar_Gxosty,   "Gxosty");
-
-        dialog.findViewById(R.id.englishTelegram).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/skyautowax"))));
-        dialog.findViewById(R.id.russianTelegram).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/skyruswax"))));
-        dialog.findViewById(R.id.lukas0x1Github).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/lukas0x1"))));
-        dialog.findViewById(R.id.artDevGithub).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/artdeell"))));
-        dialog.findViewById(R.id.romanGithub).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/RomanChamelo"))));
-        dialog.findViewById(R.id.kiojeenGithub).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Kiojeen"))));
-        dialog.findViewById(R.id.gxostyGithub).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Gxosty"))));
-        dialog.findViewById(R.id.bannerVk).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/son583"))));
-        dialog.findViewById(R.id.iconTelegram).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/Eliatshaha"))));
-        dialog.findViewById(R.id.thatgamecompanyLink).setOnClickListener(view ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://thatgamecompany.com"))));
-        dialog.findViewById(R.id.dialog_info_close).setOnClickListener(view ->
-            dialog.dismiss());
-
-        dialog.show();
-    }
-
-    private void loadAvatar(android.app.Dialog dialog, int viewId, String githubUsername) {
-        Glide.with(this)
-            .load("https://github.com/" + githubUsername + ".png?size=64")
-            .circleCrop()
-            .placeholder(R.drawable.logo_bg)
-            .error(R.drawable.logo_bg)
-            .into((ImageView) dialog.findViewById(viewId));
+        AboutDialogHelper.show(this);
     }
 
     @Override

@@ -3,22 +3,9 @@ package com.tgc.sky;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.view.View;
-import android.widget.TextView;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ImageButton;
-import android.app.Dialog;
-
-import androidx.appcompat.app.AlertDialog;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import git.artdeell.skymodloader.R;
 
 public class SystemSupport_android implements GameActivity.OnActivityResultListener {
     private static final String TAG = "SystemSupport_android";
@@ -33,9 +20,7 @@ public class SystemSupport_android implements GameActivity.OnActivityResultListe
     private boolean m_surveyActive;
     private boolean m_surveyCompleted;
 
-
     static void OnApplicationCreate(Application application) {
-
     }
 
     public static SystemSupport_android getInstance() {
@@ -49,7 +34,6 @@ public class SystemSupport_android implements GameActivity.OnActivityResultListe
         return mInstance;
     }
 
-    /* access modifiers changed from: package-private */
     public void Initialize(GameActivity gameActivity) {
         this.m_activity = gameActivity;
     }
@@ -77,7 +61,6 @@ public class SystemSupport_android implements GameActivity.OnActivityResultListe
     }
 
     public void EnableCustomerSupport(boolean z) {
-
     }
 
     public boolean IsCustomerSupportEnabled() {
@@ -85,47 +68,15 @@ public class SystemSupport_android implements GameActivity.OnActivityResultListe
     }
 
     public void ShowFAQs() {
-        m_activity.runOnUiThread(()->{
-            Dialog dialog = new Dialog(m_activity, R.style.AboutDialog);
-            dialog.setContentView(R.layout.about_dialog);
-
-            // Support links
-            setupLink(dialog, R.id.englishTelegram, "https://t.me/+Hc6QeQVTH1JjNjky");
-            setupLink(dialog, R.id.russianTelegram, "https://t.me/+mue7BZWmWOxkMDUy");
-
-            // Original developers
-            setupLink(dialog, R.id.lukas0x1Github, "https://github.com/lukas0x1");
-            setupLink(dialog, R.id.artDevGithub, "https://github.com/artdeell");
-
-            // Contributors
-            setupLink(dialog, R.id.romanGithub, "https://github.com/RomanChamelo");
-            setupLink(dialog, R.id.kiojeenGithub, "https://github.com/Kiojeen");
-            setupLink(dialog, R.id.gxostyGithub, "https://github.com/gxosty");
-
-            // Design credits
-            setupLink(dialog, R.id.bannerVk, "https://vk.com/son583");
-            setupLink(dialog, R.id.iconTelegram, "https://t.me/Eliatshaha");
-
-            // Original game
-            setupLink(dialog, R.id.thatgamecompanyLink, "https://thatgamecompany.com/");
-
-            dialog.show();
-        });
-    }
-
-    private void setupLink(Dialog dialog, int viewId, String url) {
-        TextView textView = dialog.findViewById(viewId);
-        textView.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            m_activity.startActivity(intent);
-        });
+        m_activity.runOnUiThread(() ->
+            git.artdeell.skymodloader.AboutDialogHelper.show(m_activity)
+        );
     }
 
     public void ShowSupportSession() {
     }
 
     public void ShowErrorReportConversation() {
-
     }
 
     public boolean IsSupportUIShowing() {
@@ -175,6 +126,5 @@ public class SystemSupport_android implements GameActivity.OnActivityResultListe
     }
 
     public void onActivityResult(int i, int i2, Intent intent) {
-
     }
 }
