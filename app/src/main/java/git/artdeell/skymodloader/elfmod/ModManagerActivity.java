@@ -10,14 +10,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
-import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -96,7 +92,6 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             Toast.makeText(this, R.string.updater_busy, Toast.LENGTH_SHORT).show();
             return;
         }
-
         Intent serviceStartIntent = new Intent(this, ModUpdaterService.class);
         serviceStartIntent.putExtra(ModUpdaterService.EXTRA_UPDATE_URL, metadata.getGithubReleasesUrl());
         serviceStartIntent.putExtra(ModUpdaterService.EXTRA_LIB_NAME, metadata.name);
@@ -121,7 +116,6 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             skyPackageName = "com.tgc.sky.android";
             sharedPreferences.edit().putString("sky_package_name", skyPackageName).apply();
         }
-
         setButtonTextColor(btnLaunchLive, skyPackages.get(0));
         setButtonTextColor(btnLaunchChplay, skyPackages.get(1));
         setButtonTextColor(btnLaunchHuawei, skyPackages.get(2));
@@ -235,48 +229,57 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     }
 
     public void onModInfo(View v) {
-        SpannableString message = new SpannableString(
-            "How to add a mod:\n\n" +
-            "① Download a compatible .so file\n\n" +
-            "② Tap on \"Add Mod\" and select the file\n\n" +
-            "③ You can activate or disable the mod with the toggle\n\n" +
-            "④ Start the game\n\n" +
-            "⚠︎ Sometimes mods are broken/need to be updated!\n\n" +
-            "───────────────────\n\n" +
-            "Community\n\n" +
-            "Discord  |  Telegram"
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.about_dialog);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.getWindow().setLayout(
+            (int) (getResources().getDisplayMetrics().widthPixels * 0.92),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
         );
 
-        String full = message.toString();
+        ((TextView) dialog.findViewById(R.id.about_version))
+            .setText("v" + BuildConfig.VERSION_NAME);
 
-        int discordStart = full.indexOf("Discord");
-        int discordEnd = discordStart + "Discord".length();
-        int telegramStart = full.indexOf("Telegram");
-        int telegramEnd = telegramStart + "Telegram".length();
+        loadAvatar(dialog, R.id.avatar_lukas0x1,  "lukas0x1");
+        loadAvatar(dialog, R.id.avatar_artdell,  "artdeell");
+        loadAvatar(dialog, R.id.avatar_RomanChamelo,   "RomanChamelo");
+        loadAvatar(dialog, R.id.avatar_Kiojeen, "Kiojeen");
+        loadAvatar(dialog, R.id.avatar_Gxosty,   "Gxosty");
 
-        message.setSpan(new URLSpan("https://discord.gg/ekpUFWcCFN") {
-            @Override
-            public void onClick(View widget) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://discord.gg/ekpUFWcCFN")));
-            }
-        }, discordStart, discordEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        message.setSpan(new URLSpan("https://t.me/skyautowax") {
-            @Override
-            public void onClick(View widget) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/skyautowax")));
-            }
-        }, telegramStart, telegramEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-            .setTitle("Info & Community")
-            .setMessage(message)
-            .setPositiveButton("OK", null)
-            .create();
+        dialog.findViewById(R.id.englishTelegram).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/skyautowax"))));
+        dialog.findViewById(R.id.russianTelegram).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/skyruswax"))));
+        dialog.findViewById(R.id.lukas0x1Github).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/lukas0x1"))));
+        dialog.findViewById(R.id.artDevGithub).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/artdeell"))));
+        dialog.findViewById(R.id.romanGithub).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/RomanChamelo"))));
+        dialog.findViewById(R.id.kiojeenGithub).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Kiojeen"))));
+        dialog.findViewById(R.id.gxostyGithub).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Gxosty"))));
+        dialog.findViewById(R.id.bannerVk).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/son583"))));
+        dialog.findViewById(R.id.iconTelegram).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/Eliatshaha"))));
+        dialog.findViewById(R.id.thatgamecompanyLink).setOnClickListener(view ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://thatgamecompany.com"))));
+        dialog.findViewById(R.id.dialog_info_close).setOnClickListener(view ->
+            dialog.dismiss());
 
         dialog.show();
-        ((TextView) dialog.findViewById(android.R.id.message))
-            .setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private void loadAvatar(android.app.Dialog dialog, int viewId, String githubUsername) {
+        Glide.with(this)
+            .load("https://github.com/" + githubUsername + ".png?size=64")
+            .circleCrop()
+            .placeholder(R.drawable.logo_bg)
+            .error(R.drawable.logo_bg)
+            .into((ImageView) dialog.findViewById(viewId));
     }
 
     @Override
@@ -315,17 +318,10 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             ModListAdapter adapter = (ModListAdapter) modListView.getAdapter();
             if (adapter != null) {
                 switch (mode) {
-                    case 0:
-                        adapter.notifyItemRemoved(which);
-                        break;
-                    case 1:
-                        adapter.notifyItemInserted(which);
-                        break;
-                    case 2:
-                        adapter.notifyItemChanged(which);
-                        break;
-                    case 3:
-                        adapter.notifyDataSetChanged();
+                    case 0: adapter.notifyItemRemoved(which); break;
+                    case 1: adapter.notifyItemInserted(which); break;
+                    case 2: adapter.notifyItemChanged(which); break;
+                    case 3: adapter.notifyDataSetChanged();
                 }
             } else modListView.setAdapter(new ModListAdapter(loader));
         });
@@ -348,13 +344,13 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
 
     @Override
     public void signalModRemovalError() {
-        runOnUiThread(() -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.mod_remove_unable);
-            builder.setMessage(R.string.mod_ioe);
-            builder.setPositiveButton(android.R.string.ok, (d, w) -> {});
-            builder.show();
-        });
+        runOnUiThread(() ->
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.mod_remove_unable)
+                .setMessage(R.string.mod_ioe)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {})
+                .show()
+        );
     }
 
     private void handleException() {
@@ -363,12 +359,12 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         String message;
         if (e instanceof NoDependenciesException) {
             NoDependenciesException exc = (NoDependenciesException) e;
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             for (ElfModMetadata meta : exc.failedDependencies) {
-                stringBuilder.append(getString(R.string.mod_add_missingdep, meta.name, meta.majorVersion, meta.minorVersion));
-                stringBuilder.append('\n');
+                sb.append(getString(R.string.mod_add_missingdep, meta.name, meta.majorVersion, meta.minorVersion));
+                sb.append('\n');
             }
-            message = stringBuilder.toString();
+            message = sb.toString();
         } else if (e instanceof InvalidModException) {
             message = getString(R.string.mod_add_wrongformat);
         } else if (e instanceof IOException) {
@@ -384,7 +380,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         dialogY.positiveButton.setVisibility(View.GONE);
         dialogY.title.setText(R.string.mod_add_unable);
         dialogY.content.setText(message);
-        dialogY.negativeButton.setOnClickListener((view) -> dialogY.dialog.dismiss());
+        dialogY.negativeButton.setOnClickListener(view -> dialogY.dialog.dismiss());
         dialogY.dialog.setCancelable(true);
         dialogY.dialog.show();
     }
@@ -397,13 +393,12 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             sb.append(getString(R.string.mod_remove_dep, ModListAdapter.getVisibleModName(meta)));
             sb.append('\n');
         }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.mod_remove_unable);
-        builder.setMessage(sb.toString());
-        builder.setPositiveButton(android.R.string.ok, (d, w) -> loader.resetModRemovalMetadata());
-        builder.setOnCancelListener((d) -> loader.resetModRemovalMetadata());
-        builder.show();
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.mod_remove_unable)
+            .setMessage(sb.toString())
+            .setPositiveButton(android.R.string.ok, (d, w) -> loader.resetModRemovalMetadata())
+            .setOnCancelListener(d -> loader.resetModRemovalMetadata())
+            .show();
     }
 
     private void handleLoading() {
@@ -416,9 +411,8 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     }
 
     public boolean findPackage(String packageName) {
-        PackageManager packageManager = getPackageManager();
         try {
-            packageManager.getPackageInfo(packageName, PackageManager.GET_SHARED_LIBRARY_FILES);
+            getPackageManager().getPackageInfo(packageName, PackageManager.GET_SHARED_LIBRARY_FILES);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
             return false;
@@ -439,13 +433,15 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     }
 
     public void onExtraSettingsDialog(View view) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     public void runUpdater() {
-        Intent updaterService = new Intent(this, CanvasUpdaterService.class);
-        bindService(updaterService, new CanvasUpdaterConnection(this), BIND_AUTO_CREATE);
+        bindService(
+            new Intent(this, CanvasUpdaterService.class),
+            new CanvasUpdaterConnection(this),
+            BIND_AUTO_CREATE
+        );
     }
 
     public void onClearAppData(View view) {
@@ -464,60 +460,27 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             .setPositiveButton("Clear", (dialog, which) -> {
                 new Thread(() -> {
                     try {
-                        String packageName = getPackageName();
-                        File dataDir = new File("/data/data/" + packageName);
                         File filesDir = getFilesDir();
-                        File externalDataDir = new File("/sdcard/Android/data/" + packageName);
+                        File externalDataDir = new File("/sdcard/Android/data/" + getPackageName());
 
-                        Log.i("ClearData", "Starting selective clear for package: " + packageName);
-
-                        clearDirectorySelective(filesDir, new String[]{"mods", "Accounts", "config"}, new String[]{"AccountAuthInfo.bin"});
+                        clearDirectorySelective(filesDir,
+                            new String[]{"mods", "Accounts", "config"},
+                            new String[]{"AccountAuthInfo.bin"});
 
                         File cacheDir = getCacheDir();
-                        if (cacheDir != null && cacheDir.exists()) {
-                            deleteRecursive(cacheDir);
-                            Log.i("ClearData", "Cache cleared");
-                        }
+                        if (cacheDir != null && cacheDir.exists()) deleteRecursive(cacheDir);
 
                         File codeCacheDir = getCodeCacheDir();
-                        if (codeCacheDir != null && codeCacheDir.exists()) {
-                            deleteRecursive(codeCacheDir);
-                            Log.i("ClearData", "Code cache cleared");
-                        }
-
-                        File extractedLibs = new File(filesDir, "extracted_libs");
-                        if (extractedLibs.exists()) {
-                            deleteRecursive(extractedLibs);
-                            Log.i("ClearData", "Extracted libs cleared");
-                        }
-
-                        File logsDir = new File(externalDataDir, "files/logs");
-                        if (logsDir.exists()) {
-                            deleteRecursive(logsDir);
-                            Log.i("ClearData", "Logs cleared");
-                        }
+                        if (codeCacheDir != null && codeCacheDir.exists()) deleteRecursive(codeCacheDir);
 
                         if (externalDataDir.exists()) {
-                            clearDirectorySelective(externalDataDir, new String[]{"mods", "Accounts", "config", "configs"}, new String[]{});
-                            Log.i("ClearData", "External data cleared (selective)");
+                            clearDirectorySelective(externalDataDir,
+                                new String[]{"mods", "Accounts", "config", "configs"},
+                                new String[]{});
                         }
 
-                        File sharedPrefsDir = new File(dataDir, "shared_prefs");
-                        if (sharedPrefsDir.exists()) {
-                            File[] prefFiles = sharedPrefsDir.listFiles();
-                            if (prefFiles != null) {
-                                for (File prefFile : prefFiles) {
-                                    if (!prefFile.getName().contains("package_configs")) {
-                                        prefFile.delete();
-                                        Log.i("ClearData", "Deleted pref: " + prefFile.getName());
-                                    }
-                                }
-                            }
-                        }
-
-                        Log.i("ClearData", "Selective clear completed successfully");
                         runOnUiThread(() -> {
-                            Toast.makeText(this, "Data cleared successfully. Restarting...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Data cleared. Restarting...", Toast.LENGTH_SHORT).show();
                             new android.os.Handler().postDelayed(() -> {
                                 Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
                                 if (intent != null) {
@@ -530,7 +493,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
                     } catch (Exception e) {
                         Log.e("ClearData", "Error clearing data", e);
                         runOnUiThread(() ->
-                            Toast.makeText(this, "Error clearing data: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show()
                         );
                     }
                 }).start();
@@ -547,29 +510,16 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             boolean shouldPreserve = false;
             if (file.isDirectory()) {
                 for (String folder : preserveFolders) {
-                    if (file.getName().equals(folder)) {
-                        shouldPreserve = true;
-                        Log.i("ClearData", "Preserving folder: " + file.getName());
-                        break;
-                    }
+                    if (file.getName().equals(folder)) { shouldPreserve = true; break; }
                 }
-            }
-            if (file.isFile()) {
+            } else if (file.isFile()) {
                 for (String fileName : preserveFiles) {
-                    if (file.getName().equals(fileName)) {
-                        shouldPreserve = true;
-                        Log.i("ClearData", "Preserving file: " + file.getName());
-                        break;
-                    }
+                    if (file.getName().equals(fileName)) { shouldPreserve = true; break; }
                 }
             }
             if (!shouldPreserve) {
-                if (file.isDirectory()) {
-                    deleteRecursive(file);
-                } else {
-                    file.delete();
-                }
-                Log.i("ClearData", "Deleted: " + file.getName());
+                if (file.isDirectory()) deleteRecursive(file);
+                else file.delete();
             }
         }
     }
@@ -578,9 +528,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         if (fileOrDirectory.isDirectory()) {
             File[] children = fileOrDirectory.listFiles();
             if (children != null) {
-                for (File child : children) {
-                    deleteRecursive(child);
-                }
+                for (File child : children) deleteRecursive(child);
             }
         }
         fileOrDirectory.delete();

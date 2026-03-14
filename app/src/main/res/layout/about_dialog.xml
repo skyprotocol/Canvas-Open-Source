@@ -1,403 +1,717 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/dialog_background">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:background="@drawable/buttons">
 
-        <!-- Title -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:text="Canvas Mod Loader"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <!-- Content Grid -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="36dp"
+            android:paddingBottom="28dp">
 
-            <!-- Row 1: Support and Original Developers -->
+            <LinearLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/logo_bg"
+                android:layout_marginBottom="16dp">
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:scaleX="1.3"
+                    android:scaleY="1.3"
+                    android:src="@drawable/icon_fg" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/about_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:alpha="0.35" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/separator"
+            android:alpha="0.3" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="8dp">
+
+            <!-- ── Chapter 1: The Origin ── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <!-- Support Section -->
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/section_background"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:gravity="center_horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:letterSpacing="0.05"
-                        android:text="SUPPORT"
-                        android:textColor="#CCCCCC"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/logo_bg"
+                        android:layout_marginTop="4dp" />
 
-                    <TextView
-                        android:id="@+id/englishTelegram"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="4dp"
-                        android:text="English Telegram"
-                        android:textColor="#4DA6FF"
-                        android:textSize="14sp" />
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/separator"
+                        android:alpha="0.25"
+                        android:layout_marginTop="6dp" />
 
-                    <TextView
-                        android:id="@+id/russianTelegram"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="4dp"
-                        android:text="Russian Telegram"
-                        android:textColor="#4DA6FF"
-                        android:textSize="14sp" />
                 </LinearLayout>
 
-                <!-- Original Developers Section -->
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@drawable/section_background"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="28dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:letterSpacing="0.05"
-                        android:text="ORIGINAL DEVELOPERS"
-                        android:textColor="#CCCCCC"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:text="The Origin"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Built from scratch by two developers who love Sky."
+                        android:textSize="12sp"
+                        android:alpha="0.45"
+                        android:lineSpacingMultiplier="1.4"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Icarus -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="4dp">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <ImageView
+                            android:id="@+id/avatar_lukas0x1"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/logo_bg"
+                            android:scaleType="centerCrop"
+                            android:layout_marginEnd="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="lukas0x1"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Author · retired"
+                                android:textSize="11sp"
+                                android:alpha="0.4" />
+
+                        </LinearLayout>
 
                         <TextView
+                            android:id="@+id/lukas0x1Github"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Icarus"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/icarusGithub"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text=" GitHub"
-                            android:textColor="#4DA6FF"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:text=" (retired)"
-                            android:textColor="#666666"
+                            android:text="GitHub ›"
                             android:textSize="12sp"
-                            android:textStyle="italic" />
+                            android:alpha="0.35"
+                            android:padding="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
                     </LinearLayout>
 
+                    <!-- artDev -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="4dp">
+                        android:gravity="center_vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <ImageView
+                            android:id="@+id/avatar_artdell"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/logo_bg"
+                            android:scaleType="centerCrop"
+                            android:layout_marginEnd="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="artDev"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="artdell"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Author"
+                                android:textSize="11sp"
+                                android:alpha="0.4" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/artDevGithub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text=" GitHub"
-                            android:textColor="#4DA6FF"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:text=" (retired)"
-                            android:textColor="#666666"
+                            android:text="GitHub ›"
                             android:textSize="12sp"
-                            android:textStyle="italic" />
+                            android:alpha="0.35"
+                            android:padding="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
                     </LinearLayout>
+
                 </LinearLayout>
+
             </LinearLayout>
 
-            <!-- Row 2: Contributors and Design Credits -->
+            <!-- ── Chapter 2: The Team ── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <!-- Current Maintainers Section -->
+                <LinearLayout
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/logo_bg"
+                        android:layout_marginTop="4dp" />
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/separator"
+                        android:alpha="0.25"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="8dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@drawable/section_background"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="28dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:letterSpacing="0.05"
-                        android:text="CONTRIBUTORS"
-                        android:textColor="#CCCCCC"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:text="The Team"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Contributors who kept the project alive."
+                        android:textSize="12sp"
+                        android:alpha="0.45"
+                        android:lineSpacingMultiplier="1.4"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Roman -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="4dp">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <ImageView
+                            android:id="@+id/avatar_RomanChamelo"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/logo_bg"
+                            android:scaleType="centerCrop"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Roman"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
+                            android:layout_weight="1"
+                            android:text="RomanChamelo"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/romanGithub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text=" GitHub"
-                            android:textColor="#4DA6FF"
-                            android:textSize="14sp" />
+                            android:text="GitHub ›"
+                            android:textSize="12sp"
+                            android:alpha="0.35"
+                            android:padding="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
                     </LinearLayout>
 
+                    <!-- Kiojeen -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="4dp">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <ImageView
+                            android:id="@+id/avatar_Kiojeen"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/logo_bg"
+                            android:scaleType="centerCrop"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="Kiojeen"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/kiojeenGithub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text=" GitHub"
-                            android:textColor="#4DA6FF"
-                            android:textSize="14sp" />
+                            android:text="GitHub ›"
+                            android:textSize="12sp"
+                            android:alpha="0.35"
+                            android:padding="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
                     </LinearLayout>
 
+                    <!-- Gxost -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="4dp">
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/avatar_Gxosty"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/logo_bg"
+                            android:scaleType="centerCrop"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Gxost"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/gxostGithub"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text=" GitHub"
-                            android:textColor="#4DA6FF"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Design Credits Section -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/section_background"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:letterSpacing="0.05"
-                        android:text="DESIGN CREDITS"
-                        android:textColor="#CCCCCC"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="4dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Banner: "
-                            android:textColor="#FFFFFF"
+                            android:layout_weight="1"
+                            android:text="Gxosty"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/gxostyGithub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Сон~ "
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
+                            android:text="GitHub ›"
+                            android:textSize="12sp"
+                            android:alpha="0.35"
+                            android:padding="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ── Chapter 3: The Art ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/logo_bg"
+                        android:layout_marginTop="4dp" />
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/separator"
+                        android:alpha="0.25"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="28dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="The Art"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="The faces behind the visuals."
+                        android:textSize="12sp"
+                        android:alpha="0.45"
+                        android:lineSpacingMultiplier="1.4"
+                        android:layout_marginBottom="14dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Сон~"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Banner artwork"
+                                android:textSize="11sp"
+                                android:alpha="0.4" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/bannerVk"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:background="@drawable/link_background"
-                            android:padding="2dp"
-                            android:text="VK"
-                            android:textColor="#4DA6FF"
-                            android:textSize="13sp" />
+                            android:text="VK ›"
+                            android:textSize="12sp"
+                            android:alpha="0.35"
+                            android:padding="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="4dp">
+                        android:gravity="center_vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Icon: "
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Elias Gabriel "
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Dysis"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="App icon"
+                                android:textSize="11sp"
+                                android:alpha="0.4" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/iconTelegram"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:background="@drawable/link_background"
-                            android:padding="2dp"
-                            android:text="Telegram"
-                            android:textColor="#4DA6FF"
-                            android:textSize="13sp" />
+                            android:text="TG ›"
+                            android:textSize="12sp"
+                            android:alpha="0.35"
+                            android:padding="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
                     </LinearLayout>
+
                 </LinearLayout>
+
             </LinearLayout>
 
-            <!-- Row 3: Original Game -->
+            <!-- ── Chapter 4: The Community ── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <!-- Original Game Section -->
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/section_background"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:gravity="center_horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:letterSpacing="0.05"
-                        android:text="ORIGINAL GAME"
-                        android:textColor="#CCCCCC"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/logo_bg"
+                        android:layout_marginTop="4dp" />
 
-                    <TextView
-                        android:id="@+id/thatgamecompanyLink"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="4dp"
-                        android:text="thatgamecompany"
-                        android:textColor="#4DA6FF"
-                        android:textSize="14sp" />
                 </LinearLayout>
 
-                <!-- Empty space to maintain grid -->
-                <View
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="28dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="The Community"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Join thousands of players who use Canvas every day."
+                        android:textSize="12sp"
+                        android:alpha="0.45"
+                        android:lineSpacingMultiplier="1.4"
+                        android:layout_marginBottom="14dp" />
+
+                    <LinearLayout
+                        android:id="@+id/englishTelegram"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/buttons"
+                        android:padding="14dp"
+                        android:layout_marginBottom="8dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="English Telegram"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="t.me/skyautowax"
+                                android:textSize="11sp"
+                                android:alpha="0.4"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="›"
+                            android:textSize="20sp"
+                            android:alpha="0.3" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/russianTelegram"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/buttons"
+                        android:padding="14dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Russian Telegram"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="t.me/skyruswax"
+                                android:textSize="11sp"
+                                android:alpha="0.4"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="›"
+                            android:textSize="20sp"
+                            android:alpha="0.3" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/separator"
+            android:alpha="0.3" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:id="@+id/thatgamecompanyLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sky is made by thatgamecompany"
+                    android:textSize="11sp"
+                    android:alpha="0.3" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/dialog_info_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Close"
+                android:textSize="13sp"
+                android:alpha="0.4"
+                android:paddingTop="4dp"
+                android:paddingBottom="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

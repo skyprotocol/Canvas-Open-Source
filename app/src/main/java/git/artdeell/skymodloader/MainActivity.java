@@ -284,7 +284,13 @@ public class MainActivity extends Activity {
 
         File bootloaderFile = new File(extractDir, "libBootloader.so");
 
-        int lastExtractedVersion = sharedPreferences.getInt("libbootloader_extracted_version", -1);
+        boolean useCustomBootloader = sharedPreferences.getBoolean("use_custom_bootloader", false);
+        if (useCustomBootloader && bootloaderFile.exists()) {
+            Log.d("MainActivity", "Custom libBootloader.so enabled, skip extraction");
+            return extractDir.getAbsolutePath();
+        }
+
+        int lastExtractedVersion = sharedPreferences.getInt("bootloader_version", -1);
         int currentVersion;
         try {
             currentVersion = getPackageManager().getPackageInfo(SKY_PACKAGE_NAME, 0).versionCode;
@@ -293,12 +299,12 @@ public class MainActivity extends Activity {
         }
 
         if (bootloaderFile.exists() && lastExtractedVersion == currentVersion) {
-            Log.d("MainActivity", "libBootloader.so already updated(v" + currentVersion + "), skip extraction");
+            Log.d("MainActivity", "libBootloader.so already updated (v" + currentVersion + "), skip extraction");
             return extractDir.getAbsolutePath();
         }
 
         if (bootloaderFile.exists()) {
-            Log.i("MainActivity", "Different version (v" + lastExtractedVersion + " → v" + currentVersion + "), re-extraction of libBootloader.so");
+            Log.i("MainActivity", "Sky updated (v" + lastExtractedVersion + " → v" + currentVersion + "), re-extraction of libBootloader.so");
             bootloaderFile.delete();
         }
 
@@ -319,7 +325,6 @@ public class MainActivity extends Activity {
         }
 
         sharedPreferences.edit().putInt("bootloader_version", currentVersion).apply();
-
         return extractDir.getAbsolutePath();
     }
 

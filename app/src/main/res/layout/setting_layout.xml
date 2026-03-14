@@ -211,35 +211,97 @@
                 android:letterSpacing="0.1"
                 android:alpha="0.5" />
 
-            <Button
+            <LinearLayout
+                android:id="@+id/btn_custom_bootloader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/buttons"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Custom libBootloader.so"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pick a custom bootloader or reset to original"
+                        android:textSize="12sp"
+                        android:alpha="0.5"
+                        android:layout_marginTop="2dp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textSize="22sp"
+                    android:alpha="0.4"
+                    android:layout_gravity="center_vertical" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btn_clear_app_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/buttons"
-                android:drawableTop="@android:drawable/ic_menu_delete"
-                android:drawableTint="#FF3333"
-                android:paddingTop="14dp"
-                android:paddingBottom="14dp"
-                android:text="Clear App Data"
-                android:textAllCaps="false"
-                android:textColor="#FF3333"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:gravity="center" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp"
+                android:clickable="true"
+                android:focusable="true">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="6dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
-                android:text="⚠️ Delete all game data except mods and ThatSkyMod's folders"
-                android:textSize="11sp"
-                android:alpha="0.7"
-                android:textColor="#FF3333"
-                android:maxLines="2" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Clear App Data"
+                        android:textSize="15sp"
+                        android:textColor="#FF4444"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Delete all data except mods, ThatSkyMod's folders and user.xml"
+                        android:textSize="12sp"
+                        android:textColor="#FF4444"
+                        android:alpha="0.7"
+                        android:layout_marginTop="2dp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textSize="22sp"
+                    android:textColor="#FF4444"
+                    android:alpha="0.5"
+                    android:layout_gravity="center_vertical" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

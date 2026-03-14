@@ -94,13 +94,13 @@ public class SystemSupport_android implements GameActivity.OnActivityResultListe
             setupLink(dialog, R.id.russianTelegram, "https://t.me/+mue7BZWmWOxkMDUy");
 
             // Original developers
-            setupLink(dialog, R.id.icarusGithub, "https://github.com/lukas0x1");
+            setupLink(dialog, R.id.lukas0x1Github, "https://github.com/lukas0x1");
             setupLink(dialog, R.id.artDevGithub, "https://github.com/artdeell");
 
             // Contributors
             setupLink(dialog, R.id.romanGithub, "https://github.com/RomanChamelo");
             setupLink(dialog, R.id.kiojeenGithub, "https://github.com/Kiojeen");
-            setupLink(dialog, R.id.gxostGithub, "https://github.com/gxosty");
+            setupLink(dialog, R.id.gxostyGithub, "https://github.com/gxosty");
 
             // Design credits
             setupLink(dialog, R.id.bannerVk, "https://vk.com/son583");

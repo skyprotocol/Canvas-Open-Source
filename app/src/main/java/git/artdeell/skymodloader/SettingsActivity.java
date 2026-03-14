@@ -1,24 +1,30 @@
 package git.artdeell.skymodloader;
 
-import android.app.AlertDialog;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.Button;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "ClearAppData";
+    private static final int REQUEST_PICK_BOOTLOADER = 9001;
     private Switch hideCanvasMenuSwitch;
     private Switch ceserverSwitch;
     private Switch customServerSwitch;
@@ -36,7 +42,6 @@ public class SettingsActivity extends AppCompatActivity {
         customServerSwitch = findViewById(R.id.mm_enableCustomServer);
         logcatSwitch = findViewById(R.id.mm_enableLogcat);
         serverUrlInput = findViewById(R.id.server_url_input);
-        Button btnClearAppData = findViewById(R.id.btn_clear_app_data);
 
         backButton.setOnClickListener(v -> finish());
 
@@ -64,12 +69,8 @@ public class SettingsActivity extends AppCompatActivity {
         serverUrlInput.setText(getSharedPreferences("package_configs", MODE_PRIVATE)
             .getString("server_host", ""));
         serverUrlInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 getSharedPreferences("package_configs", MODE_PRIVATE)
@@ -82,7 +83,6 @@ public class SettingsActivity extends AppCompatActivity {
         logcatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             getSharedPreferences("package_configs", MODE_PRIVATE)
                 .edit().putBoolean("logcat_enabled", isChecked).apply();
-
             Intent logcatIntent = new Intent(this, LogcatMonitorService.class);
             if (isChecked) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -97,68 +97,177 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        btnClearAppData.setOnClickListener(v -> clearAppDataComplete());
+        findViewById(R.id.btn_clear_app_data).setOnClickListener(v -> showClearDataDialog());
+        findViewById(R.id.btn_custom_bootloader).setOnClickListener(v -> showBootloaderDialog());
     }
 
-    private void clearAppDataComplete() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("⚠️ Clear App Data");
-        builder.setMessage("Delete all game data?\n\n✅ PRESERVED:\n• mods/\n• Accounts/\n• config/\n• AccountAuthInfo.bin\n\n❌ DELETED:\n• Everything else");
-        builder.setPositiveButton("Clear", (dialog, which) -> {
-            Toast.makeText(this, "Clearing data...", Toast.LENGTH_SHORT).show();
-            new Thread(() -> {
-                int deletedFiles = 0;
-                int deletedDirs = 0;
-                try {
-                    Log.i(TAG, "Starting Complete Clear App Data");
+    private void showBootloaderDialog() {
+        File current = new File(getFilesDir(), "extracted_libs/libBootloader.so");
+        boolean isCustomActive = getSharedPreferences("package_configs", MODE_PRIVATE)
+            .getBoolean("use_custom_bootloader", false);
+        String status = (isCustomActive && current.exists())
+            ? "Custom enabled · " + current.length() / 1024 + " KB"
+            : "Original version extracted from Sky's APK";
 
-                    File externalFilesDir = getExternalFilesDir(null);
-                    if (externalFilesDir != null) {
-                        File externalDataRoot = externalFilesDir.getParentFile();
-                        if (externalDataRoot != null && externalDataRoot.exists()) {
-                            Log.i(TAG, "Clearing external: " + externalDataRoot.getAbsolutePath());
-                            int[] counts = deleteRecursiveCount(externalDataRoot);
-                            deletedFiles += counts[0];
-                            deletedDirs += counts[1];
-                            Log.i(TAG, "External cleared: " + counts[0] + " files, " + counts[1] + " dirs");
-                        }
-                    }
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_custom_bootloader);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.getWindow().setLayout(
+            (int) (getResources().getDisplayMetrics().widthPixels * 0.88),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        );
 
-                    File internalDataRoot = getFilesDir().getParentFile();
-                    if (internalDataRoot != null && internalDataRoot.exists()) {
-                        Log.i(TAG, "Processing root: " + internalDataRoot.getAbsolutePath());
-                        int[] rootCounts = clearInternalDataRoot(internalDataRoot);
-                        deletedFiles += rootCounts[0];
-                        deletedDirs += rootCounts[1];
-                        Log.i(TAG, "Internal root cleared: " + rootCounts[0] + " files, " + rootCounts[1] + " dirs");
-                    }
+        ((TextView) dialog.findViewById(R.id.dialog_bootloader_status)).setText(status);
 
-                    final int totalFiles = deletedFiles;
-                    final int totalDirs = deletedDirs;
-                    Log.i(TAG, "TOTAL DELETED: " + totalFiles + " files, " + totalDirs + " dirs");
+        dialog.findViewById(R.id.dialog_bootloader_cancel)
+            .setOnClickListener(v -> dialog.dismiss());
 
-                    runOnUiThread(() -> {
-                        String message = "Cleared " + totalFiles + " files, " + totalDirs + " dirs\nRestarting...";
-                        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-                        new android.os.Handler().postDelayed(() -> {
-                            Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-                            if (intent != null) {
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                            System.exit(0);
-                        }, 1500);
-                    });
-                } catch (Exception e) {
-                    Log.e(TAG, "Error clearing data", e);
-                    runOnUiThread(() ->
-                        Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show()
-                    );
+        dialog.findViewById(R.id.dialog_bootloader_reset)
+            .setOnClickListener(v -> {
+                dialog.dismiss();
+                resetBootloaderToOriginal();
+            });
+
+        dialog.findViewById(R.id.dialog_bootloader_pick)
+            .setOnClickListener(v -> {
+                dialog.dismiss();
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.setType("application/octet-stream");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+                startActivityForResult(intent, REQUEST_PICK_BOOTLOADER);
+            });
+
+        dialog.show();
+    }
+
+    private void showClearDataDialog() {
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_clear_data);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.getWindow().setLayout(
+            (int) (getResources().getDisplayMetrics().widthPixels * 0.88),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        dialog.findViewById(R.id.dialog_clear_cancel)
+            .setOnClickListener(v -> dialog.dismiss());
+
+        dialog.findViewById(R.id.dialog_clear_confirm)
+            .setOnClickListener(v -> {
+                dialog.dismiss();
+                executeClearAppData();
+            });
+
+        dialog.show();
+    }
+
+    private void resetBootloaderToOriginal() {
+        File extractedLib = new File(getFilesDir(), "extracted_libs/libBootloader.so");
+        if (extractedLib.exists()) extractedLib.delete();
+        getSharedPreferences("package_configs", MODE_PRIVATE).edit()
+            .putBoolean("use_custom_bootloader", false)
+            .putInt("bootloader_version", -1)
+            .apply();
+        Toast.makeText(this,
+            "Reset applied. Original version will be extracted at the next launch.",
+            Toast.LENGTH_LONG).show();
+    }
+
+    private void copyBootloaderFromUri(Uri uri) {
+        new Thread(() -> {
+            try {
+                File extractDir = new File(getFilesDir(), "extracted_libs");
+                if (!extractDir.exists()) extractDir.mkdirs();
+                File dest = new File(extractDir, "libBootloader.so");
+
+                try (InputStream in = getContentResolver().openInputStream(uri);
+                     java.io.FileOutputStream out = new java.io.FileOutputStream(dest)) {
+                    if (in == null) throw new IOException("Impossible to load the selected file");
+                    byte[] buf = new byte[8192];
+                    int read;
+                    while ((read = in.read(buf)) != -1) out.write(buf, 0, read);
                 }
-            }).start();
-        });
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+
+                dest.setExecutable(true, false);
+                dest.setReadable(true, false);
+
+                getSharedPreferences("package_configs", MODE_PRIVATE)
+                    .edit().putBoolean("use_custom_bootloader", true).apply();
+
+                Log.i(TAG, "Custom libBootloader.so copied: " + dest.length() / 1024 + " KB");
+                runOnUiThread(() -> Toast.makeText(this,
+                    "✓ Custom libBootloader.so applied!",
+                    Toast.LENGTH_LONG).show());
+
+            } catch (Exception e) {
+                Log.e(TAG, "Copie failed: " + e.getMessage());
+                runOnUiThread(() -> Toast.makeText(this,
+                    "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        }).start();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_PICK_BOOTLOADER && resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri != null) copyBootloaderFromUri(uri);
+        }
+    }
+
+    private void executeClearAppData() {
+        Toast.makeText(this, "Clearing data...", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            int deletedFiles = 0;
+            int deletedDirs = 0;
+            try {
+                Log.i(TAG, "Starting Complete Clear App Data");
+
+                File externalFilesDir = getExternalFilesDir(null);
+                if (externalFilesDir != null) {
+                    File externalDataRoot = externalFilesDir.getParentFile();
+                    if (externalDataRoot != null && externalDataRoot.exists()) {
+                        int[] counts = deleteRecursiveCount(externalDataRoot);
+                        deletedFiles += counts[0];
+                        deletedDirs += counts[1];
+                    }
+                }
+
+                File internalDataRoot = getFilesDir().getParentFile();
+                if (internalDataRoot != null && internalDataRoot.exists()) {
+                    int[] rootCounts = clearInternalDataRoot(internalDataRoot);
+                    deletedFiles += rootCounts[0];
+                    deletedDirs += rootCounts[1];
+                }
+
+                final int totalFiles = deletedFiles;
+                final int totalDirs = deletedDirs;
+                Log.i(TAG, "TOTAL DELETED: " + totalFiles + " files, " + totalDirs + " dirs");
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this,
+                        "Cleared " + totalFiles + " files, " + totalDirs + " dirs\nRestarting...",
+                        Toast.LENGTH_LONG).show();
+                    new android.os.Handler().postDelayed(() -> {
+                        Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+                        if (intent != null) {
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        }
+                        System.exit(0);
+                    }, 1500);
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "Error clearing data", e);
+                runOnUiThread(() ->
+                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
     }
 
     private int[] clearInternalDataRoot(File dataRoot) {
@@ -166,20 +275,50 @@ public class SettingsActivity extends AppCompatActivity {
         int dirCount = 0;
         File[] contents = dataRoot.listFiles();
         if (contents == null) return new int[]{0, 0};
-
         for (File item : contents) {
             String name = item.getName();
             if (name.equals("files")) {
-                Log.i(TAG, "Processing files/ directory selectively...");
-                int[] filesCounts = clearFilesDirectory(item);
-                fileCount += filesCounts[0];
-                dirCount += filesCounts[1];
+                int[] counts = clearFilesDirectory(item);
+                fileCount += counts[0];
+                dirCount += counts[1];
+            } else if (name.equals("shared_prefs")) {
+                int[] counts = clearSharedPrefsDirectory(item);
+                fileCount += counts[0];
+                dirCount += counts[1];
             } else {
-                Log.i(TAG, "Deleting ROOT item: " + name);
                 int[] counts = deleteRecursiveCount(item);
                 fileCount += counts[0];
                 dirCount += counts[1];
-                Log.i(TAG, "❌ DELETED ROOT: " + name + " (" + counts[0] + " files, " + counts[1] + " dirs)");
+            }
+        }
+        return new int[]{fileCount, dirCount};
+    }
+
+    private int[] clearSharedPrefsDirectory(File sharedPrefsDir) {
+        int fileCount = 0;
+        int dirCount = 0;
+        if (!sharedPrefsDir.exists() || !sharedPrefsDir.isDirectory()) return new int[]{0, 0};
+
+        File[] contents = sharedPrefsDir.listFiles();
+        if (contents == null) return new int[]{0, 0};
+
+        for (File item : contents) {
+            if (item.getName().equals("user.xml")) {
+                Log.i(TAG, "✅ PRESERVED PREF: user.xml");
+                continue;
+            }
+            String prefName = item.getName().replace(".xml", "");
+            getSharedPreferences(prefName, MODE_PRIVATE).edit().clear().commit();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (deleteSharedPreferences(prefName)) {
+                    fileCount++;
+                    Log.i(TAG, "❌ DELETED PREF: " + item.getName());
+                }
+            } else {
+                if (item.delete()) {
+                    fileCount++;
+                    Log.i(TAG, "❌ DELETED PREF (legacy): " + item.getName());
+                }
             }
         }
         return new int[]{fileCount, dirCount};
@@ -198,38 +337,22 @@ public class SettingsActivity extends AppCompatActivity {
         for (File item : contents) {
             boolean shouldPreserve = false;
             String itemName = item.getName();
-
             if (item.isDirectory()) {
-                for (String preserved : preservedDirs) {
-                    if (itemName.equals(preserved)) {
-                        shouldPreserve = true;
-                        Log.i(TAG, "✅ PRESERVED DIR: files/" + itemName + "/");
-                        break;
-                    }
+                for (String p : preservedDirs) {
+                    if (itemName.equals(p)) { shouldPreserve = true; break; }
                 }
             } else if (item.isFile()) {
-                for (String preserved : preservedFiles) {
-                    if (itemName.equals(preserved)) {
-                        shouldPreserve = true;
-                        Log.i(TAG, "✅ PRESERVED FILE: files/" + itemName);
-                        break;
-                    }
+                for (String p : preservedFiles) {
+                    if (itemName.equals(p)) { shouldPreserve = true; break; }
                 }
             }
-
             if (!shouldPreserve) {
                 if (item.isFile()) {
-                    if (item.delete()) {
-                        fileCount++;
-                        Log.i(TAG, "❌ DELETED FILE: files/" + itemName);
-                    } else {
-                        Log.w(TAG, "Failed to delete file: files/" + itemName);
-                    }
+                    if (item.delete()) fileCount++;
                 } else if (item.isDirectory()) {
                     int[] counts = deleteRecursiveCount(item);
                     fileCount += counts[0];
                     dirCount += counts[1];
-                    Log.i(TAG, "❌ DELETED DIR: files/" + itemName + " (" + counts[0] + " files, " + counts[1] + " dirs)");
                 }
             }
         }
@@ -239,27 +362,18 @@ public class SettingsActivity extends AppCompatActivity {
     private int[] deleteRecursiveCount(File fileOrDirectory) {
         int fileCount = 0;
         int dirCount = 0;
-
         if (fileOrDirectory.isDirectory()) {
             File[] children = fileOrDirectory.listFiles();
             if (children != null) {
                 for (File child : children) {
-                    int[] childCounts = deleteRecursiveCount(child);
-                    fileCount += childCounts[0];
-                    dirCount += childCounts[1];
+                    int[] counts = deleteRecursiveCount(child);
+                    fileCount += counts[0];
+                    dirCount += counts[1];
                 }
             }
-            if (fileOrDirectory.delete()) {
-                dirCount++;
-            } else {
-                Log.w(TAG, "Failed to delete dir: " + fileOrDirectory.getAbsolutePath());
-            }
+            if (fileOrDirectory.delete()) dirCount++;
         } else {
-            if (fileOrDirectory.delete()) {
-                fileCount++;
-            } else {
-                Log.w(TAG, "Failed to delete file: " + fileOrDirectory.getAbsolutePath());
-            }
+            if (fileOrDirectory.delete()) fileCount++;
         }
         return new int[]{fileCount, dirCount};
     }
