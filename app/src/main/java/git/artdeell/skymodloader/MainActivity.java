@@ -116,7 +116,6 @@ public class MainActivity extends Activity {
             BuildConfig.VERSION_CODE = info.versionCode;
 
             String libPath = resolveLibPath(info.applicationInfo);
-
             String elfLibPath = resolveElfLibPath(info.applicationInfo, libPath);
 
             File modsDir = new File(getFilesDir(), "mods");
@@ -284,25 +283,42 @@ public class MainActivity extends Activity {
         }
 
         File bootloaderFile = new File(extractDir, "libBootloader.so");
-        if (!bootloaderFile.exists()) {
-            String apkPath = mainLibPath.substring(0, mainLibPath.indexOf("!/lib"));
-            Log.i("MainActivity", "Extracting only libBootloader.so from: " + apkPath);
-            try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(apkPath)) {
-                java.util.zip.ZipEntry entry = zipFile.getEntry("lib/arm64-v8a/libBootloader.so");
-                if (entry == null) throw new IOException("libBootloader.so not found in APK");
-                try (java.io.InputStream in = zipFile.getInputStream(entry);
-                     java.io.FileOutputStream out = new java.io.FileOutputStream(bootloaderFile)) {
-                    byte[] buf = new byte[8192];
-                    int read;
-                    while ((read = in.read(buf)) != -1) out.write(buf, 0, read);
-                }
-                bootloaderFile.setExecutable(true);
-                bootloaderFile.setReadable(true);
-                Log.i("MainActivity", "libBootloader.so extracted for ElfLoader");
-            }
-        } else {
-            Log.d("MainActivity", "libBootloader.so already exists for ElfLoader");
+
+        int lastExtractedVersion = sharedPreferences.getInt("libbootloader_extracted_version", -1);
+        int currentVersion;
+        try {
+            currentVersion = getPackageManager().getPackageInfo(SKY_PACKAGE_NAME, 0).versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new IOException("Sky package not found: " + e.getMessage());
         }
+
+        if (bootloaderFile.exists() && lastExtractedVersion == currentVersion) {
+            Log.d("MainActivity", "libBootloader.so already updated(v" + currentVersion + "), skip extraction");
+            return extractDir.getAbsolutePath();
+        }
+
+        if (bootloaderFile.exists()) {
+            Log.i("MainActivity", "Different version (v" + lastExtractedVersion + " → v" + currentVersion + "), re-extraction of libBootloader.so");
+            bootloaderFile.delete();
+        }
+
+        String apkPath = mainLibPath.substring(0, mainLibPath.indexOf("!/lib"));
+        Log.i("MainActivity", "Extracting libBootloader.so from: " + apkPath);
+        try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(apkPath)) {
+            java.util.zip.ZipEntry entry = zipFile.getEntry("lib/arm64-v8a/libBootloader.so");
+            if (entry == null) throw new IOException("libBootloader.so not found in APK");
+            try (java.io.InputStream in = zipFile.getInputStream(entry);
+                 java.io.FileOutputStream out = new java.io.FileOutputStream(bootloaderFile)) {
+                byte[] buf = new byte[8192];
+                int read;
+                while ((read = in.read(buf)) != -1) out.write(buf, 0, read);
+            }
+            bootloaderFile.setExecutable(true);
+            bootloaderFile.setReadable(true);
+            Log.i("MainActivity", "libBootloader.so extracted (v" + currentVersion + ")");
+        }
+
+        sharedPreferences.edit().putInt("bootloader_version", currentVersion).apply();
 
         return extractDir.getAbsolutePath();
     }
