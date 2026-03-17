@@ -60,7 +60,7 @@ android {
         dataBinding = true
         prefab true
     }
-    ndkVersion = '26.1.10909125'
+    ndkVersion = '29.0.14206865'
     namespace 'git.artdeell.skymodloader'
 }
 

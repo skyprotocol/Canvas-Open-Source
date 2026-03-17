@@ -6,8 +6,12 @@
 #include <string.h>
 #include <android/log.h>
 #include <stdbool.h>
-#include <sys/user.h>
 #include <sys/mman.h>
+#include <unistd.h>
+// PAGE_SIZE was removed from NDK 29 public headers; derive it at runtime.
+#ifndef PAGE_SIZE
+#  define PAGE_SIZE ((size_t)sysconf(_SC_PAGESIZE))
+#endif
 #include "procutils.h"
 
 

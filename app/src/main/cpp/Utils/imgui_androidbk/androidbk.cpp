@@ -253,6 +253,34 @@ PRIVATE_API static void loadFonts(ImGuiIO& io, jfloat fontsize, AAssetManager *m
                                  rangesEuropean.Data);
     /* END */
 
+    /* GEORGIAN GLYPH MERGE — merged into the Roboto atlas above.
+     * Roboto does not ship Georgian glyphs; we pull them from whichever
+     * NotoSansGeorgian variant is present on the device (path varies by
+     * Android version and OEM). First successful load wins; missing files
+     * are silently skipped by AddFontFromFileTTF returning nullptr. */
+    {
+        static const ImWchar kGeorgianRanges[] = {
+            0x10A0, 0x10FF, // Georgian (Mkhedruli)
+            0,
+        };
+        static const char* kGeorgianFontCandidates[] = {
+            "/system/fonts/NotoSansGeorgian-VF.ttf",           // OEM / Android 11+ (variable)
+            "/system/fonts/NotoSansGeorgian-Regular.ttf",      // Android <= 11 (static)
+            "/system/fonts/NotoSansGeorgian[wdth,wght].ttf",   // alternative variable naming
+            "/system/fonts/NotoSans-Regular.ttf",               // broad fallback
+            nullptr,
+        };
+        ImFontConfig fcGeo;
+        fcGeo.MergeMode = true;
+        for (int gi = 0; kGeorgianFontCandidates[gi]; ++gi) {
+            if (io.Fonts->AddFontFromFileTTF(kGeorgianFontCandidates[gi], fontsize,
+                                             &fcGeo, kGeorgianRanges)) {
+                break;
+            }
+        }
+    }
+    /* END GEORGIAN */
+
     void* fontBufferDroidSans = nullptr;
 
     /* DROID SANS */
