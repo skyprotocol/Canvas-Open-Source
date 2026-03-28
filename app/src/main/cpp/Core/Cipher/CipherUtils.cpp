@@ -257,15 +257,17 @@ char* CipherUtils::readAsset(const char* _assetPath) {
     }
 
     size_t asset_size = AAsset_getLength64(aAsset);
-    void* asset_buffer = malloc(asset_size);
-    if (asset_buffer == nullptr) return nullptr; // no mem?
+    void* asset_buffer = malloc(asset_size + 1);
+    if (asset_buffer == nullptr) { AAsset_close(aAsset); return nullptr; }
 
     if (AAsset_read(aAsset, asset_buffer, asset_size) != asset_size) {
         free(asset_buffer);
+        AAsset_close(aAsset);
         return nullptr;
     }
 
     AAsset_close(aAsset);
+    ((char*)asset_buffer)[asset_size] = '\0';
     return (char*)asset_buffer;
 }
 

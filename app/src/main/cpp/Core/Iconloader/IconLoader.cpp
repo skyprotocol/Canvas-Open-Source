@@ -39,7 +39,7 @@ Java_git_artdeell_skymodloader_iconloader_IconLoader_addIcon(
 }
 
 PRIVATE_API SkyImage& die() {
-    SkyImage image;
+    static SkyImage image;
     image.textureId = (ImTextureID)-1;
     return image;
 }
@@ -60,15 +60,15 @@ PRIVATE_API SkyImage& IconLoader::uploadImageKtx(const char* name, const bool& i
 
     size_t assetSz = AAsset_getLength64(aAsset);
     void* assetBuf = malloc(assetSz);
-    if(assetBuf == nullptr) return die();
-    if(AAsset_read(aAsset, assetBuf, assetSz) != assetSz) return die();
+    if(assetBuf == nullptr) { AAsset_close(aAsset); return die(); }
+    if(AAsset_read(aAsset, assetBuf, assetSz) != assetSz) { free(assetBuf); AAsset_close(aAsset); return die(); }
     AAsset_close(aAsset);
     ktxTexture* texture = nullptr;
     GLuint texid = -1;
     GLenum target, error;
-    if(ktxTexture_CreateFromMemory((const ktx_uint8_t *)assetBuf, assetSz, KTX_TEXTURE_CREATE_NO_FLAGS, &texture) != KTX_SUCCESS) return die();
+    if(ktxTexture_CreateFromMemory((const ktx_uint8_t *)assetBuf, assetSz, KTX_TEXTURE_CREATE_NO_FLAGS, &texture) != KTX_SUCCESS) { free(assetBuf); return die(); }
     glGenTextures(1, &texid);
-    if(texid == -1) die();
+    if(texid == -1) { free(assetBuf); ktxTexture_Destroy(texture); return die(); }
     auto *image = new SkyImage;
     error = glGetError();
     while(error != GL_NO_ERROR) {
