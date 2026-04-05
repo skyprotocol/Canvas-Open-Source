@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.view.Window;
 import android.view.WindowManager;
+import android.os.Build;
 import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -120,10 +121,15 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
         webView.setWebViewClient(this);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setUseWideViewPort(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+        }
         if(this.accountType == SystemAccountType.kSystemAccountType_Google) {
             settings.setUserAgentString("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36");
         }
-        //webView.setInitialScale(110);
         webView.loadUrl(loginUrl);
         dialog.show();
         Window dialogWindow = dialog.getWindow();
