@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Canvas</string>
+    <string name="app_name" translatable="false">Canvas</string>
     <string name="sky_not_installed">Open Mod Manager and choose Live/Beta/Huawei. Sky is not installed. You must have Sky installed in order to use this!</string>
     <string name="mod_manager">Mod Manager</string>
     <string name="add_mod">Add mod</string>
-    <string name="mod_name">%s (%s)</string>
+    <string name="mod_name" translatable="false">%s (%s)</string>
     <string name="mod_invalid">Invalid mod. Missing dependencies?</string>
     <string name="mod_remove_unable">Unable to remove mod</string>
     <string name="mod_remove_deps">You have mods that depend on this mod, please remove them first!</string>
@@ -14,8 +14,8 @@
     <string name="mod_add_wrongformat">Mod is not readable</string>
     <string name="mod_add_missingdep">Mod depends on %s %d.%d or newer, but it is not available</string>
     <string name="mod_add_exists">A mod under this name already exists</string>
-    <string name="mod_version">%d.%d.%d</string>
-    <string name="mod_skip_updater">Skip  the updater</string>
+    <string name="mod_version" translatable="false">%d.%d.%d</string>
+    <string name="mod_skip_updater">Skip the updater</string>
     <string name="sign_in">Sign in with %s</string>
     <string name="enable_beta">Enable Sky Beta support</string>
     <string name="launch">Play</string>
@@ -31,10 +31,10 @@
     <string name="updater_retry">Retry</string>
     <string name="updater_failed">Failed to update</string>
     <string name="updater_input_unreadable">Downloaded data not readable</string>
-    <string name="mod_canvas_version">Canvas %s</string>
-    <string name="huawei">huawei</string>
-    <string name="beta">Beta</string>
-    <string name="live">Live</string>
+    <string name="mod_canvas_version" translatable="false">Canvas %s</string>
+    <string name="huawei" translatable="false">Huawei</string>
+    <string name="beta" translatable="false">Beta</string>
+    <string name="live" translatable="false">Live</string>
     <string name="game_not_installed_warning">Game is not installed</string>
     <string name="play">PLAY</string>
     <string name="mods">MODS</string>
@@ -43,7 +43,7 @@
     <string name="updating_failed_title">"Updating Failed"</string>
     <string name="check_updates_message">Note: Update will start if you feel OK.</string>
     <string name="check_button_text">Check</string>
-    <string name="version_info">Version: %s\n%s</string>
+    <string name="version_info" translatable="false">Version: %s\n%s</string>
     <string name="update_dialog_title">%s Has a new update!!</string>
     <string name="install_button_text">Install</string>
     <string name="updater_busy">Updater is busy</string>
@@ -68,4 +68,85 @@
     <string name="mod_check_updates_complete">Update complete!</string>
     <string name="mod_check_updates_error">An error has occurred</string>
     <string name="settings_title">SETTINGS</string>
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">Sky is made by thatgamecompany</string>
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ Clear App Data</string>
+    <string name="clear_data_preserved">PRESERVED</string>
+    <string name="clear_data_mods" translatable="false">✓  mods/</string>
+    <string name="clear_data_accounts" translatable="false">✓  Accounts/</string>
+    <string name="clear_data_config" translatable="false">✓  config/</string>
+    <string name="clear_data_auth" translatable="false">✓  AccountAuthInfo.bin</string>
+    <string name="clear_data_prefs" translatable="false">✓  shared_prefs/user.xml</string>
+    <string name="clear_data_deleted">DELETED</string>
+    <string name="clear_data_everything_else">✕  Everything else</string>
+    <string name="clear">Clear</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">Custom libBootloader.so</string>
+    <string name="pick_file">Pick file</string>
+    <string name="pick_file_description">Choose a custom libBootloader.so file from the storage to replace the current bootloader</string>
+    <string name="reset_to_original">Reset to original</string>
+    <string name="reset_to_original_description">Delete the custom file and re-extract the original from Sky\'s APK</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">TITLE</string>
+    <string name="dialog_description_placeholder">DESCRIPTION</string>
+    <string name="dialog_progress_zero" translatable="false">0%</string>
+    <string name="dialog_button_natural" translatable="false">NATURAL</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">GOOGLE PLAY STORE | GLOBAL VERSION\nPLAY</string>
+    <string name="launch_huawei">APP GALLERY | HUAWEI VERSION\nPLAY</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">General</string>
+    <string name="hide_canvas_menu">Hide Canvas menu</string>
+    <string name="section_developer_options">Developer Options</string>
+    <string name="cheat_engine_server">Cheat Engine Server</string>
+    <string name="custom_server">Custom server</string>
+    <string name="server_url">Server URL</string>
+    <string name="server_url_hint" translatable="false">insert-url</string>
+    <string name="enable_logcat_monitoring">Enable Logcat Monitoring</string>
+    <string name="section_advanced">Advanced</string>
+    <string name="custom_bootloader_setting">Custom libBootloader.so</string>
+    <string name="custom_bootloader_setting_desc">Pick a custom bootloader or reset to original</string>
+    <string name="clear_app_data">Clear App Data</string>
+    <string name="clear_app_data_desc">Delete all data except mods, ThatSkyMod\'s folders and user.xml</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">The Origin</string>
+    <string name="about_chapter_origin_sub">Built from scratch by two developers who love Sky.</string>
+    <string name="about_chapter_present">The Present</string>
+    <string name="about_chapter_present_sub">Currently keeping Canvas alive.</string>
+    <string name="about_chapter_team">The Team</string>
+    <string name="about_chapter_team_sub">Everyone who made Canvas better.</string>
+    <string name="about_chapter_art">The Art</string>
+    <string name="about_chapter_art_sub">The faces behind the visuals.</string>
+    <string name="about_chapter_community">The Community</string>
+    <string name="about_chapter_community_sub">Join thousands of players who use Canvas every day.</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">Author</string>
+    <string name="role_author_retired">Author · retired</string>
+    <string name="role_maintainer">Maintainer</string>
+    <string name="role_banner_artwork">Banner artwork</string>
+    <string name="role_app_icon">App icon</string>
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">English Telegram</string>
+    <string name="community_russian_telegram">Russian Telegram</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">Stack trace copied to clipboard</string>
+    <string name="toast_logcat_enabled">Logcat monitoring enabled</string>
+    <string name="toast_logcat_disabled">Logcat monitoring disabled</string>
+    <string name="toast_bootloader_reset">Reset applied. Original version will be extracted at the next launch.</string>
+    <string name="toast_bootloader_applied">✓ Custom libBootloader.so applied!</string>
+    <string name="toast_clearing_data">Clearing data…</string>
+    <string name="toast_cleared_data">Cleared %1$d files, %2$d dirs\nRestarting…</string>
+    <string name="toast_data_cleared_restarting">Data cleared. Restarting…</string>
 </resources>

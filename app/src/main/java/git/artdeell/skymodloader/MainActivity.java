@@ -470,7 +470,7 @@ public class MainActivity extends Activity {
         ClipData clip = ClipData.newPlainText("Stack Trace", stackTrace);
         clipboard.setPrimaryClip(clip);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            Toast.makeText(this, "Stack trace copied to clipboard", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_stack_trace_copied, Toast.LENGTH_SHORT).show();
         }
     }
 

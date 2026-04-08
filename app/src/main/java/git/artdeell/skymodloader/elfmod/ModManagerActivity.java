@@ -212,10 +212,10 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             } else {
                 startService(logcatIntent);
             }
-            Toast.makeText(this, "Logcat monitoring enabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_logcat_enabled, Toast.LENGTH_SHORT).show();
         } else {
             stopService(logcatIntent);
-            Toast.makeText(this, "Logcat monitoring disabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_logcat_disabled, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -427,7 +427,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
                         }
 
                         runOnUiThread(() -> {
-                            Toast.makeText(this, "Data cleared. Restarting...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, R.string.toast_data_cleared_restarting, Toast.LENGTH_SHORT).show();
                             new android.os.Handler().postDelayed(() -> {
                                 Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
                                 if (intent != null) {

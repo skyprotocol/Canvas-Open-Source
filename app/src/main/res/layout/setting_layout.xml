@@ -37,7 +37,7 @@
                     android:id="@+id/setting_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SETTINGS"
+                    android:text="@string/settings_title"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.06" />
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_marginBottom="6dp"
-                android:text="General"
+                android:text="@string/section_general"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textAllCaps="true"
@@ -78,7 +78,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:text="Hide Canvas menu"
+                    android:text="@string/hide_canvas_menu"
                     android:textSize="15sp" />
 
                 <Switch
@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_marginBottom="6dp"
-                android:text="Developer Options"
+                android:text="@string/section_developer_options"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textAllCaps="true"
@@ -114,7 +114,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:text="Cheat Engine Server"
+                    android:text="@string/cheat_engine_server"
                     android:textSize="15sp" />
 
                 <Switch
@@ -138,7 +138,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:text="Custom server"
+                    android:text="@string/custom_server"
                     android:textSize="15sp" />
 
                 <Switch
@@ -160,7 +160,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Server URL"
+                    android:text="@string/server_url"
                     android:textSize="13sp"
                     android:alpha="0.6"
                     android:layout_marginBottom="6dp" />
@@ -169,7 +169,7 @@
                     android:id="@+id/server_url_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="insert-url"
+                    android:hint="@string/server_url_hint"
                     android:singleLine="true"
                     android:inputType="textUri"
                     android:textSize="14sp" />
@@ -188,7 +188,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:text="Enable Logcat Monitoring"
+                    android:text="@string/enable_logcat_monitoring"
                     android:textSize="15sp" />
 
                 <Switch
@@ -204,7 +204,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_marginBottom="6dp"
-                android:text="Advanced"
+                android:text="@string/section_advanced"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textAllCaps="true"
@@ -232,13 +232,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Custom libBootloader.so"
+                        android:text="@string/custom_bootloader_setting"
                         android:textSize="15sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pick a custom bootloader or reset to original"
+                        android:text="@string/custom_bootloader_setting_desc"
                         android:textSize="12sp"
                         android:alpha="0.5"
                         android:layout_marginTop="2dp" />
@@ -276,7 +276,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Clear App Data"
+                        android:text="@string/clear_app_data"
                         android:textSize="15sp"
                         android:textColor="#FF4444"
                         android:textStyle="bold" />
@@ -284,7 +284,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Delete all data except mods, ThatSkyMod's folders and user.xml"
+                        android:text="@string/clear_app_data_desc"
                         android:textSize="12sp"
                         android:textColor="#FF4444"
                         android:alpha="0.7"

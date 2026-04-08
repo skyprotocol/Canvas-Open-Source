@@ -1,0 +1,136 @@
+<resources>
+    <string name="sky_not_installed">Откройте менеджер модов и выберите версию (Live/Beta/Huawei). Sky не установлена — для работы Canvas необходима установленная игра!</string>
+    <string name="mod_manager">Менеджер модов</string>
+    <string name="add_mod">Добавить мод</string>
+    <string name="mod_invalid">Некорректный мод. Отсутствуют зависимости?</string>
+    <string name="mod_remove_unable">Не удалось удалить мод</string>
+    <string name="mod_remove_deps">Другие моды зависят от этого — сначала удалите их!</string>
+    <string name="mod_remove_dep">%s зависит от мода, который вы пытаетесь удалить</string>
+    <string name="mod_ioe">Ошибка ввода/вывода</string>
+    <string name="mod_gf">Общая ошибка</string>
+    <string name="mod_add_unable">Не удалось добавить мод</string>
+    <string name="mod_add_wrongformat">Не удалось распознать мод</string>
+    <string name="mod_add_missingdep">Мод требует %s версии %d.%d или новее, но эта зависимость недоступна</string>
+    <string name="mod_add_exists">Мод с таким названием уже существует</string>
+    <string name="mod_skip_updater">Пропустить обновление</string>
+    <string name="sign_in">Войти через %s</string>
+    <string name="enable_beta">Поддержка Sky Beta</string>
+    <string name="launch">Играть</string>
+    <string name="enable_dev">Dev-сервер</string>
+    <string name="wait">Подождите</string>
+    <string name="updater_checking">Проверка обновлений…</string>
+    <string name="updater_update_available">Доступно обновление!</string>
+    <string name="updater_update_downloading">Загрузка…</string>
+    <string name="updater_update_downloaded">Загрузка завершена!</string>
+    <string name="updater_skip">Пропустить</string>
+    <string name="updater_update">Обновить</string>
+    <string name="updater_install">Установить</string>
+    <string name="updater_retry">Повторить</string>
+    <string name="updater_failed">Не удалось обновить</string>
+    <string name="updater_input_unreadable">Загруженные данные повреждены</string>
+    <string name="game_not_installed_warning">Игра не установлена</string>
+    <string name="play">ИГРАТЬ</string>
+    <string name="mods">МОДЫ</string>
+    <string name="check_updates_title">Проверить обновления для [%1$s]?</string>
+    <string name="check_updates_failed_title">Ошибка проверки</string>
+    <string name="updating_failed_title">Ошибка обновления</string>
+    <string name="check_updates_message">Обновление начнётся после подтверждения.</string>
+    <string name="check_button_text">Проверить</string>
+    <string name="update_dialog_title">Доступно обновление для %s!</string>
+    <string name="install_button_text">Установить</string>
+    <string name="updater_busy">Обновление уже выполняется</string>
+    <string name="download_is_going">Идёт загрузка</string>
+    <string name="up_to_date_title">АКТУАЛЬНАЯ ВЕРСИЯ</string>
+    <string name="up_to_date_message">Мод обновлён до последней версии\nВерсия: %1$s</string>
+    <string name="remove">Удалить</string>
+    <string name="check_for_updates">Проверить обновления</string>
+    <string name="switch_hide_canvas_menu">Скрыть меню Canvas и автоматически включать моды</string>
+    <string name="switch_skip_updates">Пропускать обновления игры</string>
+    <string name="enable_cheat_engine_server">Включить сервер Cheat Engine</string>
+    <string name="switch_custom_server">Свой сервер</string>
+
+    <string name="close">Закрыть</string>
+    <string name="mod_icon">иконка мода</string>
+    <string name="no_update_links">Нет источника обновлений</string>
+    <string name="mod_check_updates_checking">Проверка обновлений…</string>
+    <string name="mod_check_updates_found">Найдено обновление!</string>
+    <string name="mod_check_updates_not_found">Обновлений нет.</string>
+    <string name="mod_check_updates_downloading">Загрузка обновления…</string>
+    <string name="mod_check_updates_installing">Установка обновления…</string>
+    <string name="mod_check_updates_complete">Обновление завершено!</string>
+    <string name="mod_check_updates_error">Произошла ошибка</string>
+    <string name="settings_title">НАСТРОЙКИ</string>
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">Sky — игра от thatgamecompany</string>
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ Очистка данных</string>
+    <string name="clear_data_preserved">СОХРАНЯЕТСЯ</string>
+    <string name="clear_data_deleted">УДАЛЯЕТСЯ</string>
+    <string name="clear_data_everything_else">✕  Всё остальное</string>
+    <string name="clear">Очистить</string>
+    <string name="cancel">Отмена</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">Свой libBootloader.so</string>
+    <string name="pick_file">Выбрать файл</string>
+    <string name="pick_file_description">Выберите свой libBootloader.so из хранилища для замены текущего загрузчика</string>
+    <string name="reset_to_original">Вернуть оригинал</string>
+    <string name="reset_to_original_description">Удалить пользовательский файл и заново извлечь оригинал из APK Sky</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">ЗАГОЛОВОК</string>
+    <string name="dialog_description_placeholder">ОПИСАНИЕ</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">GOOGLE PLAY STORE | ГЛОБАЛЬНАЯ ВЕРСИЯ\nИГРАТЬ</string>
+    <string name="launch_huawei">APP GALLERY | ВЕРСИЯ HUAWEI\nИГРАТЬ</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">Основные</string>
+    <string name="hide_canvas_menu">Скрыть меню Canvas</string>
+    <string name="section_developer_options">Для разработчиков</string>
+    <string name="cheat_engine_server">Сервер Cheat Engine</string>
+    <string name="custom_server">Свой сервер</string>
+    <string name="server_url">Адрес сервера</string>
+    <string name="enable_logcat_monitoring">Мониторинг Logcat</string>
+    <string name="section_advanced">Дополнительно</string>
+    <string name="custom_bootloader_setting">Свой libBootloader.so</string>
+    <string name="custom_bootloader_setting_desc">Выбрать свой загрузчик или вернуть оригинал</string>
+    <string name="clear_app_data">Очистка данных</string>
+    <string name="clear_app_data_desc">Удалить все данные кроме модов, папок ThatSkyMod и user.xml</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">Корни</string>
+    <string name="about_chapter_origin_sub">Создан с нуля двумя разработчиками, влюблёнными в Sky.</string>
+    <string name="about_chapter_present">Сегодня</string>
+    <string name="about_chapter_present_sub">Canvas жив благодаря им.</string>
+    <string name="about_chapter_team">Команда</string>
+    <string name="about_chapter_team_sub">Все, кто сделал Canvas лучше.</string>
+    <string name="about_chapter_art">Оформление</string>
+    <string name="about_chapter_art_sub">Авторы визуального стиля.</string>
+    <string name="about_chapter_community">Сообщество</string>
+    <string name="about_chapter_community_sub">Присоединяйтесь к тысячам игроков, использующих Canvas каждый день.</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">Автор</string>
+    <string name="role_author_retired">Автор · бывший</string>
+    <string name="role_maintainer">Мейнтейнер</string>
+    <string name="role_banner_artwork">Автор баннера</string>
+    <string name="role_app_icon">Автор иконки</string>
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">Telegram (English)</string>
+    <string name="community_russian_telegram">Telegram (Русский)</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">Стек вызовов скопирован</string>
+    <string name="toast_logcat_enabled">Мониторинг Logcat включён</string>
+    <string name="toast_logcat_disabled">Мониторинг Logcat выключен</string>
+    <string name="toast_bootloader_reset">Сброс выполнен. Оригинал будет извлечён при следующем запуске.</string>
+    <string name="toast_bootloader_applied">✓ Свой libBootloader.so применён!</string>
+    <string name="toast_clearing_data">Очистка данных…</string>
+    <string name="toast_cleared_data">Удалено файлов: %1$d, папок: %2$d\nПерезапуск…</string>
+    <string name="toast_data_cleared_restarting">Данные очищены. Перезапуск…</string>
+</resources>

@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="⚠️ Clear App Data"
+        android:text="@string/clear_data_title"
         android:textSize="17sp"
         android:textStyle="bold"
         android:textColor="#FF4444"
@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PRESERVED"
+        android:text="@string/clear_data_preserved"
         android:textSize="11sp"
         android:textStyle="bold"
         android:textAllCaps="true"
@@ -36,35 +36,35 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✓  mods/"
+            android:text="@string/clear_data_mods"
             android:textSize="13sp"
             android:layout_marginBottom="2dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✓  Accounts/"
+            android:text="@string/clear_data_accounts"
             android:textSize="13sp"
             android:layout_marginBottom="2dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✓  config/"
+            android:text="@string/clear_data_config"
             android:textSize="13sp"
             android:layout_marginBottom="2dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✓  AccountAuthInfo.bin"
+            android:text="@string/clear_data_auth"
             android:textSize="13sp"
             android:layout_marginBottom="2dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✓  shared_prefs/user.xml"
+            android:text="@string/clear_data_prefs"
             android:textSize="13sp" />
 
     </LinearLayout>
@@ -72,7 +72,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DELETED"
+        android:text="@string/clear_data_deleted"
         android:textSize="11sp"
         android:textStyle="bold"
         android:textAllCaps="true"
@@ -84,7 +84,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="✕  Everything else"
+        android:text="@string/clear_data_everything_else"
         android:textSize="13sp"
         android:textColor="#FF4444"
         android:alpha="0.8"
@@ -100,7 +100,7 @@
             android:id="@+id/dialog_clear_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Annulla"
+            android:text="@string/cancel"
             android:textSize="14sp"
             android:alpha="0.5"
             android:padding="8dp"
@@ -112,7 +112,7 @@
             android:id="@+id/dialog_clear_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clear"
+            android:text="@string/clear"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="#FF4444"

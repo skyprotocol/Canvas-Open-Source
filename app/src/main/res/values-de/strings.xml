@@ -1,0 +1,136 @@
+<resources>
+    <string name="sky_not_installed">Bitte den Mod-Manager starten und eine Version wählen (Live/Beta/Huawei). Sky ist nicht installiert — Canvas benötigt eine installierte Version von Sky!</string>
+    <string name="mod_manager">Mod-Verwaltung</string>
+    <string name="add_mod">Mod hinzufügen</string>
+    <string name="mod_invalid">Ungültiger Mod. Fehlende Abhängigkeiten?</string>
+    <string name="mod_remove_unable">Mod konnte nicht entfernt werden</string>
+    <string name="mod_remove_deps">Andere Mods hängen davon ab — bitte zuerst diese entfernen!</string>
+    <string name="mod_remove_dep">%s hängt von dem Mod ab, den du entfernen möchtest</string>
+    <string name="mod_ioe">Ein-/Ausgabefehler</string>
+    <string name="mod_gf">Allgemeiner Fehler</string>
+    <string name="mod_add_unable">Mod konnte nicht hinzugefügt werden</string>
+    <string name="mod_add_wrongformat">Mod konnte nicht erkannt werden</string>
+    <string name="mod_add_missingdep">Mod benötigt %s in Version %d.%d oder neuer, diese Abhängigkeit ist aber nicht verfügbar</string>
+    <string name="mod_add_exists">Ein Mod mit diesem Namen existiert bereits</string>
+    <string name="mod_skip_updater">Updater überspringen</string>
+    <string name="sign_in">Anmelden mit %s</string>
+    <string name="enable_beta">Sky Beta unterstützen</string>
+    <string name="launch">Spielen</string>
+    <string name="enable_dev">Dev-Server</string>
+    <string name="wait">Bitte warten</string>
+    <string name="updater_checking">Suche nach Updates…</string>
+    <string name="updater_update_available">Ein Update ist verfügbar!</string>
+    <string name="updater_update_downloading">Wird heruntergeladen…</string>
+    <string name="updater_update_downloaded">Download abgeschlossen!</string>
+    <string name="updater_skip">Überspringen</string>
+    <string name="updater_update">Aktualisieren</string>
+    <string name="updater_install">Installieren</string>
+    <string name="updater_retry">Erneut versuchen</string>
+    <string name="updater_failed">Update fehlgeschlagen</string>
+    <string name="updater_input_unreadable">Heruntergeladene Daten sind beschädigt</string>
+    <string name="game_not_installed_warning">Spiel ist nicht installiert</string>
+    <string name="play">SPIELEN</string>
+    <string name="mods">MODS</string>
+    <string name="check_updates_title">Nach Updates für [%1$s] suchen?</string>
+    <string name="check_updates_failed_title">Prüfung fehlgeschlagen</string>
+    <string name="updating_failed_title">Update fehlgeschlagen</string>
+    <string name="check_updates_message">Das Update startet nach Bestätigung.</string>
+    <string name="check_button_text">Prüfen</string>
+    <string name="update_dialog_title">Neues Update für %s verfügbar!</string>
+    <string name="install_button_text">Installieren</string>
+    <string name="updater_busy">Ein Update läuft bereits</string>
+    <string name="download_is_going">Download läuft</string>
+    <string name="up_to_date_title">AKTUELL</string>
+    <string name="up_to_date_message">Mod ist auf dem neuesten Stand\nVersion: %1$s</string>
+    <string name="remove">Entfernen</string>
+    <string name="check_for_updates">Nach Updates suchen</string>
+    <string name="switch_hide_canvas_menu">Canvas-Menü ausblenden und Mods automatisch aktivieren</string>
+    <string name="switch_skip_updates">Spiel-Updates überspringen</string>
+    <string name="enable_cheat_engine_server">Cheat Engine Server aktivieren</string>
+    <string name="switch_custom_server">Eigener Server</string>
+
+    <string name="close">Schließen</string>
+    <string name="mod_icon">Mod-Symbol</string>
+    <string name="no_update_links">Keine Update-Quelle vorhanden</string>
+    <string name="mod_check_updates_checking">Suche nach Updates…</string>
+    <string name="mod_check_updates_found">Update gefunden!</string>
+    <string name="mod_check_updates_not_found">Keine Updates verfügbar.</string>
+    <string name="mod_check_updates_downloading">Update wird heruntergeladen…</string>
+    <string name="mod_check_updates_installing">Update wird installiert…</string>
+    <string name="mod_check_updates_complete">Update abgeschlossen!</string>
+    <string name="mod_check_updates_error">Ein Fehler ist aufgetreten</string>
+    <string name="settings_title">EINSTELLUNGEN</string>
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">Sky ist ein Spiel von thatgamecompany</string>
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ App-Daten löschen</string>
+    <string name="clear_data_preserved">BLEIBT ERHALTEN</string>
+    <string name="clear_data_deleted">WIRD GELÖSCHT</string>
+    <string name="clear_data_everything_else">✕  Alles andere</string>
+    <string name="clear">Löschen</string>
+    <string name="cancel">Abbrechen</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">Eigene libBootloader.so</string>
+    <string name="pick_file">Datei auswählen</string>
+    <string name="pick_file_description">Wähle eine eigene libBootloader.so aus dem Speicher, um den aktuellen Bootloader zu ersetzen</string>
+    <string name="reset_to_original">Original wiederherstellen</string>
+    <string name="reset_to_original_description">Eigene Datei löschen und das Original aus der Sky-APK neu entpacken</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">TITEL</string>
+    <string name="dialog_description_placeholder">BESCHREIBUNG</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">GOOGLE PLAY STORE | GLOBALE VERSION\nSPIELEN</string>
+    <string name="launch_huawei">APP GALLERY | HUAWEI-VERSION\nSPIELEN</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">Allgemein</string>
+    <string name="hide_canvas_menu">Canvas-Menü ausblenden</string>
+    <string name="section_developer_options">Entwickleroptionen</string>
+    <string name="cheat_engine_server">Cheat Engine Server</string>
+    <string name="custom_server">Eigener Server</string>
+    <string name="server_url">Server-Adresse</string>
+    <string name="enable_logcat_monitoring">Logcat-Protokollierung</string>
+    <string name="section_advanced">Erweitert</string>
+    <string name="custom_bootloader_setting">Eigene libBootloader.so</string>
+    <string name="custom_bootloader_setting_desc">Eigenen Bootloader auswählen oder Original wiederherstellen</string>
+    <string name="clear_app_data">App-Daten löschen</string>
+    <string name="clear_app_data_desc">Alle Daten löschen außer Mods, ThatSkyMod-Ordner und user.xml</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">Der Ursprung</string>
+    <string name="about_chapter_origin_sub">Von zwei Entwicklern aus Liebe zu Sky erschaffen.</string>
+    <string name="about_chapter_present">Heute</string>
+    <string name="about_chapter_present_sub">Canvas lebt dank ihnen weiter.</string>
+    <string name="about_chapter_team">Das Team</string>
+    <string name="about_chapter_team_sub">Alle, die Canvas besser gemacht haben.</string>
+    <string name="about_chapter_art">Gestaltung</string>
+    <string name="about_chapter_art_sub">Die kreativen Köpfe hinter dem Design.</string>
+    <string name="about_chapter_community">Community</string>
+    <string name="about_chapter_community_sub">Werde Teil von Tausenden Spielern, die Canvas täglich nutzen.</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">Autor</string>
+    <string name="role_author_retired">Ehemaliger Autor</string>
+    <string name="role_maintainer">Maintainer</string>
+    <string name="role_banner_artwork">Banner-Design</string>
+    <string name="role_app_icon">App-Icon</string>
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">Telegram (English)</string>
+    <string name="community_russian_telegram">Telegram (Russisch)</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">Stacktrace in Zwischenablage kopiert</string>
+    <string name="toast_logcat_enabled">Logcat-Protokollierung aktiviert</string>
+    <string name="toast_logcat_disabled">Logcat-Protokollierung deaktiviert</string>
+    <string name="toast_bootloader_reset">Zurückgesetzt. Das Original wird beim nächsten Start neu entpackt.</string>
+    <string name="toast_bootloader_applied">✓ Eigene libBootloader.so angewendet!</string>
+    <string name="toast_clearing_data">Daten werden gelöscht…</string>
+    <string name="toast_cleared_data">%1$d Dateien, %2$d Ordner gelöscht\nNeustart…</string>
+    <string name="toast_data_cleared_restarting">Daten gelöscht. Neustart…</string>
+</resources>

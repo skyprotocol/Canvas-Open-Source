@@ -90,10 +90,10 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     startService(logcatIntent);
                 }
-                Toast.makeText(this, "Logcat monitoring enabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_logcat_enabled, Toast.LENGTH_SHORT).show();
             } else {
                 stopService(logcatIntent);
-                Toast.makeText(this, "Logcat monitoring disabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_logcat_disabled, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -171,9 +171,7 @@ public class SettingsActivity extends AppCompatActivity {
             .putBoolean("use_custom_bootloader", false)
             .putInt("bootloader_version", -1)
             .apply();
-        Toast.makeText(this,
-            "Reset applied. Original version will be extracted at the next launch.",
-            Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.toast_bootloader_reset, Toast.LENGTH_LONG).show();
     }
 
     private void copyBootloaderFromUri(Uri uri) {
@@ -199,7 +197,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 Log.i(TAG, "Custom libBootloader.so copied: " + dest.length() / 1024 + " KB");
                 runOnUiThread(() -> Toast.makeText(this,
-                    "✓ Custom libBootloader.so applied!",
+                    R.string.toast_bootloader_applied,
                     Toast.LENGTH_LONG).show());
 
             } catch (Exception e) {
@@ -220,7 +218,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void executeClearAppData() {
-        Toast.makeText(this, "Clearing data...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.toast_clearing_data, Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             int deletedFiles = 0;
             int deletedDirs = 0;
@@ -250,7 +248,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     Toast.makeText(this,
-                        "Cleared " + totalFiles + " files, " + totalDirs + " dirs\nRestarting...",
+                        getString(R.string.toast_cleared_data, totalFiles, totalDirs),
                         Toast.LENGTH_LONG).show();
                     new android.os.Handler().postDelayed(() -> {
                         Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());

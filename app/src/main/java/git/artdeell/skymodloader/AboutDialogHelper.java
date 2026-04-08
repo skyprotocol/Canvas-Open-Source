@@ -31,16 +31,16 @@ public class AboutDialogHelper {
 
         LinearLayout timeline = dialog.findViewById(R.id.about_timeline);
 
-        addChapter(activity, timeline, "The Origin", "Built from scratch by two developers who love Sky.", true);
-		addPerson(activity, timeline, "artdeell", "Author",  "artdeell",  "https://github.com/artdeell");
-        addPerson(activity, timeline, "lukas0x1", "Author · retired", "lukas0x1",  "https://github.com/lukas0x1");
+        addChapter(activity, timeline, activity.getString(R.string.about_chapter_origin), activity.getString(R.string.about_chapter_origin_sub), true);
+		addPerson(activity, timeline, "artdeell", activity.getString(R.string.role_author),  "artdeell",  "https://github.com/artdeell");
+        addPerson(activity, timeline, "lukas0x1", activity.getString(R.string.role_author_retired), "lukas0x1",  "https://github.com/lukas0x1");
         endChapter(timeline);
 
-        addChapter(activity, timeline, "The Present", "Currently keeping Canvas alive.", true);
-        addPerson(activity, timeline, "MisterGatto", "Maintainer", "MisterGatto", "https://github.com/MisterGatto");
+        addChapter(activity, timeline, activity.getString(R.string.about_chapter_present), activity.getString(R.string.about_chapter_present_sub), true);
+        addPerson(activity, timeline, "MisterGatto", activity.getString(R.string.role_maintainer), "MisterGatto", "https://github.com/MisterGatto");
         endChapter(timeline);
 
-        addChapter(activity, timeline, "The Team", "Everyone who made Canvas better.", true);
+        addChapter(activity, timeline, activity.getString(R.string.about_chapter_team), activity.getString(R.string.about_chapter_team_sub), true);
         addPerson(activity, timeline, "RomanChamelo",   null, "RomanChamelo",   "https://github.com/RomanChamelo");
         addPerson(activity, timeline, "Kiojeen",        null, "Kiojeen",        "https://github.com/Kiojeen");
         addPerson(activity, timeline, "Gxosty",         null, "Gxosty",         "https://github.com/gxosty");
@@ -51,15 +51,15 @@ public class AboutDialogHelper {
         addPerson(activity, timeline, "alvindimas05",   null, "alvindimas05",   "https://github.com/alvindimas05");
         endChapter(timeline);
 
-        addChapter(activity, timeline, "The Art", "The faces behind the visuals.", true);
-        addPersonCustomLink(activity, timeline, "Сон~",         "Banner artwork", "VK ›", "https://vk.com/son583");
-        addPersonCustomLink(activity, timeline, "Dysis", "App icon",      "TG ›", "https://t.me/Eliatshaha");
+        addChapter(activity, timeline, activity.getString(R.string.about_chapter_art), activity.getString(R.string.about_chapter_art_sub), true);
+        addPersonCustomLink(activity, timeline, "Сон~",         activity.getString(R.string.role_banner_artwork), "VK ›", "https://vk.com/son583");
+        addPersonCustomLink(activity, timeline, "Dysis", activity.getString(R.string.role_app_icon),      "TG ›", "https://t.me/Eliatshaha");
         endChapter(timeline);
 
-        addChapter(activity, timeline, "The Community", "Join thousands of players who use Canvas every day.", false);
+        addChapter(activity, timeline, activity.getString(R.string.about_chapter_community), activity.getString(R.string.about_chapter_community_sub), false);
 		addCommunityCard(activity, timeline, "Discord", "https://discord.gg/FrHP57VRPs",    "https://discord.gg/FrHP57VRPs");
-        addCommunityCard(activity, timeline, "English Telegram", "t.me/skyautowax", "https://t.me/skyautowax");
-        addCommunityCard(activity, timeline, "Russian Telegram",  "t.me/skyruswax",  "https://t.me/s/ruautowax");
+        addCommunityCard(activity, timeline, activity.getString(R.string.community_english_telegram), "t.me/skyautowax", "https://t.me/skyautowax");
+        addCommunityCard(activity, timeline, activity.getString(R.string.community_russian_telegram),  "t.me/skyruswax",  "https://t.me/s/ruautowax");
 		endChapter(timeline);
 
         dialog.findViewById(R.id.thatgamecompanyLink).setOnClickListener(v ->

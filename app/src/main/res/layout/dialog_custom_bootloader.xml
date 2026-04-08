@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Custom libBootloader.so"
+        android:text="@string/custom_bootloader_title"
         android:textSize="17sp"
         android:textStyle="bold"
         android:layout_marginBottom="4dp" />
@@ -45,14 +45,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pick file"
+                android:text="@string/pick_file"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Choose a custom libBootloader.so file from the storage to replace the current bootloader"
+                android:text="@string/pick_file_description"
                 android:textSize="12sp"
                 android:alpha="0.5"
                 android:layout_marginTop="2dp" />
@@ -90,14 +90,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Reset to original"
+                android:text="@string/reset_to_original"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delete the custom file and re-extract the original from Sky's APK"
+                android:text="@string/reset_to_original_description"
                 android:textSize="12sp"
                 android:alpha="0.5"
                 android:layout_marginTop="2dp" />
@@ -117,7 +117,7 @@
         android:id="@+id/dialog_bootloader_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cancel"
+        android:text="@string/cancel"
         android:textSize="13sp"
         android:alpha="0.4"
         android:layout_gravity="end"

@@ -122,7 +122,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mod Manager"
+                        android:text="@string/mod_manager"
                         android:textColor="@color/text"
                         android:alpha="0.55"
                         android:textSize="12sp" />
@@ -195,7 +195,7 @@
                     android:layout_marginBottom="7dp"
                     android:background="@drawable/buttons"
                     android:gravity="center"
-                    android:text="GOOGLE PLAY STORE | GLOBAL VERSION\nPLAY"
+                    android:text="@string/launch_google_play"
                     android:textSize="12sp"
                     android:maxLines="2" />
 
@@ -216,7 +216,7 @@
                     android:layout_height="54dp"
                     android:background="@drawable/buttons"
                     android:gravity="center"
-                    android:text="APP GALLERY | HUAWEI VERSION\nPLAY"
+                    android:text="@string/launch_huawei"
                     android:textSize="12sp"
                     android:maxLines="2" />
 
