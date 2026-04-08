@@ -212,6 +212,7 @@ Java_git_artdeell_skymodloader_MainActivity_settle(
         jboolean _hideCanvasMenu
         ) {
     fsel_setup(env);
+    Canvas::userLibs.clear();
     Canvas::MainActivity = clazz;
     Canvas::CeserverEnabled = _ceserver_enabled;
     Canvas::hideCanvasMenu = _hideCanvasMenu;
