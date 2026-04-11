@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -39,7 +40,11 @@ public class LogcatMonitorService extends Service {
         Log.d(TAG, "Service created");
 
         createNotificationChannel();
-        startForeground(NOTIFICATION_ID, createNotification("Starting..."));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, createNotification("Starting..."), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            startForeground(NOTIFICATION_ID, createNotification("Starting..."));
+        }
     }
 
     @Override
@@ -97,7 +102,11 @@ public class LogcatMonitorService extends Service {
                 Log.d(TAG, "Log file: " + logFile.getAbsolutePath());
 
                 // starts logcat
-                ProcessBuilder processBuilder = new ProcessBuilder("logcat", "-v", "threadtime");
+                ProcessBuilder processBuilder = new ProcessBuilder(
+                    "logcat",
+                    "--pid=" + android.os.Process.myPid(),
+                    "-v", "threadtime"
+                );
                 logcatProcess = processBuilder.start();
 
                 BufferedReader reader = new BufferedReader(
