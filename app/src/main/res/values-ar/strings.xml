@@ -1,0 +1,152 @@
+<resources>
+    <string name="app_name" translatable="false">Canvas</string>
+    <string name="sky_not_installed">افتح مدير التعديلات واختر مباشر/تجريبي/هواوي. لعبة Sky غير مثبتة. يجب تثبيت Sky لاستخدام هذا!</string>
+    <string name="mod_manager">مدير التعديلات</string>
+    <string name="add_mod">إضافة تعديل</string>
+    <string name="mod_name" translatable="false">%s (%s)</string>
+    <string name="mod_invalid">تعديل غير صالح. هل توجد تبعيات مفقودة؟</string>
+    <string name="mod_remove_unable">تعذر إزالة التعديل</string>
+    <string name="mod_remove_deps">لديك تعديلات تعتمد على هذا التعديل، يرجى إزالتها أولاً!</string>
+    <string name="mod_remove_dep">%s يعتمد على التعديل الذي تحاول إزالته</string>
+    <string name="mod_ioe">خطأ إدخال/إخراج</string>
+    <string name="mod_gf">خطأ عام</string>
+    <string name="mod_add_unable">تعذر إضافة التعديل</string>
+    <string name="mod_add_wrongformat">التعديل غير قابل للقراءة</string>
+    <string name="mod_add_missingdep">التعديل يعتمد على %s %d.%d أو أحدث، لكنه غير متوفر</string>
+    <string name="mod_add_exists">يوجد تعديل بهذا الاسم بالفعل</string>
+    <string name="mod_version" translatable="false">%d.%d.%d</string>
+    <string name="mod_skip_updater">تخطي المُحدِّث</string>
+    <string name="sign_in">تسجيل الدخول باستخدام %s</string>
+    <string name="enable_beta">تفعيل دعم النسخة التجريبية من Sky</string>
+    <string name="launch">تشغيل</string>
+    <string name="enable_dev">خادم المطور</string>
+    <string name="wait">انتظر</string>
+    <string name="updater_checking">جارٍ التحقق من التحديثات…</string>
+    <string name="updater_update_available">يتوفر تحديث جديد!</string>
+    <string name="updater_update_downloading">جارٍ التنزيل…</string>
+    <string name="updater_update_downloaded">تم التنزيل بنجاح!</string>
+    <string name="updater_skip">تخطي</string>
+    <string name="updater_update">تحديث</string>
+    <string name="updater_install">تثبيت</string>
+    <string name="updater_retry">إعادة المحاولة</string>
+    <string name="updater_failed">فشل التحديث</string>
+    <string name="updater_input_unreadable">البيانات التي تم تنزيلها غير قابلة للقراءة</string>
+    <string name="mod_canvas_version" translatable="false">Canvas %s</string>
+    <string name="huawei" translatable="false">هواوي</string>
+    <string name="beta" translatable="false">تجريبي</string>
+    <string name="live" translatable="false">مباشر</string>
+    <string name="game_not_installed_warning">اللعبة غير مثبتة</string>
+    <string name="play">تشغيل</string>
+    <string name="mods">التعديلات</string>
+    <string name="check_updates_title">هل تريد التحقق مما إذا كان [%1$s] لديه تحديث؟</string>
+    <string name="check_updates_failed_title">فشل التحقق</string>
+    <string name="updating_failed_title">"فشل التحديث"</string>
+    <string name="check_updates_message">ملاحظة: سيبدأ التحديث إذا وافقت.</string>
+    <string name="check_button_text">تحقق</string>
+    <string name="version_info" translatable="false">الإصدار: %s\n%s</string>
+    <string name="update_dialog_title">%s لديه تحديث جديد!!</string>
+    <string name="install_button_text">تثبيت</string>
+    <string name="updater_busy">المُحدِّث مشغول</string>
+    <string name="download_is_going">جارٍ التنزيل</string>
+    <string name="up_to_date_title">مُحدَّث</string>
+    <string name="up_to_date_message">التعديل الحالي مُحدَّث\nالإصدار: %1$s</string>
+    <string name="remove">إزالة</string>
+    <string name="check_for_updates">التحقق من التحديثات</string>
+    <string name="switch_hide_canvas_menu">إخفاء قائمة Canvas وتفعيل التعديلات تلقائيًا</string>
+    <string name="switch_skip_updates">تجاوز تحديثات اللعبة</string>
+    <string name="enable_cheat_engine_server">تفعيل خادم محرك الغش</string>
+    <string name="switch_custom_server">تفعيل خادم مخصص</string>
+
+    <string name="close">إغلاق</string>
+    <string name="mod_icon">أيقونة التعديل</string>
+    <string name="no_update_links">لا توجد روابط تحديث</string>
+    <string name="mod_check_updates_checking">جارٍ التحقق من التحديثات…</string>
+    <string name="mod_check_updates_found">تم العثور على تحديث!</string>
+    <string name="mod_check_updates_not_found">لا توجد تحديثات متاحة.</string>
+    <string name="mod_check_updates_downloading">جارٍ تنزيل التحديث…</string>
+    <string name="mod_check_updates_installing">جارٍ تثبيت التحديث…</string>
+    <string name="mod_check_updates_complete">اكتمل التحديث!</string>
+    <string name="mod_check_updates_error">حدث خطأ</string>
+    <string name="settings_title">الإعدادات</string>
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">تم تطوير Sky بواسطة thatgamecompany</string>
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ مسح بيانات التطبيق</string>
+    <string name="clear_data_preserved">محفوظ</string>
+    <string name="clear_data_mods" translatable="false">✓  التعديلات/</string>
+    <string name="clear_data_accounts" translatable="false">✓  الحسابات/</string>
+    <string name="clear_data_config" translatable="false">✓  الإعدادات/</string>
+    <string name="clear_data_auth" translatable="false">✓  معلومات_توثيق_الحساب.bin</string>
+    <string name="clear_data_prefs" translatable="false">✓  التفضيلات_المشتركة/user.xml</string>
+    <string name="clear_data_deleted">محذوف</string>
+    <string name="clear_data_everything_else">✕  كل شيء آخر</string>
+    <string name="clear">مسح</string>
+    <string name="cancel">إلغاء</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">ملف libBootloader.so مخصص</string>
+    <string name="pick_file">اختيار ملف</string>
+    <string name="pick_file_description">اختر ملف libBootloader.so مخصص من التخزين لاستبدال محمّل الإقلاع الحالي</string>
+    <string name="reset_to_original">إعادة إلى الأصلي</string>
+    <string name="reset_to_original_description">حذف الملف المخصص وإعادة استخراج النسخة الأصلية من APK الخاص بـ Sky</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">العنوان</string>
+    <string name="dialog_description_placeholder">الوصف</string>
+    <string name="dialog_progress_zero" translatable="false">0%</string>
+    <string name="dialog_button_natural" translatable="false">NATURAL</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">متجر جوجل بلاي | النسخة العالمية\nتشغيل</string>
+    <string name="launch_huawei">متجر التطبيقات | نسخة هواوي\nتشغيل</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">عام</string>
+    <string name="hide_canvas_menu">إخفاء قائمة Canvas</string>
+    <string name="section_developer_options">خيارات المطور</string>
+    <string name="cheat_engine_server">خادم محرك الغش</string>
+    <string name="custom_server">خادم مخصص</string>
+    <string name="server_url">رابط الخادم</string>
+    <string name="server_url_hint" translatable="false">أدخل-الرابط</string>
+    <string name="enable_logcat_monitoring">تفعيل مراقبة السجل</string>
+    <string name="section_advanced">متقدم</string>
+    <string name="custom_bootloader_setting">ملف libBootloader.so مخصص</string>
+    <string name="custom_bootloader_setting_desc">اختر محمّل إقلاع مخصص أو أعد التعيين إلى الأصلي</string>
+    <string name="clear_app_data">مسح بيانات التطبيق</string>
+    <string name="clear_app_data_desc">حذف جميع البيانات باستثناء التعديلات ومجلدات ThatSkyMod و user.xml</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">الأصل</string>
+    <string name="about_chapter_origin_sub">تم بناؤه من الصفر بواسطة مطورين يحبون Sky.</string>
+    <string name="about_chapter_present">الحاضر</string>
+    <string name="about_chapter_present_sub">يتم حالياً إبقاء Canvas قيد العمل.</string>
+    <string name="about_chapter_team">الفريق</string>
+    <string name="about_chapter_team_sub">كل من جعل Canvas أفضل.</string>
+    <string name="about_chapter_art">الفن</string>
+    <string name="about_chapter_art_sub">الوجوه وراء التصاميم.</string>
+    <string name="about_chapter_community">المجتمع</string>
+    <string name="about_chapter_community_sub">انضم إلى آلاف اللاعبين الذين يستخدمون Canvas يومياً.</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">المؤلف</string>
+    <string name="role_author_retired">المؤلف · متقاعد</string>
+    <string name="role_maintainer">المشرف</string>
+    <string name="role_banner_artwork">تصميم البانر</string>
+    <string name="role_app_icon">أيقونة التطبيق</string>
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">تيليجرام إنجليزي</string>
+    <string name="community_russian_telegram">تيليجرام روسي</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">تم نسخ سجل الأخطاء إلى الحافظة</string>
+    <string name="toast_logcat_enabled">تم تفعيل مراقبة السجل</string>
+    <string name="toast_logcat_disabled">تم تعطيل مراقبة السجل</string>
+    <string name="toast_bootloader_reset">تم تطبيق إعادة التعيين. سيتم استخراج النسخة الأصلية عند التشغيل التالي.</string>
+    <string name="toast_bootloader_applied">✓ تم تطبيق ملف libBootloader.so مخصص!</string>
+    <string name="toast_clearing_data">جارٍ مسح البيانات…</string>
+    <string name="toast_cleared_data">تم مسح %1$d ملفات و %2$d مجلدات\nجارٍ إعادة التشغيل…</string>
+    <string name="toast_data_cleared_restarting">تم مسح البيانات. جارٍ إعادة التشغيل…</string>
+</resources>
