@@ -99,7 +99,7 @@
     <string name="dialog_button_natural" translatable="true">NATURAL</string>
 
     <!-- mod_manager -->
-    <string name="launch_google_play">GOOGLE PLAY STORE | VERSÃO GLOBAL\JOGAR</string>
+    <string name="launch_google_play">GOOGLE PLAY STORE | VERSÃO GLOBAL\nJOGAR</string>
     <string name="launch_huawei">APP GALLERY | VERSÃO HUAWEI\nJOGAR</string>
 
     <!-- setting_layout -->
