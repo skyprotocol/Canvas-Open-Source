@@ -75,11 +75,11 @@
     <!-- dialog_clear_data -->
     <string name="clear_data_title">⚠️ مسح بيانات التطبيق</string>
     <string name="clear_data_preserved">محفوظ</string>
-    <string name="clear_data_mods" translatable="false">✓  التعديلات/</string>
-    <string name="clear_data_accounts" translatable="false">✓  الحسابات/</string>
-    <string name="clear_data_config" translatable="false">✓  الإعدادات/</string>
-    <string name="clear_data_auth" translatable="false">✓  معلومات_توثيق_الحساب.bin</string>
-    <string name="clear_data_prefs" translatable="false">✓  التفضيلات_المشتركة/user.xml</string>
+    <string name="clear_data_mods" translatable="false">✓  mods/</string>
+    <string name="clear_data_accounts" translatable="false">✓  Accounts/</string>
+    <string name="clear_data_config" translatable="false">✓  config/</string>
+    <string name="clear_data_auth" translatable="false">✓  AccountAuthInfo.bin</string>
+    <string name="clear_data_prefs" translatable="false">✓  shared_prefs/user.xml</string>
     <string name="clear_data_deleted">محذوف</string>
     <string name="clear_data_everything_else">✕  كل شيء آخر</string>
     <string name="clear">مسح</string>

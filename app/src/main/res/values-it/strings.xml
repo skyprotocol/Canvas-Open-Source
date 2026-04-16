@@ -54,8 +54,8 @@
     <string name="check_for_updates">Controlla Aggiornamenti</string>
     <string name="switch_hide_canvas_menu">Nascondi il menu di Canvas e abilita le mod in automatico</string>
     <string name="switch_skip_updates">Bypassa gli aggiornamenti del gioco</string>
-    <string name="enable_cheat_engine_server">Abilita il server Cheat Engine</string>
-    <string name="switch_custom_server">Abilita server personalizzato</string>
+    <string name="enable_cheat_engine_server">Abilita il server per Cheat Engine</string>
+    <string name="switch_custom_server">Abilita server privato</string>
 
     <string name="close">Chiudi</string>
     <string name="mod_icon">icona della mod</string>
