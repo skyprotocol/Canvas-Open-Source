@@ -6,12 +6,12 @@
     <string name="mod_name" translatable="false">%s (%s)</string>
     <string name="mod_invalid">Mod inválido. Dependências ausentes?</string>
     <string name="mod_remove_unable">Não foi possível remover o mod</string>
-    <string name="mod_remove_deps">Existem mods que dependem deste; remova-os primeiro!</string>
+    <string name="mod_remove_deps">Existem mods que dependem deste; remova-os primeiro.</string>
     <string name="mod_remove_dep">%s depende do mod que você está tentando remover</string>
-    <string name="mod_ioe">I/O error</string>
+    <string name="mod_ioe">Erro de E/S</string>
     <string name="mod_gf">Falha geral</string>
     <string name="mod_add_unable">Não foi possível adicionar o mod</string>
-    <string name="mod_add_wrongformat">O mod não pode ser lido</string>
+    <string name="mod_add_wrongformat">Não foi possível ler o mod</string>
     <string name="mod_add_missingdep">Este mod depende do %s %d.%d ou superior, mas não está disponível</string>
     <string name="mod_add_exists">Já existe um mod com este nome</string>
     <string name="mod_version" translatable="false">%d.%d.%d</string>
@@ -41,10 +41,10 @@
     <string name="check_updates_title">Deseja verificar se há atualizações para [%1$s]?</string>
     <string name="check_updates_failed_title">Falha na verificação</string>
     <string name="updating_failed_title">Falha na atualização</string>
-    <string name="check_updates_message">Nota: a atualização será iniciada se você confirmar.</string>
+    <string name="check_updates_message">Nota: a atualização será iniciada após a confirmação.</string>
     <string name="check_button_text">Verificar</string>
     <string name="version_info" translatable="false">Versão: %s\n%s</string>
-    <string name="update_dialog_title">Nova atualização disponível para %s!!</string>
+    <string name="update_dialog_title">Nova atualização disponível para %s!</string>
     <string name="install_button_text">Instalar</string>
     <string name="updater_busy">O atualizador está ocupado</string>
     <string name="download_is_going">O download está em andamento</string>
@@ -52,7 +52,7 @@
     <string name="up_to_date_message">O mod atual já está atualizado.\nVersão: %1$s</string>
     <string name="remove">Remover</string>
     <string name="check_for_updates">Verificar atualizações</string>
-    <string name="switch_hide_canvas_menu">Ocultar menu do Canvas &amp; Autoativar mods</string>
+    <string name="switch_hide_canvas_menu">Ocultar menu do Canvas e autoativar mods</string>
     <string name="switch_skip_updates">Ignorar atualizações do jogo</string>
     <string name="enable_cheat_engine_server">Ativar servidor do Cheat Engine</string>
     <string name="switch_custom_server">Ativar servidor personalizado</string>
@@ -74,14 +74,14 @@
 
     <!-- dialog_clear_data -->
     <string name="clear_data_title">⚠️ Limpar dados do app</string>
-    <string name="clear_data_preserved">PRESERVADO</string>
+    <string name="clear_data_preserved">PRESERVADOS</string>
     <string name="clear_data_mods" translatable="false">✓  mods/</string>
     <string name="clear_data_accounts" translatable="false">✓  Accounts/</string>
     <string name="clear_data_config" translatable="false">✓  config/</string>
     <string name="clear_data_auth" translatable="false">✓  AccountAuthInfo.bin</string>
     <string name="clear_data_prefs" translatable="false">✓  shared_prefs/user.xml</string>
-    <string name="clear_data_deleted">APAGADO</string>
-    <string name="clear_data_everything_else">✕  Todo o resto</string>
+    <string name="clear_data_deleted">EXCLUÍDOS</string>
+    <string name="clear_data_everything_else">✕  Demais arquivos</string>
     <string name="clear">Limpar</string>
     <string name="cancel">Cancelar</string>
 
@@ -96,7 +96,7 @@
     <string name="dialog_title_placeholder">TÍTULO</string>
     <string name="dialog_description_placeholder">DESCRIÇÃO</string>
     <string name="dialog_progress_zero" translatable="false">0%</string>
-    <string name="dialog_button_natural" translatable="true">NATURAL</string>
+    <string name="dialog_button_natural" translatable="false">NATURAL</string>
 
     <!-- mod_manager -->
     <string name="launch_google_play">GOOGLE PLAY STORE | VERSÃO GLOBAL\nJOGAR</string>
@@ -109,7 +109,7 @@
     <string name="cheat_engine_server">Servidor do Cheat Engine</string>
     <string name="custom_server">Servidor personalizado</string>
     <string name="server_url">URL do servidor</string>
-    <string name="server_url_hint" translatable="true">inserir-url</string>
+    <string name="server_url_hint" translatable="true">Digite a URL</string>
     <string name="enable_logcat_monitoring">Ativar monitoramento do Logcat</string>
     <string name="section_advanced">AVANÇADO</string>
     <string name="custom_bootloader_setting">libBootloader.so personalizada</string>
@@ -119,11 +119,11 @@
 
     <!-- about_dialog chapters -->
     <string name="about_chapter_origin">A origem</string>
-    <string name="about_chapter_origin_sub">Criado do zero por dois desenvolvedores que amam o Sky.</string>
+    <string name="about_chapter_origin_sub">Criado do zero por dois desenvolvedores que amam Sky.</string>
     <string name="about_chapter_present">O presente</string>
     <string name="about_chapter_present_sub">Atualmente mantendo o Canvas vivo.</string>
     <string name="about_chapter_team">A equipe</string>
-    <string name="about_chapter_team_sub">Todos que tornaram o Canvas melhor.</string>
+    <string name="about_chapter_team_sub">Colaboradores que tornaram o Canvas melhor.</string>
     <string name="about_chapter_art">A arte</string>
     <string name="about_chapter_art_sub">Os rostos por trás do visual.</string>
     <string name="about_chapter_community">A comunidade</string>
@@ -137,8 +137,8 @@
     <string name="role_app_icon">Ícone do app</string>
 
     <!-- about_dialog community cards -->
-    <string name="community_english_telegram">Telegram Inglês</string>
-    <string name="community_russian_telegram">Telegram Russo</string>
+    <string name="community_english_telegram">Telegram (Inglês)</string>
+    <string name="community_russian_telegram">Telegram (Russo)</string>
 
     <!-- toast messages -->
     <string name="toast_stack_trace_copied">Stack trace copiado para a área de transferência</string>
@@ -147,7 +147,6 @@
     <string name="toast_bootloader_reset">Redefinição aplicada. A versão original será extraída na próxima inicialização.</string>
     <string name="toast_bootloader_applied">✓ libBootloader.so personalizada aplicada!</string>
     <string name="toast_clearing_data">Limpando dados…</string>
-    <string name="toast_cleared_data">Limpeza concluída: %1$d arquivos, %2$d pastas\nReiniciando…</string>
+    <string name="toast_cleared_data">Limpeza concluída: %1$d arquivos e %2$d pastas\nReiniciando…</string>
     <string name="toast_data_cleared_restarting">Dados limpos. Reiniciando…</string>
-    
 </resources>

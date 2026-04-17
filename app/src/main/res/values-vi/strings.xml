@@ -1,0 +1,152 @@
+<resources>
+    <string name="app_name" translatable="false">Canvas</string>
+    <string name="sky_not_installed">Mở Quản lý Mod và chọn Live/Beta/Huawei. Sky chưa được cài đặt. Bạn phải cài Sky để sử dụng!</string>
+    <string name="mod_manager">Quản lý Mod</string>
+    <string name="add_mod">Thêm mod</string>
+    <string name="mod_name" translatable="false">%s (%s)</string>
+    <string name="mod_invalid">Mod không hợp lệ. Thiếu phụ thuộc?</string>
+    <string name="mod_remove_unable">Không thể xóa mod</string>
+    <string name="mod_remove_deps">Có mod khác phụ thuộc mod này, hãy xóa chúng trước!</string>
+    <string name="mod_remove_dep">%s phụ thuộc vào mod bạn đang muốn xóa</string>
+    <string name="mod_ioe">Lỗi I/O</string>
+    <string name="mod_gf">Lỗi chung</string>
+    <string name="mod_add_unable">Không thể thêm mod</string>
+    <string name="mod_add_wrongformat">Không đọc được mod</string>
+    <string name="mod_add_missingdep">Mod yêu cầu %s %d.%d hoặc mới hơn nhưng không có</string>
+    <string name="mod_add_exists">Đã có mod trùng tên</string>
+    <string name="mod_version" translatable="false">%d.%d.%d</string>
+    <string name="mod_skip_updater">Bỏ qua cập nhật</string>
+    <string name="sign_in">Đăng nhập bằng %s</string>
+    <string name="enable_beta">Bật hỗ trợ Sky Beta</string>
+    <string name="launch">Chơi</string>
+    <string name="enable_dev">Máy chủ Dev</string>
+    <string name="wait">Chờ</string>
+    <string name="updater_checking">Đang kiểm tra cập nhật…</string>
+    <string name="updater_update_available">Có bản cập nhật mới!</string>
+    <string name="updater_update_downloading">Đang tải…</string>
+    <string name="updater_update_downloaded">Tải xuống thành công!</string>
+    <string name="updater_skip">Bỏ qua</string>
+    <string name="updater_update">Cập nhật</string>
+    <string name="updater_install">Cài đặt</string>
+    <string name="updater_retry">Thử lại</string>
+    <string name="updater_failed">Cập nhật thất bại</string>
+    <string name="updater_input_unreadable">Dữ liệu tải về không đọc được</string>
+    <string name="mod_canvas_version" translatable="false">Canvas %s</string>
+    <string name="huawei" translatable="false">Huawei</string>
+    <string name="beta" translatable="false">Beta</string>
+    <string name="live" translatable="false">Live</string>
+    <string name="game_not_installed_warning">Game chưa được cài</string>
+    <string name="play">CHƠI</string>
+    <string name="mods">MOD</string>
+    <string name="check_updates_title">Do you want to check if [%1$s] have an update?</string>
+    <string name="check_updates_failed_title">Kiểm tra thất bại</string>
+    <string name="updating_failed_title">"Updating Failed"</string>
+    <string name="check_updates_message">Note: Cập nhật will start if you feel OK.</string>
+    <string name="check_button_text">Kiểm tra</string>
+    <string name="version_info" translatable="false">Version: %s\n%s</string>
+    <string name="update_dialog_title">%s Has a new update!!</string>
+    <string name="install_button_text">Cài đặt</string>
+    <string name="updater_busy">Cập nhậtr is busy</string>
+    <string name="download_is_going">Đang tải xuống</string>
+    <string name="up_to_date_title">ĐÃ MỚI NHẤT</string>
+    <string name="up_to_date_message">Current mod is up to date\nVersion: %1$s</string>
+    <string name="remove">Xóa</string>
+    <string name="check_for_updates">Kiểm tra For Cập nhậts</string>
+    <string name="switch_hide_canvas_menu">Hide Canvas Menu &amp; Auto Enable Mods</string>
+    <string name="switch_skip_updates">Bypass Game Cập nhậts</string>
+    <string name="enable_cheat_engine_server">Bật máy chủ Cheat Engine</string>
+    <string name="switch_custom_server">Bật máy chủ tùy chỉnh</string>
+
+    <string name="close">Đóng</string>
+    <string name="mod_icon">icon mod</string>
+    <string name="no_update_links">No Cập nhật Links</string>
+    <string name="mod_check_updates_checking">Đang kiểm tra cập nhật…</string>
+    <string name="mod_check_updates_found">Đã tìm thấy bản cập nhật!</string>
+    <string name="mod_check_updates_not_found">Không có bản cập nhật.</string>
+    <string name="mod_check_updates_downloading">Đang tải bản cập nhật…</string>
+    <string name="mod_check_updates_installing">Cài đặting update…</string>
+    <string name="mod_check_updates_complete">Cập nhật complete!</string>
+    <string name="mod_check_updates_error">Đã xảy ra lỗi</string>
+    <string name="settings_title">CÀI ĐẶT</string>
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">Sky được tạo bởi thatgamecompany</string>
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ Xóa dữ liệu ứng dụng</string>
+    <string name="clear_data_preserved">GIỮ LẠI</string>
+    <string name="clear_data_mods" translatable="false">✓  mods/</string>
+    <string name="clear_data_accounts" translatable="false">✓  Accounts/</string>
+    <string name="clear_data_config" translatable="false">✓  config/</string>
+    <string name="clear_data_auth" translatable="false">✓  AccountAuthInfo.bin</string>
+    <string name="clear_data_prefs" translatable="false">✓  shared_prefs/user.xml</string>
+    <string name="clear_data_deleted">ĐÃ XÓA</string>
+    <string name="clear_data_everything_else">✕  Mọi thứ khác</string>
+    <string name="clear">Xóa</string>
+    <string name="cancel">Hủy</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">libBootloader.so tùy chỉnh</string>
+    <string name="pick_file">Chọn file</string>
+    <string name="pick_file_description">Chọn file libBootloader.so tùy chỉnh từ bộ nhớ để thay bootloader hiện tại</string>
+    <string name="reset_to_original">Khôi phục gốc</string>
+    <string name="reset_to_original_description">Xóa file tùy chỉnh và giải nén lại bản gốc từ APK của Sky</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">TIÊU ĐỀ</string>
+    <string name="dialog_description_placeholder">MÔ TẢ</string>
+    <string name="dialog_progress_zero" translatable="false">0%</string>
+    <string name="dialog_button_natural" translatable="false">NATURAL</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">GOOGLE CHƠI STORE | GLOBAL VERSION\nCHƠI</string>
+    <string name="launch_huawei">APP GALLERY | HUAWEI VERSION\nCHƠI</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">Chung</string>
+    <string name="hide_canvas_menu">Ẩn menu Canvas</string>
+    <string name="section_developer_options">Tùy chọn nhà phát triển</string>
+    <string name="cheat_engine_server">Máy chủ Cheat Engine</string>
+    <string name="custom_server">Máy chủ tùy chỉnh</string>
+    <string name="server_url">URL máy chủ</string>
+    <string name="server_url_hint" translatable="false">insert-url</string>
+    <string name="enable_logcat_monitoring">Bật theo dõi Logcat</string>
+    <string name="section_advanced">Nâng cao</string>
+    <string name="custom_bootloader_setting">libBootloader.so tùy chỉnh</string>
+    <string name="custom_bootloader_setting_desc">Chọn bootloader tùy chỉnh hoặc khôi phục bản gốc</string>
+    <string name="clear_app_data">Xóa App Data</string>
+    <string name="clear_app_data_desc">Xóa toàn bộ dữ liệu trừ mods, thư mục ThatSkyMod và user.xml</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">Nguồn gốc</string>
+    <string name="about_chapter_origin_sub">Được xây dựng từ đầu bởi hai dev yêu thích Sky.</string>
+    <string name="about_chapter_present">Hiện tại</string>
+    <string name="about_chapter_present_sub">Hiện đang duy trì Canvas.</string>
+    <string name="about_chapter_team">Đội ngũ</string>
+    <string name="about_chapter_team_sub">Những người đã làm Canvas tốt hơn.</string>
+    <string name="about_chapter_art">Nghệ thuật</string>
+    <string name="about_chapter_art_sub">Những người đứng sau phần hình ảnh.</string>
+    <string name="about_chapter_community">Cộng đồng</string>
+    <string name="about_chapter_community_sub">Tham gia cùng hàng nghìn người chơi dùng Canvas mỗi ngày.</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">Tác giả</string>
+    <string name="role_author_retired">Tác giả · retired</string>
+    <string name="role_maintainer">Người duy trì</string>
+    <string name="role_banner_artwork">Ảnh banner</string>
+    <string name="role_app_icon">Icon ứng dụng</string>
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">Telegram tiếng Anh</string>
+    <string name="community_russian_telegram">Telegram tiếng Nga</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">Đã sao chép stack trace</string>
+    <string name="toast_logcat_enabled">Đã bật Logcat</string>
+    <string name="toast_logcat_disabled">Đã tắt Logcat</string>
+    <string name="toast_bootloader_reset">Đã khôi phục. Bản gốc sẽ được giải nén ở lần mở tiếp theo.</string>
+    <string name="toast_bootloader_applied">✓ libBootloader.so tùy chỉnh applied!</string>
+    <string name="toast_clearing_data">Xóaing data…</string>
+    <string name="toast_cleared_data">Xóaed %1$d files, %2$d dirs\nRestarting…</string>
+    <string name="toast_data_cleared_restarting">Đã xóa dữ liệu. Đang khởi động lại…</string>
+</resources>
