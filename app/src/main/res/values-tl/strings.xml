@@ -1,0 +1,152 @@
+<resources>
+    <string name="app_name" translatable="false">Canvas</string>
+    <string name="sky_not_installed">Ibuksan ang Mod Manager at pumili Live/Beta/Huawei. Hindi naka download ang Sky. Dapat idownload muna ang Sky para makagamit ka nito.</string>
+    <string name="mod_manager">Mod Manager</string>
+    <string name="add_mod">Add mod</string>
+    <string name="mod_name" translatable="false">%s (%s)</string>
+    <string name="mod_invalid">Di-wastong mod. Nawawala ang mga dependencies?</string>
+    <string name="mod_remove_unable">Hindi maalis ang mod.</string>
+    <string name="mod_remove_deps">Mayroon kang mods na naka depende dito sa mod, maunawang ialis muna ito!</string>
+    <string name="mod_remove_dep">%s Depende sa mod na iaalis mo</string>
+    <string name="mod_ioe">I/O error</string>
+    <string name="mod_gf">General fault</string>
+    <string name="mod_add_unable">Hindi malagay ang mod.</string>
+    <string name="mod_add_wrongformat">Hindi mabasa ang mod.</string>
+    <string name="mod_add_missingdep">Ang mod ay depende sa %s %d.%d o kaya masbago, pero hindi ito available.</string>
+    <string name="mod_add_exists">May isa nang mod na naka pangalan ukay dito.</string>
+    <string name="mod_version" translatable="false">%d.%d.%d</string>
+    <string name="mod_skip_updater">Skip the updater</string>
+    <string name="sign_in">Sign in with %s</string>
+    <string name="enable_beta">Enable Sky Beta support</string>
+    <string name="launch">Play</string>
+    <string name="enable_dev">Dev Server</string>
+    <string name="wait">Teka lang</string>
+    <string name="updater_checking">Naghahanap para sa updates...</string>
+    <string name="updater_update_available">May bagong puwedeng update!</string>
+    <string name="updater_update_downloading">Downloading…</string>
+    <string name="updater_update_downloaded">Downloaded successfully!</string>
+    <string name="updater_skip">Skip</string>
+    <string name="updater_update">Update</string>
+    <string name="updater_install">Install</string>
+    <string name="updater_retry">Ulitin</string>
+    <string name="updater_failed">Nabigo ang update.</string>
+    <string name="updater_input_unreadable">Downloaded datos ay hindi mabasa.</string>
+    <string name="mod_canvas_version" translatable="false">Canvas %s</string>
+    <string name="huawei" translatable="false">Huawei</string>
+    <string name="beta" translatable="false">Beta</string>
+    <string name="live" translatable="false">Live</string>
+    <string name="game_not_installed_warning">Hindi naka install ang laro.</string>
+    <string name="play">MAGLARO</string>
+    <string name="mods">MODS</string>
+    <string name="check_updates_title">Gusto mo bang suriin kung [%1$s] ay may update?</string>
+    <string name="check_updates_failed_title">Nabigo ang pagse-check.</string>
+    <string name="updating_failed_title">"Nabigo and pag update."</string>
+    <string name="check_updates_message">Note: Magsisimula ang update pagka OK ka na.</string>
+    <string name="check_button_text">Check</string>
+    <string name="version_info" translatable="false">Version: %s\n%s</string>
+    <string name="update_dialog_title">%s Ay may bagong update!</string>
+    <string name="install_button_text">Install</string>
+    <string name="updater_busy">Ang updater ay abala.</string>
+    <string name="download_is_going">Ang download ay pumupunta.</string>
+    <string name="up_to_date_title">UP TO DATE</string>
+    <string name="up_to_date_message">Ang mod ay kasalukuyan sa date \nVersion: %1$s</string>
+    <string name="remove">Tangalin</string>
+    <string name="check_for_updates">Mag-check para sa updates.</string>
+    <string name="switch_hide_canvas_menu">Itago ang Canvas Menu &amp; Auto Enable Mods</string>
+    <string name="switch_skip_updates">Bypass Game Updates</string>
+    <string name="enable_cheat_engine_server">Enable Cheat Engine Server</string>
+    <string name="switch_custom_server">Enable Custom Server</string>
+
+    <string name="close">Isarado</string>
+    <string name="mod_icon">mod icon</string>
+    <string name="no_update_links">Walang Update Links</string>
+    <string name="mod_check_updates_checking">Nagse-check para sa updates…</string>
+    <string name="mod_check_updates_found">Nakahanap ng update!</string>
+    <string name="mod_check_updates_not_found">Walang magagamit na updates.</string>
+    <string name="mod_check_updates_downloading">Downloading update…</string>
+    <string name="mod_check_updates_installing">Installing update…</string>
+    <string name="mod_check_updates_complete">Kumpleto na ang update!</string>
+    <string name="mod_check_updates_error">May nangyaring error.</string>
+    <string name="settings_title">SETTINGS</string>
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">Ang Sky ay ginawa ni thatgamecompany</string>
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ Clear App Data</string>
+    <string name="clear_data_preserved">PRESERVED</string>
+    <string name="clear_data_mods" translatable="false">✓  mods/</string>
+    <string name="clear_data_accounts" translatable="false">✓  Accounts/</string>
+    <string name="clear_data_config" translatable="false">✓  config/</string>
+    <string name="clear_data_auth" translatable="false">✓  AccountAuthInfo.bin</string>
+    <string name="clear_data_prefs" translatable="false">✓  shared_prefs/user.xml</string>
+    <string name="clear_data_deleted">DELETED</string>
+    <string name="clear_data_everything_else">✕  Everything else</string>
+    <string name="clear">Clear</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">Custom libBootloader.so</string>
+    <string name="pick_file">Pumili ng file</string>
+    <string name="pick_file_description">Pumili ka ng custom libBootloader.so file sa storage para palitan ang kasulukuyang bootloader.</string>
+    <string name="reset_to_original">I-reset sa orihinal.</string>
+    <string name="reset_to_original_description">Alisin ang custom file at i-re-extract ang orihinal galing sa Sky\'s APK</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">TITLE</string>
+    <string name="dialog_description_placeholder">DESCRIPTION</string>
+    <string name="dialog_progress_zero" translatable="false">0%</string>
+    <string name="dialog_button_natural" translatable="false">NATURAL</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">GOOGLE PLAY STORE | GLOBAL VERSION\nPLAY</string>
+    <string name="launch_huawei">APP GALLERY | HUAWEI VERSION\nPLAY</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">General</string>
+    <string name="hide_canvas_menu">Itago ang Canvas menu</string>
+    <string name="section_developer_options">Developer Options</string>
+    <string name="cheat_engine_server">Cheat Engine Server</string>
+    <string name="custom_server">Custom server</string>
+    <string name="server_url">Server URL</string>
+    <string name="server_url_hint" translatable="false">insert-url</string>
+    <string name="enable_logcat_monitoring">Enable Logcat Monitoring</string>
+    <string name="section_advanced">Advanced</string>
+    <string name="custom_bootloader_setting">Custom libBootloader.so</string>
+    <string name="custom_bootloader_setting_desc">Pumili ng custom bootloader o i-reset sa orihinal</string>
+    <string name="clear_app_data">Clear App Data</string>
+    <string name="clear_app_data_desc">Alisin ang lahat ng datos maliban ba sa mods, ThatSkyMod\'s folders at user.xml</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">Ang Pinagmulan</string>
+    <string name="about_chapter_origin_sub">Itinayo galing sa scratch ng dalawang developers na mahal ang Sky.</string>
+    <string name="about_chapter_present">Ang Kasalukuyan</string>
+    <string name="about_chapter_present_sub">Kasalukuyan na binubuhay ang Canvas.</string>
+    <string name="about_chapter_team">Ang Koponan</string>
+    <string name="about_chapter_team_sub">Ang mga tao na ginawang mas mabuti ang Canvas.</string>
+    <string name="about_chapter_art">Ang Sining</string>
+    <string name="about_chapter_art_sub">Ang mga muka sa likod ng mga biswals.</string>
+    <string name="about_chapter_community">Ang Komunidad</string>
+    <string name="about_chapter_community_sub">Sumali sa libu-libong manlalaro na ginagamit ang Canvas araw-araw.</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">Author</string>
+    <string name="role_author_retired">Author · retired</string>
+    <string name="role_maintainer">Maintainer</string>
+    <string name="role_banner_artwork">Banner artwork</string>
+    <string name="role_app_icon">App icon</string>
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">English Telegram</string>
+    <string name="community_russian_telegram">Russian Telegram</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">Stack trace copied to clipboard</string>
+    <string name="toast_logcat_enabled">Logcat monitoring enabled</string>
+    <string name="toast_logcat_disabled">Logcat monitoring disabled</string>
+    <string name="toast_bootloader_reset">Reset applied. Original version will be extracted at the next launch.</string>
+    <string name="toast_bootloader_applied">✓ Custom libBootloader.so applied!</string>
+    <string name="toast_clearing_data">Clearing data…</string>
+    <string name="toast_cleared_data">Cleared %1$d files, %2$d dirs\nRestarting…</string>
+    <string name="toast_data_cleared_restarting">Data cleared. Restarting…</string>
+</resources>
