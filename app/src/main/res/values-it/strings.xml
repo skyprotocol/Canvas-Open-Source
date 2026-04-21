@@ -149,4 +149,15 @@
     <string name="toast_clearing_data">Cancellazione dati in corso…</string>
     <string name="toast_cleared_data">Cancellati %1$d file, %2$d cartelle\nRiavvio in corso…</string>
     <string name="toast_data_cleared_restarting">Dati cancellati. Riavvio in corso…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">Mod</string>
+    <string name="tab_community">Community</string>
+    <string name="community_title">COMMUNITY</string>
+    <string name="community_subtitle">Unisciti alle nostre community ufficiali</string>
+    <string name="join_server">Unisciti</string>
+    <string name="members_count">%s membri</string>
+    <string name="online_count">%s online</string>
+    <string name="loading_server">Caricamento…</string>
+    <string name="error_loading_server">Impossibile caricare le info del server</string>
 </resources>

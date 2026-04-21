@@ -1,0 +1,163 @@
+<resources>
+    <string name="app_name" translatable="false">Canvas</string>
+    <string name="sky_not_installed">Mod マネージャーを開き、Live / Beta / Huawei を選択してください。Sky がインストールされていません。使用するには Sky が必要です！</string>
+    <string name="mod_manager">Mod マネージャー</string>
+    <string name="add_mod">Mod を追加</string>
+    <string name="mod_name" translatable="false">%s (%s)</string>
+    <string name="mod_invalid">無効な Mod です。依存関係が不足していますか？</string>
+    <string name="mod_remove_unable">Mod を削除できませんでした</string>
+    <string name="mod_remove_deps">この Mod に依存している Mod があります。先にそちらを削除してください！</string>
+    <string name="mod_remove_dep">%s はこの Mod に依存しています</string>
+    <string name="mod_ioe">I/O エラー</string>
+    <string name="mod_gf">一般エラー</string>
+    <string name="mod_add_unable">Mod を追加できませんでした</string>
+    <string name="mod_add_wrongformat">Mod を読み込めません</string>
+    <string name="mod_add_missingdep">この Mod には %s %d.%d 以上が必要ですが、利用できません</string>
+    <string name="mod_add_exists">同じ名前の Mod がすでに存在します</string>
+    <string name="mod_version" translatable="false">%d.%d.%d</string>
+    <string name="mod_skip_updater">アップデーターをスキップ</string>
+    <string name="sign_in">%s でサインイン</string>
+    <string name="enable_beta">Sky ベータ版のサポートを有効化</string>
+    <string name="launch">プレイ</string>
+    <string name="enable_dev">開発者サーバー</string>
+    <string name="wait">お待ちください</string>
+    <string name="updater_checking">アップデートを確認中…</string>
+    <string name="updater_update_available">新しいアップデートがあります！</string>
+    <string name="updater_update_downloading">ダウンロード中…</string>
+    <string name="updater_update_downloaded">ダウンロード完了！</string>
+    <string name="updater_skip">スキップ</string>
+    <string name="updater_update">アップデート</string>
+    <string name="updater_install">インストール</string>
+    <string name="updater_retry">再試行</string>
+    <string name="updater_failed">アップデートに失敗しました</string>
+    <string name="updater_input_unreadable">ダウンロードしたデータを読み込めません</string>
+    <string name="mod_canvas_version" translatable="false">Canvas %s</string>
+    <string name="huawei" translatable="false">Huawei</string>
+    <string name="beta" translatable="false">Beta</string>
+    <string name="live" translatable="false">Live</string>
+    <string name="game_not_installed_warning">ゲームがインストールされていません</string>
+    <string name="play">プレイ</string>
+    <string name="mods">MOD</string>
+    <string name="check_updates_title">[%1$s] のアップデートを確認しますか？</string>
+    <string name="check_updates_failed_title">確認に失敗しました</string>
+    <string name="updating_failed_title">アップデートに失敗しました</string>
+    <string name="check_updates_message">注意：確認後にアップデートが開始されます。</string>
+    <string name="check_button_text">確認</string>
+    <string name="version_info" translatable="false">バージョン: %s\n%s</string>
+    <string name="update_dialog_title">%s に新しいアップデートがあります！！</string>
+    <string name="install_button_text">インストール</string>
+    <string name="updater_busy">アップデーターは処理中です</string>
+    <string name="download_is_going">ダウンロード中です</string>
+    <string name="up_to_date_title">最新バージョンです</string>
+    <string name="up_to_date_message">現在の Mod は最新です\nバージョン: %1$s</string>
+    <string name="remove">削除</string>
+    <string name="check_for_updates">アップデートを確認</string>
+    <string name="switch_hide_canvas_menu">Canvas メニューを非表示 &amp; Mod を自動有効化</string>
+    <string name="switch_skip_updates">ゲームのアップデートをスキップ</string>
+    <string name="enable_cheat_engine_server">Cheat Engine サーバーを有効化</string>
+    <string name="switch_custom_server">カスタムサーバーを有効化</string>
+
+    <string name="close">閉じる</string>
+    <string name="mod_icon">Mod アイコン</string>
+    <string name="no_update_links">アップデートリンクなし</string>
+    <string name="mod_check_updates_checking">アップデートを確認中…</string>
+    <string name="mod_check_updates_found">アップデートが見つかりました！</string>
+    <string name="mod_check_updates_not_found">アップデートはありません。</string>
+    <string name="mod_check_updates_downloading">アップデートをダウンロード中…</string>
+    <string name="mod_check_updates_installing">アップデートをインストール中…</string>
+    <string name="mod_check_updates_complete">アップデート完了！</string>
+    <string name="mod_check_updates_error">エラーが発生しました</string>
+    <string name="settings_title">設定</string>
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">Sky は thatgamecompany が制作しています</string>
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ アプリデータを削除</string>
+    <string name="clear_data_preserved">保持されるもの</string>
+    <string name="clear_data_mods" translatable="false">✓  mods/</string>
+    <string name="clear_data_accounts" translatable="false">✓  Accounts/</string>
+    <string name="clear_data_config" translatable="false">✓  config/</string>
+    <string name="clear_data_auth" translatable="false">✓  AccountAuthInfo.bin</string>
+    <string name="clear_data_prefs" translatable="false">✓  shared_prefs/user.xml</string>
+    <string name="clear_data_deleted">削除されるもの</string>
+    <string name="clear_data_everything_else">✕  その他すべて</string>
+    <string name="clear">削除</string>
+    <string name="cancel">キャンセル</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">カスタム libBootloader.so</string>
+    <string name="pick_file">ファイルを選択</string>
+    <string name="pick_file_description">ストレージからカスタム libBootloader.so ファイルを選択し、現在のブートローダーと置き換えます</string>
+    <string name="reset_to_original">元に戻す</string>
+    <string name="reset_to_original_description">カスタムファイルを削除し、Sky の APK から元のファイルを再展開します</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">タイトル</string>
+    <string name="dialog_description_placeholder">説明</string>
+    <string name="dialog_progress_zero" translatable="false">0%</string>
+    <string name="dialog_button_natural" translatable="false">NATURAL</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">GOOGLE PLAY STORE | グローバル版\nプレイ</string>
+    <string name="launch_huawei">APP GALLERY | HUAWEI版\nプレイ</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">一般</string>
+    <string name="hide_canvas_menu">Canvas メニューを非表示</string>
+    <string name="section_developer_options">開発者オプション</string>
+    <string name="cheat_engine_server">Cheat Engine サーバー</string>
+    <string name="custom_server">カスタムサーバー</string>
+    <string name="server_url">サーバー URL</string>
+    <string name="server_url_hint" translatable="false">insert-url</string>
+    <string name="enable_logcat_monitoring">Logcat モニタリングを有効化</string>
+    <string name="section_advanced">詳細設定</string>
+    <string name="custom_bootloader_setting">カスタム libBootloader.so</string>
+    <string name="custom_bootloader_setting_desc">カスタムブートローダーを選択するか、元に戻す</string>
+    <string name="clear_app_data">アプリデータを削除</string>
+    <string name="clear_app_data_desc">Mod、ThatSkyMod のフォルダ、user.xml を除くすべてのデータを削除します</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">誕生</string>
+    <string name="about_chapter_origin_sub">Sky を愛する 2 人の開発者によってゼロから作られました。</string>
+    <string name="about_chapter_present">現在</string>
+    <string name="about_chapter_present_sub">Canvas を維持し続けています。</string>
+    <string name="about_chapter_team">チーム</string>
+    <string name="about_chapter_team_sub">Canvas をより良くしてくれたすべての方々。</string>
+    <string name="about_chapter_art">アート</string>
+    <string name="about_chapter_art_sub">ビジュアルを手がけたクリエイターたち。</string>
+    <string name="about_chapter_community">コミュニティ</string>
+    <string name="about_chapter_community_sub">毎日 Canvas を使う何千ものプレイヤーに参加しよう。</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">制作者</string>
+    <string name="role_author_retired">制作者・引退</string>
+    <string name="role_maintainer">メンテナー</string>
+    <string name="role_banner_artwork">バナーアート</string>
+    <string name="role_app_icon">アプリアイコン</string>
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">英語版 Telegram</string>
+    <string name="community_russian_telegram">ロシア語版 Telegram</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">スタックトレースをクリップボードにコピーしました</string>
+    <string name="toast_logcat_enabled">Logcat モニタリングを有効化しました</string>
+    <string name="toast_logcat_disabled">Logcat モニタリングを無効化しました</string>
+    <string name="toast_bootloader_reset">リセットを適用しました。次回起動時に元のバージョンが展開されます。</string>
+    <string name="toast_bootloader_applied">✓ カスタム libBootloader.so を適用しました！</string>
+    <string name="toast_clearing_data">データを削除中…</string>
+    <string name="toast_cleared_data">%1$d 個のファイルと %2$d 個のフォルダを削除しました\n再起動中…</string>
+    <string name="toast_data_cleared_restarting">データを削除しました。再起動中…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">Mod</string>
+    <string name="tab_community">コミュニティ</string>
+    <string name="community_title">コミュニティ</string>
+    <string name="community_subtitle">公式コミュニティに参加しよう</string>
+    <string name="join_server">参加</string>
+    <string name="members_count">%s メンバー</string>
+    <string name="online_count">%s オンライン</string>
+    <string name="loading_server">読み込み中…</string>
+    <string name="error_loading_server">サーバー情報を読み込めませんでした</string>
+</resources>

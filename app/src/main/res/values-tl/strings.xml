@@ -149,4 +149,15 @@
     <string name="toast_clearing_data">Clearing data…</string>
     <string name="toast_cleared_data">Cleared %1$d files, %2$d dirs\nRestarting…</string>
     <string name="toast_data_cleared_restarting">Data cleared. Restarting…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">Mods</string>
+    <string name="tab_community">Komunidad</string>
+    <string name="community_title">KOMUNIDAD</string>
+    <string name="community_subtitle">Sumali sa aming mga opisyal na komunidad</string>
+    <string name="join_server">Sumali</string>
+    <string name="members_count">%s miyembro</string>
+    <string name="online_count">%s online</string>
+    <string name="loading_server">Naglo-load…</string>
+    <string name="error_loading_server">Hindi maload ang info ng server</string>
 </resources>

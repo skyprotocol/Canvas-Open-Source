@@ -11,4 +11,6 @@
     <color name="widgets">#FF161616</color>
     <color name="text">#FFFFFFFF</color>
     <color name="green">#83EF06</color>
+    <color name="discord_blurple">#5865F2</color>
+    <color name="discord_online_green">#3BA55C</color>
 </resources>

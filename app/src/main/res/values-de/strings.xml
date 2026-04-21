@@ -133,4 +133,15 @@
     <string name="toast_clearing_data">Daten werden gelöscht…</string>
     <string name="toast_cleared_data">%1$d Dateien, %2$d Ordner gelöscht\nNeustart…</string>
     <string name="toast_data_cleared_restarting">Daten gelöscht. Neustart…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">Mods</string>
+    <string name="tab_community">Community</string>
+    <string name="community_title">COMMUNITY</string>
+    <string name="community_subtitle">Tritt unseren offiziellen Communities bei</string>
+    <string name="join_server">Beitreten</string>
+    <string name="members_count">%s Mitglieder</string>
+    <string name="online_count">%s online</string>
+    <string name="loading_server">Wird geladen…</string>
+    <string name="error_loading_server">Serverinfo konnte nicht geladen werden</string>
 </resources>

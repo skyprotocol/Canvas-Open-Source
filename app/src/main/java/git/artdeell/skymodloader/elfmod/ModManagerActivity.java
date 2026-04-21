@@ -12,10 +12,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +31,7 @@ import java.util.Objects;
 
 import git.artdeell.skymodloader.AboutDialogHelper;
 import git.artdeell.skymodloader.BuildConfig;
+import git.artdeell.skymodloader.CommunityTabBuilder;
 import git.artdeell.skymodloader.DialogY;
 import git.artdeell.skymodloader.LogcatMonitorService;
 import git.artdeell.skymodloader.MainActivity;
@@ -55,6 +59,15 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     private ArrayList<String> skyPackages;
     private ModUpdaterDialogManager mDialogManager;
 
+    // Tab navigation
+    private ConstraintLayout modsTabContent;
+    private ScrollView communityTabContent;
+    private LinearLayout communityContainer;
+    private TextView navModsText;
+    private TextView navCommunityText;
+    private boolean isModsTabActive = true;
+    private boolean communityLoaded = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +89,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         modListView.setAdapter(new ModListAdapter(loader));
         setButtonClickListeners();
         setButtonLongClickListeners();
+        initializeTabNavigation();
     }
 
     private void initializeModUpdater() {
@@ -389,6 +403,36 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             new CanvasUpdaterConnection(this),
             BIND_AUTO_CREATE
         );
+    }
+
+    private void initializeTabNavigation() {
+        modsTabContent = findViewById(R.id.mods_tab_content);
+        communityTabContent = findViewById(R.id.community_tab_content);
+        communityContainer = findViewById(R.id.community_container);
+        navModsText = findViewById(R.id.nav_tab_mods_text);
+        navCommunityText = findViewById(R.id.nav_tab_community_text);
+
+        findViewById(R.id.nav_tab_mods).setOnClickListener(v -> switchTab(true));
+        findViewById(R.id.nav_tab_community).setOnClickListener(v -> switchTab(false));
+    }
+
+    private void switchTab(boolean showMods) {
+        if (showMods == isModsTabActive) return;
+        isModsTabActive = showMods;
+
+        modsTabContent.setVisibility(showMods ? View.VISIBLE : View.GONE);
+        communityTabContent.setVisibility(showMods ? View.GONE : View.VISIBLE);
+
+        // Active tab: bold + full opacity; inactive: normal + dimmed
+        navModsText.setTypeface(null, showMods ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
+        navModsText.setAlpha(showMods ? 1.0f : 0.45f);
+        navCommunityText.setTypeface(null, showMods ? android.graphics.Typeface.NORMAL : android.graphics.Typeface.BOLD);
+        navCommunityText.setAlpha(showMods ? 0.45f : 1.0f);
+
+        if (!showMods && !communityLoaded) {
+            communityLoaded = true;
+            CommunityTabBuilder.build(this, communityContainer);
+        }
     }
 
     public void onClearAppData(View view) {

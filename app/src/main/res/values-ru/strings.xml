@@ -133,4 +133,15 @@
     <string name="toast_clearing_data">Очистка данных…</string>
     <string name="toast_cleared_data">Удалено файлов: %1$d, папок: %2$d\nПерезапуск…</string>
     <string name="toast_data_cleared_restarting">Данные очищены. Перезапуск…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">Моды</string>
+    <string name="tab_community">Сообщество</string>
+    <string name="community_title">СООБЩЕСТВО</string>
+    <string name="community_subtitle">Присоединяйтесь к нашим официальным сообществам</string>
+    <string name="join_server">Вступить</string>
+    <string name="members_count">%s участников</string>
+    <string name="online_count">%s онлайн</string>
+    <string name="loading_server">Загрузка…</string>
+    <string name="error_loading_server">Не удалось загрузить информацию о сервере</string>
 </resources>

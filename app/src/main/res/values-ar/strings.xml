@@ -149,4 +149,15 @@
     <string name="toast_clearing_data">جارٍ مسح البيانات…</string>
     <string name="toast_cleared_data">تم مسح %1$d ملفات و %2$d مجلدات\nجارٍ إعادة التشغيل…</string>
     <string name="toast_data_cleared_restarting">تم مسح البيانات. جارٍ إعادة التشغيل…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">التعديلات</string>
+    <string name="tab_community">المجتمع</string>
+    <string name="community_title">المجتمع</string>
+    <string name="community_subtitle">انضم إلى مجتمعاتنا الرسمية</string>
+    <string name="join_server">انضم</string>
+    <string name="members_count">%s عضو</string>
+    <string name="online_count">%s متصل</string>
+    <string name="loading_server">جارٍ التحميل…</string>
+    <string name="error_loading_server">تعذر تحميل معلومات السيرفر</string>
 </resources>

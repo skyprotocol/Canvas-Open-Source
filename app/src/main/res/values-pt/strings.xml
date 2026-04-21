@@ -149,4 +149,15 @@
     <string name="toast_clearing_data">Limpando dados…</string>
     <string name="toast_cleared_data">Limpeza concluída: %1$d arquivos e %2$d pastas\nReiniciando…</string>
     <string name="toast_data_cleared_restarting">Dados limpos. Reiniciando…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">Mods</string>
+    <string name="tab_community">Comunidade</string>
+    <string name="community_title">COMUNIDADE</string>
+    <string name="community_subtitle">Junte-se às nossas comunidades oficiais</string>
+    <string name="join_server">Entrar</string>
+    <string name="members_count">%s membros</string>
+    <string name="online_count">%s online</string>
+    <string name="loading_server">Carregando…</string>
+    <string name="error_loading_server">Não foi possível carregar as informações do servidor</string>
 </resources>

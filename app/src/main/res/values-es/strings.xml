@@ -125,4 +125,15 @@
   <string name="toast_clearing_data">Borrando datos…</string>
   <string name="toast_cleared_data">Se borraron %1$d archivos y %2$d carpetas\nReiniciando…</string>
   <string name="toast_data_cleared_restarting">Datos borrados. Reiniciando…</string>
+
+  <!-- community tab -->
+  <string name="tab_mods">Mods</string>
+  <string name="tab_community">Comunidad</string>
+  <string name="community_title">COMUNIDAD</string>
+  <string name="community_subtitle">Únete a nuestras comunidades oficiales</string>
+  <string name="join_server">Unirse</string>
+  <string name="members_count">%s miembros</string>
+  <string name="online_count">%s en línea</string>
+  <string name="loading_server">Cargando…</string>
+  <string name="error_loading_server">No se pudo cargar la info del servidor</string>
 </resources>
