@@ -133,7 +133,7 @@
 
     <!-- about_dialog roles -->
     <string name="role_author">Pencipta</string>
-    <string name="role_author_retired">Pencipta · Pensiun</string
+    <string name="role_author_retired">Pencipta · Pensiun</string>
     <string name="role_maintainer">Pemelihara</string>
     <string name="role_banner_artwork">Ilustrasi banner</string>
     <string name="role_app_icon">Ikon aplikasi</string>

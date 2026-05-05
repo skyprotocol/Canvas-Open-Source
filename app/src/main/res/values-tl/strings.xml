@@ -52,7 +52,7 @@
 <string name="up_to_date_message">Napapanahon ang mod\nVersion: %1$s</string>
 <string name="remove">Tanggalin</string>
 <string name="check_for_updates">Suriin ang mga update</string>
-<string name="switch_hide_canvas_menu">Itago ang Canvas Menu & Auto Enable Mods</string>
+<string name="switch_hide_canvas_menu">Itago ang Canvas Menu &amp; Auto Enable Mods</string>
 <string name="switch_skip_updates">Bypass Game Updates</string>
 <string name="enable_cheat_engine_server">Enable Cheat Engine Server</string>
 <string name="switch_custom_server">Enable Custom Server</string>
