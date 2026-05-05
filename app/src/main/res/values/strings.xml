@@ -155,6 +155,8 @@
     <string name="tab_community">Community</string>
     <string name="community_title">COMMUNITY</string>
     <string name="community_subtitle">Join our Official Communities</string>
+    <string name="community_android">Android Community</string>
+    <string name="community_pc">PC/Steam/Windows Community</string>
     <string name="join_server">Join</string>
     <string name="members_count">%s members</string>
     <string name="online_count">%s online</string>

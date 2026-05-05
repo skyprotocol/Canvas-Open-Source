@@ -29,9 +29,9 @@ public class CommunityTabBuilder {
 
     private static final String TAG = "CommunityTab";
 
-    private static final String[][] SERVERS = {
-        {"ekpUFWcCFN", "https://discord.gg/ekpUFWcCFN"},
-        {"thatskymod",  "https://discord.gg/thatskymod"}
+    private static final Object[][] SERVERS = {
+        {"ekpUFWcCFN", "https://discord.gg/ekpUFWcCFN", R.string.community_android},
+        {"thatskymod",  "https://discord.gg/thatskymod", R.string.community_pc}
     };
 
     private static boolean built = false;
@@ -76,9 +76,26 @@ public class CommunityTabBuilder {
         sep.setBackgroundResource(R.drawable.separator);
         container.addView(sep);
 
-        for (String[] server : SERVERS) {
-            addServerCard(activity, container, server[0], server[1]);
+        for (Object[] server : SERVERS) {
+            addCategoryLabel(activity, container, (Integer) server[2]);
+            addServerCard(activity, container, (String) server[0], (String) server[1]);
         }
+    }
+
+    private static void addCategoryLabel(Activity activity, LinearLayout container, int stringResId) {
+        TextView label = new TextView(activity);
+        label.setText(stringResId);
+        label.setTextSize(13);
+        label.setTypeface(null, Typeface.BOLD);
+        label.setAllCaps(true);
+        label.setAlpha(0.6f);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMarginStart(dp(activity, 4));
+        params.topMargin = dp(activity, 8);
+        params.bottomMargin = dp(activity, 12);
+        label.setLayoutParams(params);
+        container.addView(label);
     }
 
     private static void addServerCard(Activity activity, LinearLayout container, String inviteCode, String inviteUrl) {
