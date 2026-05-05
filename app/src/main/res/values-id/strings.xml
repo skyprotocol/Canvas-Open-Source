@@ -1,0 +1,166 @@
+<resources>
+    <string name="app_name" translatable="false">Canvas</string>
+    <string name="sky_not_installed">Buka Mod Manager dan pilih Live/Beta/Huawei. Aplikasi Sky tidak terdeteksi. Anda harus menginstal Sky untuk menggunakan fitur ini!</string>
+    <string name="mod_manager">Mod Manager</string>
+    <string name="add_mod">Tambah mod</string>
+    <string name="mod_name" translatable="false">%s (%s)</string>
+    <string name="mod_invalid">Mod tidak valid. Pastikan semua persyaratan sistem telah terpenuhi.</string>
+    <string name="mod_remove_unable">Tidak dapat menghapus mod</string>
+    <string name="mod_remove_deps">Mod ini tidak bisa dihapus karena sedang digunakan oleh mod lain. Hapus mod lain tersebut lebih dulu!</string>
+    <string name="mod_remove_dep">%s masih menggunakan mod yang ingin Anda hapus ini</string>
+    <string name="mod_ioe">Gagal memproses data (Masalah Penyimpanan)</string>
+    <string name="mod_gf">Terjadi gangguan teknis pada sistem</string>
+    <string name="mod_add_unable">Mod tidak dapat ditambahkan</string>
+    <string name="mod_add_wrongformat">Berkas mod tidak dapat dibaca atau rusak</string>
+    <string name="mod_add_missingdep">Mod ini butuh %s versi %d.%d atau yang lebih baru agar bisa jalan, tapi belum terpasang</string>
+    <string name="mod_add_exists">Mod dengan nama ini sudah ada di daftar</string>
+    <string name="mod_version" translatable="false">%d.%d.%d</string>
+    <string name="mod_skip_updater">Lewati pembaruan</string>
+    <string name="sign_in">Masuk dengan %s</string>
+    <string name="enable_beta">Aktifkan dukungan Sky Beta</string>
+    <string name="launch">Mulai Game</string>
+    <string name="enable_dev">Server Pengembang</string>
+    <string name="wait">Mohon tunggu…</string>
+    <string name="updater_checking">Memeriksa pembaruan…</string>
+    <string name="updater_update_available">Versi terbaru tersedia!</string>
+    <string name="updater_update_downloading">Mengunduh…</string>
+    <string name="updater_update_downloaded">Pembaruan berhasil diunduh!</string>
+    <string name="updater_skip">Lewati</string>
+    <string name="updater_update">Perbarui</string>
+    <string name="updater_install">Pasang</string>
+    <string name="updater_retry">Coba Lagi</string>
+    <string name="updater_failed">Gagal memperbarui</string>
+    <string name="updater_input_unreadable">Data unduhan tidak dapat dibaca</string>
+    <string name="mod_canvas_version" translatable="false">Canvas %s</string>
+    <string name="huawei" translatable="false">Huawei</string>
+    <string name="beta" translatable="false">Beta</string>
+    <string name="live" translatable="false">Live</string>
+    <string name="game_not_installed_warning">Game belum terpasang</string>
+    <string name="play">MAINKAN</string>
+    <string name="mods">MOD</string>
+    <string name="check_updates_title">Anda ingin memeriksa apakah [%1$s] memiliki pembaruan?</string>
+    <string name="check_updates_failed_title">Pemeriksaan Gagal</string>
+    <string name="updating_failed_title">"Pembaruan Gagal"</string>
+    <string name="check_updates_message">Catatan: Pembaruan akan segera dimulai jika Anda setuju.</string>
+    <string name="check_button_text">Periksa</string>
+    <string name="version_info" translatable="false">Versi: %s\n%s</string>
+    <string name="update_dialog_title">%s memiliki pembaruan baru!</string>
+    <string name="install_button_text">Pasang</string>
+    <string name="updater_busy">Sistem pembaruan sedang sibuk</string>
+    <string name="download_is_going">Proses pengunduhan sedang berjalan</string>
+    <string name="up_to_date_title">VERSI TERBARU</string>
+    <string name="up_to_date_message">Mod sudah menggunakan versi terbaru\nVersi: %1$s</string>
+    <string name="remove">Hapus</string>
+    <string name="check_for_updates">Periksa Pembaruan</string>
+    <string name="switch_hide_canvas_menu">Sembunyikan Menu Canvas &amp; Aktifkan Mod Otomatis</string>
+    <string name="switch_skip_updates">Lewati Pembaruan Game</string>
+    <string name="enable_cheat_engine_server">Aktifkan Server Cheat Engine</string>
+    <string name="switch_custom_server">Gunakan Server Kustom</string>
+
+    <string name="close">Tutup</string>
+    <string name="mod_icon">ikon mod</string>
+    <string name="no_update_links">Tautan pembaruan tidak tersedia</string>
+    <string name="mod_check_updates_checking">Memeriksa pembaruan…</string>
+    <string name="mod_check_updates_found">Pembaruan ditemukan!</string>
+    <string name="mod_check_updates_not_found">Tidak ada pembaruan tersedia.</string>
+    <string name="mod_check_updates_downloading">Mengunduh pembaruan…</string>
+    <string name="mod_check_updates_installing">Memasang pembaruan…</string>
+    <string name="mod_check_updates_complete">Pembaruan selesai!</string>
+    <string name="mod_check_updates_error">Terjadi kesalahan pada sistem</string>
+    <string name="settings_title">PENGATURAN</string>
+
+
+    <!-- about_dialog -->
+    <string name="sky_attribution">Sky dibuat oleh thatgamecompany</string>
+
+
+    <!-- dialog_clear_data -->
+    <string name="clear_data_title">⚠️ Hapus Data Aplikasi</string>
+    <string name="clear_data_preserved">DATA DISIMPAN</string>
+    <string name="clear_data_mods" translatable="false">✓  mods/</string>
+    <string name="clear_data_accounts" translatable="false">✓  Accounts/</string>
+    <string name="clear_data_config" translatable="false">✓  config/</string>
+    <string name="clear_data_auth" translatable="false">✓  AccountAuthInfo.bin</string>
+    <string name="clear_data_prefs" translatable="false">✓  shared_prefs/user.xml</string>
+    <string name="clear_data_deleted">DATA DIHAPUS</string>
+    <string name="clear_data_everything_else">✕  Seluruh data lainnya</string>
+    <string name="clear">Hapus</string>
+    <string name="cancel">Batal</string>
+
+    <!-- dialog_custom_bootloader -->
+    <string name="custom_bootloader_title">libBootloader.so Kustom</string>
+    <string name="pick_file">Pilih berkas</string>
+    <string name="pick_file_description">Pilih berkas libBootloader.so kustom dari penyimpanan untuk mengganti bootloader saat ini</string>
+    <string name="reset_to_original">Kembalikan ke awal</string>
+    <string name="reset_to_original_description">Hapus berkas kustom dan ekstrak kembali berkas asli dari APK Sky</string>
+
+    <!-- dialog_x -->
+    <string name="dialog_title_placeholder">JUDUL</string>
+    <string name="dialog_description_placeholder">DESKRIPSI</string>
+    <string name="dialog_progress_zero" translatable="false">0%</string>
+    <string name="dialog_button_natural" translatable="false">BAWAAN</string>
+
+    <!-- mod_manager -->
+    <string name="launch_google_play">GOOGLE PLAY STORE | VERSI GLOBAL\nMAINKAN</string>
+    <string name="launch_huawei">APP GALLERY | VERSI HUAWEI\nMAINKAN</string>
+
+    <!-- setting_layout -->
+    <string name="section_general">Umum</string>
+    <string name="hide_canvas_menu">Sembunyikan menu Canvas</string>
+    <string name="section_developer_options">Opsi Pengembang</string>
+    <string name="cheat_engine_server">Server Cheat Engine</string>
+    <string name="custom_server">Server kustom</string>
+    <string name="server_url">URL Server</string>
+    <string name="server_url_hint" translatable="false">masukkan-url</string>
+    <string name="enable_logcat_monitoring">Aktifkan Pemantauan Logcat</string>
+    <string name="section_advanced">Lanjutan</string>
+    <string name="custom_bootloader_setting">libBootloader.so Kustom</string>
+    <string name="custom_bootloader_setting_desc">Pilih bootloader kustom atau kembalikan ke asli</string>
+    <string name="clear_app_data">Hapus Data Aplikasi</string>
+    <string name="clear_app_data_desc">Hapus seluruh data kecuali mod, folder ThatSkyMod, dan berkas user.xml</string>
+
+    <!-- about_dialog chapters -->
+    <string name="about_chapter_origin">Asal Mula</string>
+    <string name="about_chapter_origin_sub">Dibangun dari awal oleh dua pengembang yang mencintai Sky.</string>
+    <string name="about_chapter_present">Masa Sekarang</string>
+    <string name="about_chapter_present_sub">Menjaga Canvas tetap beroperasi untuk Anda.</string>
+    <string name="about_chapter_team">Tim Kami</string>
+    <string name="about_chapter_team_sub">Seluruh kontributor yang membuat Canvas menjadi lebih baik.</string>
+    <string name="about_chapter_art">Karya Seni</string>
+    <string name="about_chapter_art_sub">Kreator di balik tampilan visual aplikasi.</string>
+    <string name="about_chapter_community">Komunitas</string>
+    <string name="about_chapter_community_sub">Bergabunglah dengan ribuan pemain yang menggunakan Canvas setiap hari.</string>
+
+    <!-- about_dialog roles -->
+    <string name="role_author">Pencipta</string>
+    <string name="role_author_retired">Pencipta · Pensiun</string
+    <string name="role_maintainer">Pemelihara</string>
+    <string name="role_banner_artwork">Ilustrasi banner</string>
+    <string name="role_app_icon">Ikon aplikasi</string>
+
+
+    <!-- about_dialog community cards -->
+    <string name="community_english_telegram">Telegram Bahasa Inggris</string>
+    <string name="community_russian_telegram">Telegram Bahasa Rusia</string>
+
+    <!-- toast messages -->
+    <string name="toast_stack_trace_copied">Laporan error telah disalin</string> 
+    <string name="toast_logcat_enabled">Pemantauan sistem diaktifkan</string>
+    <string name="toast_logcat_disabled">Pemantauan sistem dinonaktifkan</string>
+    <string name="toast_bootloader_reset">Reset berhasil. File asli akan dipasang saat aplikasi dibuka kembali.</string>
+    <string name="toast_bootloader_applied">✓ Berhasil menggunakan libBootloader.so kustom!</string>
+    <string name="toast_clearing_data">Sedang membersihkan data…</string>
+    <string name="toast_cleared_data">Berhasil menghapus %1$d file dan %2$d folder\nMemulai ulang…</string>
+    <string name="toast_data_cleared_restarting">Data berhasil dibersihkan. Sedang memulai ulang…</string>
+
+    <!-- community tab -->
+    <string name="tab_mods">Mod</string>
+    <string name="tab_community">Komunitas</string>
+    <string name="community_title">KOMUNITAS</string>
+    <string name="community_subtitle">Mari Bergabung dengan Komunitas Resmi Kami</string>
+    <string name="join_server">Gabung</string>
+    <string name="members_count">%s anggota</string>
+    <string name="online_count">%s aktif</string>
+    <string name="loading_server">Memuat…</string>
+    <string name="error_loading_server">Gagal memuat informasi server</string>
+</resources>

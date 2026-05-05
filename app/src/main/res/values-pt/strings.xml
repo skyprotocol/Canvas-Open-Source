@@ -154,7 +154,7 @@
     <string name="tab_mods">Mods</string>
     <string name="tab_community">Comunidade</string>
     <string name="community_title">COMUNIDADE</string>
-    <string name="community_subtitle">Junte-se às nossas comunidades oficiais</string>
+    <string name="community_subtitle">Participe das nossas comunidades oficiais</string>
     <string name="join_server">Entrar</string>
     <string name="members_count">%s membros</string>
     <string name="online_count">%s online</string>
