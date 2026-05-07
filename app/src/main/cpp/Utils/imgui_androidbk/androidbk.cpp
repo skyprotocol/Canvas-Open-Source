@@ -299,7 +299,7 @@ PRIVATE_API static void loadFonts(ImGuiIO& io, jfloat fontsize, AAssetManager *m
             goto ds_fini;
         }
         io.Fonts->AddFontFromMemoryTTF(fontBufferDroidSans, (int) size, fontsize,
-                                       &fc, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+                                       &fc, io.Fonts->GetGlyphRangesChineseFull());
         ds_fini:
         AAsset_close(font_droidsans);
     }

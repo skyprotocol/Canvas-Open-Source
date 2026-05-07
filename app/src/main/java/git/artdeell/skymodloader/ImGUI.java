@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 
 import com.tgc.sky.ui.Utils;
 
-import java.util.Locale;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ImGUI implements SurfaceHolder.Callback{
@@ -56,7 +55,7 @@ public class ImGUI implements SurfaceHolder.Callback{
                 resurface(surfaceHolder.getSurface());
             }else{
                 thread.hasInitialized = true;
-                init(surfaceHolder.getSurface(), Utils.sp2px(14), Utils.dp2px(1.2f), SMLApplication.smlRes.getAssets(), Locale.getDefault().getLanguage().startsWith("zh"));
+                init(surfaceHolder.getSurface(), Utils.sp2px(14), Utils.dp2px(1.2f), SMLApplication.smlRes.getAssets(), true);
             }
         });
     }
