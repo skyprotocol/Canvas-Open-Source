@@ -25,4 +25,48 @@ typedef void (*callback_function)(int fd);
  */
 bool requestFile(const char* mime_type, callback_function callback, bool save);
 
+/**
+ * Request a file from the user, accepting any of multiple MIME types.
+ * mime_types - array of MIME type strings (e.g. {"application/json", "text/plain"})
+ * mime_type_count - number of entries; must be > 0
+ * callback - called when a file is selected
+ * save - whether you need to save (true) or load (false)
+ * Returns:
+ * true if the file selection was requested
+ * false if the selector is busy or the input is invalid
+ *
+ * In load mode the picker filters via EXTRA_MIME_TYPES; some OEM pickers
+ * (Huawei, MIUI) ignore the filter, so callers must validate contents.
+ * In save mode only mime_types[0] is honored.
+ */
+bool requestFileMulti(const char* const* mime_types,
+                      size_t mime_type_count,
+                      callback_function callback,
+                      bool save);
+
+/**
+ * Callback for requestFiles.
+ * count - number of file descriptors; 0 on cancel or all-failed
+ * fds - valid only during the callback; callee owns the fds and must close
+ *       them before returning, or copy them out for later use.
+ */
+typedef void (*callback_function_files)(size_t count, const int* fds);
+
+/**
+ * Request one or more files from the user via a multi-select picker.
+ * mime_types - array of MIME type strings; must contain at least one entry
+ * mime_type_count - number of entries; must be > 0
+ * callback - invoked with the selected fds; count == 0 on cancel
+ * Returns:
+ * true if the file selection was requested
+ * false if the selector is busy or the input is invalid
+ *
+ * Picking one file still fires the callback with count == 1.  Some OEM
+ * pickers (Samsung, MIUI) ignore EXTRA_ALLOW_MULTIPLE and EXTRA_MIME_TYPES,
+ * so callers must validate contents.
+ */
+bool requestFiles(const char* const* mime_types,
+                  size_t mime_type_count,
+                  callback_function_files callback);
+
 #endif //SKY_MODLOADER_FILESELECTOR_H
