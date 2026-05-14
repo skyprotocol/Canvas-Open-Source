@@ -23,7 +23,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.net.Uri;
+
+import git.artdeell.skymodloader.net.StarwatchBlocker;
 
 import com.tgc.sky.SystemUI_android;
 import com.tgc.sky.ui.panels.CodeScanner;
@@ -105,6 +108,13 @@ public class Starboard extends BasePanel implements View.OnLayoutChangeListener,
             @Override // android.webkit.WebViewClient
             public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest webResourceRequest) {
                 return handleUrl(webResourceRequest.getUrl());
+            }
+
+            @Override // android.webkit.WebViewClient
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                WebResourceResponse blocked = StarwatchBlocker.interceptWebViewRequest(request);
+                if (blocked != null) return blocked;
+                return super.shouldInterceptRequest(view, request);
             }
 
             @Override // android.webkit.WebViewClient

@@ -7,9 +7,12 @@ import android.view.WindowManager;
 import android.os.Build;
 import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import git.artdeell.skymodloader.net.StarwatchBlocker;
 
 import com.tgc.sky.BuildConfig;
 import com.tgc.sky.GameActivity;
@@ -147,6 +150,13 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+        WebResourceResponse blocked = StarwatchBlocker.interceptWebViewRequest(request);
+        if (blocked != null) return blocked;
+        return super.shouldInterceptRequest(view, request);
     }
 
     private void processLoading(final String url) {

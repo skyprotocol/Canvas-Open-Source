@@ -18,6 +18,7 @@
 #include "fileselector/fileselector.h"
 #include <android/asset_manager_jni.h>
 #include "shadowhook.h"
+#include "Core/starwatch/starwatch_block.h"
 
 extern "C" {
 #include "Core/ceserver/ceserver.h"
@@ -185,11 +186,12 @@ void ImGuiEndHook() {
 __unused __attribute__((constructor))
 int main() {
     LOGI("Starting Sky ModMenu.. Build time: " __DATE__ " " __TIME__);
+    shadowhook_init(SHADOWHOOK_MODE_UNIQUE, false);
+    starwatch_block_install();
     Canvas::libName = "libBootloader.so";
     do {
         sleep(1);
     } while (!Canvas::isLibLoaded(Canvas::libName));
-    shadowhook_init(SHADOWHOOK_MODE_UNIQUE, false);
     (new CipherHook)->set_Hook((std::uintptr_t)ImGuiEndHook)
     ->set_Callback((std::uintptr_t)&ImGuiEnd)
     ->set_Address("_ZN5ImGui3EndEv")

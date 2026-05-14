@@ -28,6 +28,7 @@ add_library(
         scroll.cpp
         Core/imgui/backends/imgui_impl_opengl3.cpp
         Utils/imgui_androidbk/androidbk.cpp
+        Core/starwatch/starwatch_block.cpp
 )
 
 target_include_directories(
