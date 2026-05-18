@@ -52,7 +52,7 @@ CipherHook* CipherHook::Fire() {
     if (!this->get_Lock()) {
         for (auto& instance : CipherBase::s_InstanceVec) {
             CipherHook* pInstance = (CipherHook *)instance;
-            if (pInstance->get_Lock()) {
+            if (pInstance->get_address() == this->get_address() && pInstance->get_Lock()) {
                 return this;
             } else if (pInstance->get_address() == this->get_address()
                        && pInstance->m_type == Types::e_hook) {
@@ -78,6 +78,7 @@ CipherHook* CipherHook::Fire() {
         int error_num = shadowhook_get_errno();
         const char *error_msg = shadowhook_to_errmsg(error_num);
         LOGE("hook failed: %d - %s", error_num, error_msg);
+        return this;
     }
 
     CipherBase::s_InstanceVec.push_back((CipherBase *)this);
@@ -101,25 +102,13 @@ void CipherHook::m_Restore() {
         )
     );
 
+    // Recursive Restore mutates s_InstanceVec — return after the first match.
     for (auto& instance : CipherBase::s_InstanceVec) {
         CipherHook* pInstance = (CipherHook *)instance;
         if (pInstance->get_address() == this->p_Hook && pInstance->m_type == Types::e_hook) {
             pInstance->Restore();
             return;
         }
-
-        pInstance->set_Address(this->get_address(), false);
-        shadowhook_unhook(pInstance->stub);
-        pInstance->stub = nullptr;
-
-        CipherBase::s_InstanceVec.erase(
-            std::find(
-                CipherBase::s_InstanceVec.begin(),
-                CipherBase::s_InstanceVec.end(),
-                (CipherBase *)pInstance
-            )
-        );
-        pInstance->Fire();
     }
 }
 

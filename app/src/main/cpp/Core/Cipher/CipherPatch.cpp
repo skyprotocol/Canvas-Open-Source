@@ -17,7 +17,7 @@ CipherPatch* CipherPatch::Fire() {
         return this;
     }
 
-    if (this->get_address() == 0 || this->get_Lock()) {
+    if (this->get_address() == 0) {
         return this;
     }
 
