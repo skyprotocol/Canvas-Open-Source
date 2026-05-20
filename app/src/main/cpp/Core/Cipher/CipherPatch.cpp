@@ -10,7 +10,7 @@ PRIVATE_API std::mutex cipher_patch_mtx;
 
 CipherPatch *CipherPatch::set_Opcode(std::string _hex) {
     artpatch_set_hex(this->patch, _hex.c_str());
-    m_patchBytes = _hex.length() / 2;
+    CipherInternal::NotePatchBytes(this, _hex.length() / 2);
     return this;
 }
 
@@ -45,7 +45,9 @@ CipherPatch* CipherPatch::Fire() {
     this->m_fired = true;
 
     CipherInternal::RecordInstall(this, callerPC, Types::e_patch,
-                                  this->get_address(), m_patchBytes, this->get_libName());
+                                  this->get_address(),
+                                  CipherInternal::LookupPatchBytes(this),
+                                  this->get_libName());
     return this;
 }
 

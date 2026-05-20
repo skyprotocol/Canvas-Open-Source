@@ -341,7 +341,6 @@ public:
  */
 class CipherPatch : public CipherBase {
     bool m_fired = false; /**< Flag indicating whether the patch has been applied. */
-    std::size_t m_patchBytes = 0; /**< Byte count from set_Opcode; used by the install registry. */
     patch_t patch; /**< Internal patch structure. */
 
 public:

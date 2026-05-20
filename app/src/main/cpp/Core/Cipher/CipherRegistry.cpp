@@ -28,6 +28,7 @@ namespace {
 struct RegistryState {
     std::shared_mutex                                                     mtx;
     std::unordered_map<CipherBase*, CipherInstallInfo>                    byInstance;
+    std::unordered_map<CipherBase*, std::size_t>                          patchBytes;
     std::atomic<std::uint64_t>                                            seq{0};
     std::vector<std::function<void(const CipherInstallInfo&)>>            listeners;
 };
@@ -112,6 +113,18 @@ PRIVATE_API void RecordInstall(CipherBase* base, void* callerPC,
 PRIVATE_API void ForgetInstall(CipherBase* base) {
     std::unique_lock<std::shared_mutex> lock(State().mtx);
     State().byInstance.erase(base);
+    State().patchBytes.erase(base);  // no-op for hooks
+}
+
+PRIVATE_API void NotePatchBytes(CipherBase* patch, std::size_t bytes) {
+    std::unique_lock<std::shared_mutex> lock(State().mtx);
+    State().patchBytes[patch] = bytes;
+}
+
+PRIVATE_API std::size_t LookupPatchBytes(CipherBase* patch) {
+    std::shared_lock<std::shared_mutex> lock(State().mtx);
+    auto it = State().patchBytes.find(patch);
+    return it != State().patchBytes.end() ? it->second : 0;
 }
 
 PRIVATE_API std::string ResolveOwnerForLog(void* callerPC) {
