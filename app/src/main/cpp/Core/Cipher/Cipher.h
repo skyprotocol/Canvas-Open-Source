@@ -4,6 +4,28 @@
 #include <vector>
 #include <string>
 #include "../../Utils/artpatch/artpatch.h"
+#include <functional>
+
+/**
+ * @brief Cipher install type.
+ */
+enum Types {
+    e_patch,
+    e_hook
+};
+
+/**
+ * @brief Metadata recorded for each successful Fire(). Returned by
+ *        Cipher::DescribePatchesAt et al.
+ */
+struct CipherInstallInfo {
+    std::string    ownerModule;   ///< dladdr basename of caller (e.g. "libtibik.so")
+    std::string    targetLib;     ///< m_libName at install time (target binary)
+    Types          kind;          ///< e_hook | e_patch
+    std::uintptr_t address;       ///< absolute target address
+    std::size_t    bytes;         ///< 16 for hooks (conservative); exact for patches
+    std::uint64_t  installSeq;    ///< monotonic, set at successful Fire()
+};
 
 enum Section {
     BOOTLOADER_ROD = 0,
@@ -133,11 +155,39 @@ public:
      * @return A pointer to a char array containing the asset data.
      */
     static char* read_asset(char* _assetPath);
-};
 
-enum Types {
-    e_patch,
-    e_hook
+    /**
+     * @brief Returns true if any installed hook/patch covers this address.
+     */
+    static bool IsAddressPatched(std::uintptr_t addr);
+
+    /**
+     * @brief Returns every install whose [address, address+bytes) covers
+     *        addr. Sorted by install order.
+     */
+    static std::vector<CipherInstallInfo> DescribePatchesAt(std::uintptr_t addr);
+
+    /**
+     * @brief Returns every install whose byte range overlaps [start, start+len).
+     */
+    static std::vector<CipherInstallInfo> DescribePatchesIn(
+        std::uintptr_t start, std::size_t len);
+
+    /**
+     * @brief When a pattern scan returns 0, list installs that overlap any
+     *        scanned segment of the target library. Two overloads to match
+     *        Cipher::CipherScan / Cipher::CipherScanIdaPattern shapes.
+     */
+    static std::vector<CipherInstallInfo> ExplainScanFailure(
+        const char* bytes, const char* mask, const char* libName = nullptr);
+    static std::vector<CipherInstallInfo> ExplainScanFailure(
+        const std::string& idaPattern, const char* libName = nullptr);
+
+    /**
+     * @brief Subscribe to every successful Fire(). Callback fires outside
+     *        the registry lock; do NOT call Fire()/Restore() from inside.
+     */
+    static void OnInstallEvent(std::function<void(const CipherInstallInfo&)>);
 };
 
 /**

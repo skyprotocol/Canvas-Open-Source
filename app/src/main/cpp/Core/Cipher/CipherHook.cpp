@@ -1,4 +1,5 @@
 #include "Cipher.h"
+#include "CipherRegistry.h"
 
 #include <mutex>
 
@@ -39,6 +40,8 @@ CipherHook* CipherHook::set_Callback(std::uintptr_t _callback) {
 }
 
 CipherHook* CipherHook::Fire() {
+    void* callerPC = __builtin_return_address(0);
+
     //check if fields are set
     const bool invalidHook = this->get_address() == 0 || this->p_Hook == 0;
     const bool invalidCallback = !this->get_Lock() && this->p_Callback == 0;
@@ -52,10 +55,19 @@ CipherHook* CipherHook::Fire() {
     if (!this->get_Lock()) {
         for (auto& instance : CipherBase::s_InstanceVec) {
             CipherHook* pInstance = (CipherHook *)instance;
-            if (pInstance->get_Lock()) {
+            if (pInstance->get_address() == this->get_address() && pInstance->get_Lock()) {
+                const auto prior = Cipher::DescribePatchesAt(get_address());
+                LOGW("Cipher: hook at %p rejected - locked by %s",
+                     (void*)get_address(),
+                     prior.empty() ? "<unknown>" : prior.front().ownerModule.c_str());
                 return this;
             } else if (pInstance->get_address() == this->get_address()
                        && pInstance->m_type == Types::e_hook) {
+                const auto prior = Cipher::DescribePatchesAt(get_address());
+                LOGI("Cipher: hook chain at %p - prior=%s, new=%s",
+                     (void*)get_address(),
+                     prior.empty() ? "<unknown>" : prior.front().ownerModule.c_str(),
+                     CipherInternal::ResolveOwnerForLog(callerPC).c_str());
                 this->set_Address(pInstance->p_Hook, false); //hooks the hooked function instead
             }
         }
@@ -78,9 +90,14 @@ CipherHook* CipherHook::Fire() {
         int error_num = shadowhook_get_errno();
         const char *error_msg = shadowhook_to_errmsg(error_num);
         LOGE("hook failed: %d - %s", error_num, error_msg);
+        return this;
     }
 
     CipherBase::s_InstanceVec.push_back((CipherBase *)this);
+    // 16-byte conservative ARM64 prologue size; shadowhook doesn't expose
+    // the exact rewrite count.
+    CipherInternal::RecordInstall(this, callerPC, Types::e_hook,
+                                  this->get_address(), 16, this->get_libName());
     return this;
 }
 
@@ -100,26 +117,15 @@ void CipherHook::m_Restore() {
             (CipherBase *)this
         )
     );
+    CipherInternal::ForgetInstall(this);
 
+    // Recursive Restore mutates s_InstanceVec — return after the first match.
     for (auto& instance : CipherBase::s_InstanceVec) {
         CipherHook* pInstance = (CipherHook *)instance;
         if (pInstance->get_address() == this->p_Hook && pInstance->m_type == Types::e_hook) {
             pInstance->Restore();
             return;
         }
-
-        pInstance->set_Address(this->get_address(), false);
-        shadowhook_unhook(pInstance->stub);
-        pInstance->stub = nullptr;
-
-        CipherBase::s_InstanceVec.erase(
-            std::find(
-                CipherBase::s_InstanceVec.begin(),
-                CipherBase::s_InstanceVec.end(),
-                (CipherBase *)pInstance
-            )
-        );
-        pInstance->Fire();
     }
 }
 

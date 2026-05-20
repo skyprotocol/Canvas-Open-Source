@@ -1,23 +1,28 @@
 #include "Cipher.h"
+#include "CipherRegistry.h"
 
 #include <mutex>
 
+#include "../include/misc/Logger.h"
 #include "../../include/misc/visibility.h"
 
 PRIVATE_API std::mutex cipher_patch_mtx;
 
 CipherPatch *CipherPatch::set_Opcode(std::string _hex) {
     artpatch_set_hex(this->patch, _hex.c_str());
+    CipherInternal::NotePatchBytes(this, _hex.length() / 2);
     return this;
 }
 
 CipherPatch* CipherPatch::Fire() {
+    void* callerPC = __builtin_return_address(0);
+
     if (m_fired) {
         artpatch_apply(this->patch);
         return this;
     }
 
-    if (this->get_address() == 0 || this->get_Lock()) {
+    if (this->get_address() == 0) {
         return this;
     }
 
@@ -26,6 +31,10 @@ CipherPatch* CipherPatch::Fire() {
     for (auto& instance : CipherPatch::s_InstanceVec) {
         CipherPatch* pInstance = (CipherPatch *)instance;
         if (pInstance->get_address() == get_address() && pInstance->get_Lock()) {
+            const auto prior = Cipher::DescribePatchesAt(get_address());
+            LOGW("Cipher: patch at %p rejected - locked by %s",
+                 (void*)get_address(),
+                 prior.empty() ? "<unknown>" : prior.front().ownerModule.c_str());
             return this;
         }
     }
@@ -34,6 +43,11 @@ CipherPatch* CipherPatch::Fire() {
     artpatch_apply(this->patch);
     CipherPatch::s_InstanceVec.push_back((CipherBase *)this);
     this->m_fired = true;
+
+    CipherInternal::RecordInstall(this, callerPC, Types::e_patch,
+                                  this->get_address(),
+                                  CipherInternal::LookupPatchBytes(this),
+                                  this->get_libName());
     return this;
 }
 
@@ -58,5 +72,6 @@ CipherPatch::~CipherPatch() {
             (CipherBase *)this
         )
     );
+    CipherInternal::ForgetInstall(this);
     artpatch_die(this->patch);
 }
