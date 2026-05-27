@@ -10,7 +10,7 @@
     <string name="mod_gf">Allgemeiner Fehler</string>
     <string name="mod_add_unable">Mod konnte nicht hinzugefügt werden</string>
     <string name="mod_add_wrongformat">Mod konnte nicht erkannt werden</string>
-    <string name="mod_add_missingdep">Mod benötigt %s in Version %d.%d oder neuer, diese Abhängigkeit ist aber nicht verfügbar</string>
+    <string name="mod_add_missingdep">Mod benötigt %1$s in Version %2$d.%3$d oder neuer, diese Abhängigkeit ist aber nicht verfügbar</string>
     <string name="mod_add_exists">Ein Mod mit diesem Namen existiert bereits</string>
     <string name="mod_skip_updater">Updater überspringen</string>
     <string name="sign_in">Anmelden mit %s</string>

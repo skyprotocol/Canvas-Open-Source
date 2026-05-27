@@ -31,7 +31,7 @@ public class CommunityTabBuilder {
 
     private static final Object[][] SERVERS = {
         {"ekpUFWcCFN", "https://discord.gg/ekpUFWcCFN", R.string.community_android},
-        {"thatskymod",  "https://discord.gg/thatskymod", R.string.community_pc}
+        {"mpytQTuuWR",  "https://discord.gg/mpytQTuuWR", R.string.community_pc}
     };
 
     private static boolean built = false;

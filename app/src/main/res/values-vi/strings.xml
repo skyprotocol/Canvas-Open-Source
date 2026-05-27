@@ -12,7 +12,7 @@
     <string name="mod_gf">Lỗi chung</string>
     <string name="mod_add_unable">Không thể thêm mod</string>
     <string name="mod_add_wrongformat">Không đọc được mod</string>
-    <string name="mod_add_missingdep">Mod yêu cầu %s %d.%d hoặc mới hơn nhưng không có</string>
+    <string name="mod_add_missingdep">Mod yêu cầu %1$s %2$d.%3$d hoặc mới hơn nhưng không có</string>
     <string name="mod_add_exists">Đã có mod trùng tên</string>
     <string name="mod_version" translatable="false">%d.%d.%d</string>
     <string name="mod_skip_updater">Bỏ qua cập nhật</string>

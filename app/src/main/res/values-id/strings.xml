@@ -12,7 +12,7 @@
     <string name="mod_gf">Terjadi gangguan teknis pada sistem</string>
     <string name="mod_add_unable">Mod tidak dapat ditambahkan</string>
     <string name="mod_add_wrongformat">Berkas mod tidak dapat dibaca atau rusak</string>
-    <string name="mod_add_missingdep">Mod ini butuh %s versi %d.%d atau yang lebih baru agar bisa jalan, tapi belum terpasang</string>
+    <string name="mod_add_missingdep">Mod ini butuh %1$s versi %2$d.%3$d atau yang lebih baru agar bisa jalan, tapi belum terpasang</string>
     <string name="mod_add_exists">Mod dengan nama ini sudah ada di daftar</string>
     <string name="mod_version" translatable="false">%d.%d.%d</string>
     <string name="mod_skip_updater">Lewati pembaruan</string>

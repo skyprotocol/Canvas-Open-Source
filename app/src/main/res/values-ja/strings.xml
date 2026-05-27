@@ -12,7 +12,7 @@
     <string name="mod_gf">一般エラー</string>
     <string name="mod_add_unable">Mod を追加できませんでした</string>
     <string name="mod_add_wrongformat">Mod を読み込めません</string>
-    <string name="mod_add_missingdep">この Mod には %s %d.%d 以上が必要ですが、利用できません</string>
+    <string name="mod_add_missingdep">この Mod には %1$s %2$d.%3$d 以上が必要ですが、利用できません</string>
     <string name="mod_add_exists">同じ名前の Mod がすでに存在します</string>
     <string name="mod_version" translatable="false">%d.%d.%d</string>
     <string name="mod_skip_updater">アップデーターをスキップ</string>

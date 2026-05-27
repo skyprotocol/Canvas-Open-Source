@@ -12,7 +12,7 @@
     <string name="mod_gf">Falha geral</string>
     <string name="mod_add_unable">Não foi possível adicionar o mod</string>
     <string name="mod_add_wrongformat">Não foi possível ler o mod</string>
-    <string name="mod_add_missingdep">Este mod depende do %s %d.%d ou superior, mas não está disponível</string>
+    <string name="mod_add_missingdep">Este mod depende do %1$s %2$d.%3$d ou superior, mas não está disponível</string>
     <string name="mod_add_exists">Já existe um mod com este nome</string>
     <string name="mod_version" translatable="false">%d.%d.%d</string>
     <string name="mod_skip_updater">Pular o atualizador</string>

@@ -1511,4 +1511,8 @@ public class SystemUI_android {
     String GetDateString(long j) {
         return DateFormat.getDateInstance(0, Locale.getDefault()).format(new Date(j * 1000));
     }
+
+    String GetShortDateString(long j) {
+        return DateFormat.getDateInstance(3, Locale.getDefault()).format(new Date(j * 1000));
+    }
 }

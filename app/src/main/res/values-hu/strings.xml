@@ -12,7 +12,7 @@
     <string name="mod_gf">Általános hiba</string>
     <string name="mod_add_unable">Nem sikerült hozzáadni a modot</string>
     <string name="mod_add_wrongformat">A mod nem olvasható/kompatibilis</string>
-    <string name="mod_add_missingdep">A mod a következő verziótól függ: %s %d.%d vagy újabb, de nem elérhető</string>
+    <string name="mod_add_missingdep">A mod a következő verziótól függ: %1$s %2$d.%3$d vagy újabb, de nem elérhető</string>
     <string name="mod_add_exists">Ilyen Nevü mod már létezik</string>
     <string name="mod_version" translatable="false">%d.%d.%d</string>
     <string name="mod_skip_updater">A frissítés kihagyása</string>

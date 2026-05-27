@@ -10,7 +10,7 @@
     <string name="mod_gf">Общая ошибка</string>
     <string name="mod_add_unable">Не удалось добавить мод</string>
     <string name="mod_add_wrongformat">Не удалось распознать мод</string>
-    <string name="mod_add_missingdep">Мод требует %s версии %d.%d или новее, но эта зависимость недоступна</string>
+    <string name="mod_add_missingdep">Мод требует %1$s версии %2$d.%3$d или новее, но эта зависимость недоступна</string>
     <string name="mod_add_exists">Мод с таким названием уже существует</string>
     <string name="mod_skip_updater">Пропустить обновление</string>
     <string name="sign_in">Войти через %s</string>
