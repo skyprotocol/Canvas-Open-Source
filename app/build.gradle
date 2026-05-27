@@ -24,7 +24,7 @@ android {
         minSdk 26
         targetSdk 34
         versionCode 61
-        versionName "1.7.6-Pre"
+        versionName "1.7.6"
 
         externalNativeBuild {
             cmake {
