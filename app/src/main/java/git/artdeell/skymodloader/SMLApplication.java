@@ -24,6 +24,7 @@ public class SMLApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        StarwatchBlocker.init(this);
         StarwatchBlocker.install();
         Log.i("Canvas", "SMLApplication.onCreate() called");
         smlApplication = this;

@@ -22,12 +22,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import git.artdeell.skymodloader.net.StarwatchBlocker;
+
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "ClearAppData";
     private static final int REQUEST_PICK_BOOTLOADER = 9001;
     private Switch hideCanvasMenuSwitch;
     private Switch ceserverSwitch;
     private Switch customServerSwitch;
+    private Switch starwatchSwitch;
     private Switch logcatSwitch;
     private EditText serverUrlInput;
 
@@ -40,6 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
         hideCanvasMenuSwitch = findViewById(R.id.mm_hideCanvasMenu);
         ceserverSwitch = findViewById(R.id.mm_enableCeserver);
         customServerSwitch = findViewById(R.id.mm_enableCustomServer);
+        starwatchSwitch = findViewById(R.id.mm_allowStarwatch);
         logcatSwitch = findViewById(R.id.mm_enableLogcat);
         serverUrlInput = findViewById(R.id.server_url_input);
 
@@ -65,6 +69,14 @@ public class SettingsActivity extends AppCompatActivity {
             getSharedPreferences("package_configs", MODE_PRIVATE)
                 .edit().putBoolean("custom_server", isChecked).apply()
         );
+
+        starwatchSwitch.setChecked(getSharedPreferences(StarwatchBlocker.PREFS_NAME, MODE_PRIVATE)
+            .getBoolean(StarwatchBlocker.PREF_ALLOW_STARWATCH, false));
+        starwatchSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            getSharedPreferences(StarwatchBlocker.PREFS_NAME, MODE_PRIVATE)
+                .edit().putBoolean(StarwatchBlocker.PREF_ALLOW_STARWATCH, isChecked).apply();
+            StarwatchBlocker.setStarwatchAllowed(isChecked);
+        });
 
         serverUrlInput.setText(getSharedPreferences("package_configs", MODE_PRIVATE)
             .getString("server_host", ""));

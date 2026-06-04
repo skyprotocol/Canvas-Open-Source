@@ -108,6 +108,7 @@
     <string name="section_developer_options">Developer Options</string>
     <string name="cheat_engine_server">Cheat Engine Server</string>
     <string name="custom_server">Custom server</string>
+    <string name="allow_starwatch">Allow Starwatch</string>
     <string name="server_url">Server URL</string>
     <string name="server_url_hint" translatable="false">insert-url</string>
     <string name="enable_logcat_monitoring">Enable Logcat Monitoring</string>

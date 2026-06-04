@@ -34,6 +34,7 @@ import java.util.Optional;
 import dalvik.system.DexClassLoader;
 import git.artdeell.skymodloader.elfmod.ElfRefcountLoader;
 import git.artdeell.skymodloader.iconloader.IconLoader;
+import git.artdeell.skymodloader.net.StarwatchBlocker;
 
 public class MainActivity extends Activity {
     private SharedPreferences sharedPreferences;
@@ -196,6 +197,8 @@ public class MainActivity extends Activity {
             ElfLoader loader = new ElfLoader(elfLibPath);
             loader.loadLib("libBootloader.so");
             System.loadLibrary("ciphered");
+            nativeSetStarwatchAllowed(sharedPreferences.getBoolean(
+                StarwatchBlocker.PREF_ALLOW_STARWATCH, false));
 
             String buildKey = getSkyBuildAccessKey();
             if (buildKey != null) {
@@ -522,6 +525,7 @@ public class MainActivity extends Activity {
     public static native void lateInitUserLibs();
     public static native void getSysetemUI(Object systemUI);
     private static native void nativeSetSkyBuildKey(String key);
+    private static native void nativeSetStarwatchAllowed(boolean allowed);
 
     public static class DeviceInfo {
         public float xdpi;

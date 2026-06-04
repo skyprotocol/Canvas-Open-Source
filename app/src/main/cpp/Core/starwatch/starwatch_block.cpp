@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <set>
 #include <mutex>
+#include <atomic>
 #include <android/log.h>
 #include "shadowhook.h"
 #include "../../include/misc/visibility.h"
@@ -26,6 +27,11 @@ static ssize_t (*orig_sendto)(int, const void *, size_t, int,
 
 static std::mutex g_mtx;
 static std::set<int> g_blocked_fds;
+static std::atomic_bool g_starwatch_allowed{false};
+
+PRIVATE_API static bool block_is_enabled() {
+    return !g_starwatch_allowed.load(std::memory_order_relaxed);
+}
 
 PRIVATE_API static bool contains_starwatch(const char *host) {
     if (!host) return false;
@@ -49,7 +55,7 @@ PRIVATE_API static bool is_loopback(const struct sockaddr *addr) {
 PRIVATE_API static int hooked_getaddrinfo(const char *node, const char *service,
                                            const struct addrinfo *hints,
                                            struct addrinfo **res) {
-    if (contains_starwatch(node)) {
+    if (block_is_enabled() && contains_starwatch(node)) {
         __android_log_print(ANDROID_LOG_DEBUG, SW_TAG,
                             "Blocked DNS: %s", node);
 
@@ -74,7 +80,7 @@ PRIVATE_API static int hooked_getaddrinfo(const char *node, const char *service,
 
 PRIVATE_API static int hooked_connect(int fd, const struct sockaddr *addr,
                                        socklen_t addrlen) {
-    if (is_loopback(addr)) {
+    if (block_is_enabled() && is_loopback(addr)) {
         auto *sin = (const struct sockaddr_in *)addr;
         int port = ntohs(sin->sin_port);
         if (port > 1024) {
@@ -91,7 +97,7 @@ PRIVATE_API static int hooked_connect(int fd, const struct sockaddr *addr,
 PRIVATE_API static ssize_t hooked_sendto(int fd, const void *buf, size_t len,
                                           int flags, const struct sockaddr *addr,
                                           socklen_t addrlen) {
-    if (addr && is_loopback(addr)) {
+    if (block_is_enabled() && addr && is_loopback(addr)) {
         auto *sin = (const struct sockaddr_in *)addr;
         int port = ntohs(sin->sin_port);
         if (port > 1024) {
@@ -101,7 +107,7 @@ PRIVATE_API static ssize_t hooked_sendto(int fd, const void *buf, size_t len,
 
     {
         std::lock_guard<std::mutex> lock(g_mtx);
-        if (g_blocked_fds.count(fd)) {
+        if (block_is_enabled() && g_blocked_fds.count(fd)) {
             return (ssize_t)len;
         }
     }
@@ -133,4 +139,14 @@ void starwatch_block_install() {
                         s1 ? "OK" : "FAIL",
                         s2 ? "OK" : "FAIL",
                         s3 ? "OK" : "FAIL");
+}
+
+void starwatch_block_set_allowed(bool allowed) {
+    g_starwatch_allowed.store(allowed, std::memory_order_relaxed);
+    if (allowed) {
+        std::lock_guard<std::mutex> lock(g_mtx);
+        g_blocked_fds.clear();
+    }
+    __android_log_print(ANDROID_LOG_INFO, SW_TAG,
+                        "Starwatch allowed: %s", allowed ? "true" : "false");
 }

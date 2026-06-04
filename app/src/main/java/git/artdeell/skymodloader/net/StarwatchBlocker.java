@@ -1,5 +1,7 @@
 package git.artdeell.skymodloader.net;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -17,17 +19,34 @@ import java.net.URLStreamHandlerFactory;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class StarwatchBlocker {
 
     private static final String TAG = "StarwatchBlocker";
     private static final String BLOCKED_KEYWORD = "starwatch";
+    public static final String PREFS_NAME = "package_configs";
+    public static final String PREF_ALLOW_STARWATCH = "allow_starwatch";
+
+    private static volatile boolean starwatchAllowed = false;
 
     private StarwatchBlocker() {}
 
+    public static void init(Context context) {
+        SharedPreferences preferences = context.getApplicationContext()
+                .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        setStarwatchAllowed(preferences.getBoolean(PREF_ALLOW_STARWATCH, false));
+    }
+
+    public static void setStarwatchAllowed(boolean allowed) {
+        starwatchAllowed = allowed;
+    }
+
     public static boolean shouldBlock(String urlOrHost) {
-        return urlOrHost != null && urlOrHost.toLowerCase().contains(BLOCKED_KEYWORD);
+        return !starwatchAllowed
+                && urlOrHost != null
+                && urlOrHost.toLowerCase(Locale.ROOT).contains(BLOCKED_KEYWORD);
     }
 
     public static void install() {

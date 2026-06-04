@@ -378,3 +378,13 @@ Java_git_artdeell_skymodloader_MainActivity_nativeSetSkyBuildKey(
         LOGI("SkyBuildKey set: %s", g_skyBuildKey.c_str());
     }
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_git_artdeell_skymodloader_MainActivity_nativeSetStarwatchAllowed(
+        JNIEnv *env,
+        jclass clazz,
+        jboolean allowed
+) {
+    starwatch_block_set_allowed(allowed == JNI_TRUE);
+}
