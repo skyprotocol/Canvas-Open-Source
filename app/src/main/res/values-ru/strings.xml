@@ -93,6 +93,7 @@
     <string name="section_developer_options">Для разработчиков</string>
     <string name="cheat_engine_server">Сервер Cheat Engine</string>
     <string name="custom_server">Свой сервер</string>
+	<string name="allow_starwatch">Разрешить Starwatch</string>
     <string name="server_url">Адрес сервера</string>
     <string name="enable_logcat_monitoring">Мониторинг Logcat</string>
     <string name="section_advanced">Дополнительно</string>
