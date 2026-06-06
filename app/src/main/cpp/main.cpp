@@ -83,13 +83,22 @@ PRIVATE_API void SystemsTest() {
 
 }
 
-PRIVATE_API static void HelpMarker(const char* desc)
+PRIVATE_API static void HelpMarker(const Canvas::UserLib& userLib)
 {
     ImGui::TextDisabled("(?)");
     if (ImGui::BeginItemTooltip())
     {
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-        ImGui::TextWrapped("%s", desc);
+        ImGui::TextWrapped("%s: %s", userLib.Name.c_str(), userLib.Version.c_str());
+        if (!userLib.Author.empty()) {
+            ImGui::TextWrapped("Author: %s", userLib.Author.c_str());
+        }
+
+        if (!userLib.Description.empty()) {
+            ImGui::Separator();
+            ImGui::TextWrapped("%s", userLib.Description.c_str());
+        }
+
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
     }
@@ -114,20 +123,6 @@ PRIVATE_API void DrawMods() {
             }
         }
     }
-}
-
-#include <sstream>
-std::string formatUserLibInfo(const Canvas::UserLib& _userLib) {
-    std::ostringstream oss;
-    oss << _userLib.Name << ": " << _userLib.Version << "\\n";
-    if (!_userLib.Author.empty()) {
-        oss << "Author: " << _userLib.Author << "\\n";
-    }
-
-    if (!_userLib.Description.empty()) {
-        oss << "---------\\nDescription:\\n" << _userLib.Description << "\\n";
-    }
-    return oss.str();
 }
 
 PRIVATE_API void Canvas::CanvasMenu() {
@@ -159,7 +154,7 @@ PRIVATE_API void Canvas::CanvasMenu() {
             ImGui::Checkbox(userLib.Name.c_str(), &userLib.UIEnabled);
 
             ImGui::TableSetColumnIndex(1);
-            HelpMarker(formatUserLibInfo(userLib).c_str());
+            HelpMarker(userLib);
 
         }
         ImGui::EndTable();
