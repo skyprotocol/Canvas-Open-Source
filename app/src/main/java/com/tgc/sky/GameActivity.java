@@ -80,6 +80,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     private int m_nativeHeight;
     private int m_nativeWidth;
     private ImGUI imgui;
+    private SurfaceView imguiView;
     private boolean imguiKeybaordShowing;
     private ImGUITextInput imguiInput;
     private boolean m_logoSoundReleased = false;
@@ -88,6 +89,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     private boolean m_editTextFocused = false;
     private boolean m_isKeyboardShowing = false;
     private RelativeLayout m_relativeLayout;
+    private final int[] m_imguiViewLocation = new int[2];
     SystemAccounts_android m_systemAccounts = null;
     private boolean m_lTriggerPressed = false;
     private boolean m_rTriggerPressed = false;
@@ -208,7 +210,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
         ((SurfaceView) findViewById(R.id.surfaceView)).getHolder().addCallback(this);
         FileSelector.setActivity(this);
         if (imgui == null) imgui = new ImGUI();
-        SurfaceView imguiView = findViewById(R.id.imguiView);
+        imguiView = findViewById(R.id.imguiView);
         imguiView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         imguiView.getHolder().addCallback(imgui);
         imguiView.setZOrderOnTop(true);
@@ -436,7 +438,14 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     public boolean onTouchEvent(MotionEvent motionEvent) {
         int actionMasked = motionEvent.getActionMasked();
         if (actionMasked == MotionEvent.ACTION_UP || actionMasked == MotionEvent.ACTION_DOWN || actionMasked == MotionEvent.ACTION_MOVE) {
-            ImGUI.submitPositionEvent(motionEvent.getX(), motionEvent.getY());
+            float imguiX = motionEvent.getX();
+            float imguiY = motionEvent.getY();
+            if (imguiView != null) {
+                imguiView.getLocationOnScreen(m_imguiViewLocation);
+                imguiX = motionEvent.getRawX() - m_imguiViewLocation[0];
+                imguiY = motionEvent.getRawY() - m_imguiViewLocation[1];
+            }
+            ImGUI.submitPositionEvent(imguiX, imguiY);
             if (actionMasked == MotionEvent.ACTION_DOWN) ImGUI.submitButtonEvent(0, true);
             if (actionMasked == MotionEvent.ACTION_UP) ImGUI.submitButtonEvent(0, false);
         }
