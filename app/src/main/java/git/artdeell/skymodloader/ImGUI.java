@@ -1,7 +1,6 @@
 package git.artdeell.skymodloader;
 
 import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.res.AssetManager;
 import android.view.Surface;
@@ -24,12 +23,19 @@ public class ImGUI implements SurfaceHolder.Callback{
         clipboard = service;
     }
     public static String getClipboard() {
-        if(clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-            ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-            CharSequence data = item.getText();
-            if(data != null) return data.toString();
+        if (clipboard == null || !clipboard.hasPrimaryClip()) {
+            return "";
         }
-        return "";
+
+        ClipData clip = clipboard.getPrimaryClip();
+        if (clip == null || clip.getItemCount() == 0) {
+            return "";
+        }
+
+        ClipData.Item item = clip.getItemAt(0);
+        SMLApplication app = SMLApplication.deez();
+        CharSequence data = app != null ? item.coerceToText(app) : item.getText();
+        return data != null ? data.toString() : "";
     }
     public static void setClipboard(String data) {
         clipboard.setPrimaryClip(ClipData.newPlainText("ImGui paste", data));
