@@ -6,9 +6,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -43,7 +45,6 @@ public class SystemCommerce_android
     private static final String SKY_STORE_URL = "https://store.thatskygame.com/";
     private static final String XSOLLA_CATALOG_URL = "https://store.xsolla.com/api/v2/project/207830/items/virtual_items/group";
     private static final String XSOLLA_SKU_PREFIX = "xsolla.sky.";
-    private static final long EXTERNAL_PURCHASE_PENDING_TIMEOUT_MS = 1500L;
     private static final String[] XSOLLA_CATALOG_GROUPS = {
             "event2",
             "events",
@@ -61,7 +62,6 @@ public class SystemCommerce_android
     private final HashMap<String, ProductInfo> mProductInfo = new HashMap<>();
     private boolean mProductsInitialized;
     private String mPendingExternalProductId;
-    private boolean mStoreCompleted;
 
     SystemCommerce_android(final GameActivity activity) {
         mActivity = activity;
@@ -105,9 +105,7 @@ public class SystemCommerce_android
         String[] systemProductIds = new String[productIds.length];
         for (int i = 0; i < productIds.length; ++i) {
             String systemProductId = toSystemProductId(productIds[i]);
-            ProductInfo productInfo = createDisplayOnlyProductInfo(systemProductId);
-            Log.d(TAG, "Product loaded: " + productInfo.systemProductId);
-            mProductInfo.put(productInfo.systemProductId, productInfo);
+            Log.d(TAG, "Product requested: " + systemProductId);
             systemProductIds[i] = systemProductId;
         }
         mProductsInitialized = true;
@@ -119,12 +117,16 @@ public class SystemCommerce_android
     }
 
     public boolean MakePurchase(String productIdToSystemProductId, String accountId, String profileId) {
+        String systemProductId = toSystemProductId(productIdToSystemProductId);
+        if (!mProductInfo.containsKey(systemProductId)) {
+            return false;
+        }
+
         String url = createStoreUrl(productIdToSystemProductId, accountId);
         if (url == null) {
             return false;
         }
-        mPendingExternalProductId = toSystemProductId(productIdToSystemProductId);
-        mStoreCompleted = false;
+        mPendingExternalProductId = systemProductId;
         openStore(url);
         return true;
     }
@@ -154,44 +156,11 @@ public class SystemCommerce_android
     private void openStore(final String url) {
         mActivity.runOnUiThread(() -> {
             final Dialog dialog = new Dialog(mActivity);
-            final WebView webView = new WebView(mActivity) {
-                @Override
-                public boolean onCheckIsTextEditor() {
-                    return true;
-                }
-            };
+            final FrameLayout webViewContainer = new FrameLayout(mActivity);
+            final WebView webView = createStoreWebView(dialog, webViewContainer);
 
-            dialog.setContentView(webView);
-            WebSettings settings = webView.getSettings();
-            settings.setJavaScriptEnabled(true);
-            settings.setDomStorageEnabled(true);
-            settings.setDatabaseEnabled(true);
-            settings.setUseWideViewPort(true);
-            settings.setLoadWithOverviewMode(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
-            }
-
-            webView.setWebChromeClient(new WebChromeClient());
-            webView.setWebViewClient(new WebViewClient() {
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                    return handleStoreUrl(dialog, request.getUrl());
-                }
-
-                @Override
-                @SuppressWarnings("deprecation")
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    return handleStoreUrl(dialog, Uri.parse(url));
-                }
-
-                @Override
-                public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                    WebResourceResponse blocked = StarwatchBlocker.interceptWebViewRequest(request);
-                    if (blocked != null) return blocked;
-                    return super.shouldInterceptRequest(view, request);
-                }
-            });
+            webViewContainer.addView(webView);
+            dialog.setContentView(webViewContainer);
 
             webView.loadUrl(url);
             dialog.setOnDismissListener(d -> {
@@ -208,20 +177,78 @@ public class SystemCommerce_android
         });
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
+    private WebView createStoreWebView(Dialog dialog, FrameLayout webViewContainer) {
+        WebView webView = new WebView(mActivity) {
+            @Override
+            public boolean onCheckIsTextEditor() {
+                return true;
+            }
+        };
+
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
+        settings.setSupportMultipleWindows(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+        }
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                WebView popupWebView = createStoreWebView(dialog, webViewContainer);
+                webViewContainer.addView(popupWebView);
+                popupWebView.bringToFront();
+
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                transport.setWebView(popupWebView);
+                resultMsg.sendToTarget();
+                return true;
+            }
+
+            @Override
+            public void onCloseWindow(WebView window) {
+                webViewContainer.removeView(window);
+                window.destroy();
+            }
+        });
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return handleStoreUrl(dialog, request.getUrl());
+            }
+
+            @Override
+            @SuppressWarnings("deprecation")
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return handleStoreUrl(dialog, Uri.parse(url));
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                WebResourceResponse blocked = StarwatchBlocker.interceptWebViewRequest(request);
+                if (blocked != null) return blocked;
+                return super.shouldInterceptRequest(view, request);
+            }
+        });
+        return webView;
+    }
+
     private void loadCatalogProducts(String[] systemProductIds) {
         new Thread(() -> {
             try {
                 HashMap<String, ProductInfo> catalogProducts = fetchCatalogProducts(systemProductIds);
                 mMainHandler.post(() -> {
-                    boolean changed = false;
                     for (ProductInfo productInfo : catalogProducts.values()) {
-                        if (mProductInfo.containsKey(productInfo.systemProductId)) {
-                            mProductInfo.put(productInfo.systemProductId, productInfo);
-                            changed = true;
-                        }
+                        mProductInfo.put(productInfo.systemProductId, productInfo);
                     }
 
-                    if (changed) {
+                    if (!catalogProducts.isEmpty()) {
                         Log.d(TAG, "Sky Store catalog applied: " + catalogProducts.size() + " products");
                     }
                     mActivity.onCommerceUpdate(true, false, false);
@@ -312,7 +339,6 @@ public class SystemCommerce_android
     private boolean handleStoreUrl(Dialog dialog, Uri uri) {
         String url = uri.toString();
         if (url.contains("operationPayload=")) {
-            mStoreCompleted = true;
             dialog.dismiss();
             mActivity.onOpenedWithURLNative(url, false);
             return true;
@@ -323,23 +349,18 @@ public class SystemCommerce_android
             return false;
         }
 
-        mStoreCompleted = true;
         dialog.dismiss();
         mActivity.onOpenedWithURLNative(url, false);
         return true;
     }
 
     private void finishExternalStoreFlow() {
-        if (mStoreCompleted || mPendingExternalProductId == null) {
+        if (mPendingExternalProductId == null) {
             return;
         }
 
-        mMainHandler.postDelayed(() -> {
-            if (!mStoreCompleted) {
-                mPendingExternalProductId = null;
-                mActivity.onCommerceUpdate(true, false, false);
-            }
-        }, EXTERNAL_PURCHASE_PENDING_TIMEOUT_MS);
+        mPendingExternalProductId = null;
+        mActivity.onCommerceUpdate(true, false, false);
     }
 
     private String createStoreUrl(String productIdToSystemProductId, String accountId) {
