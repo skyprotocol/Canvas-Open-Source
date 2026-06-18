@@ -66,21 +66,33 @@ public class ModListAdapter extends RecyclerView.Adapter<ModListAdapter.ViewHold
             }
 
             LinearLayout checkForUpdatesLayout = myView.findViewById(R.id.check_for_updates);
+            TextView textUpdate = myView.findViewById(R.id.text_update);
+            ImageView imageUpdate = myView.findViewById(R.id.image_update);
             String githubReleasesRegex = "https://api\\.github\\.com/repos/.+/releases/latest";
+            boolean hasGithubUpdates = metadata.githubReleasesUrl != null && metadata.githubReleasesUrl.matches(githubReleasesRegex);
+            boolean hasOffsetsUpdates = metadata.hasOffsetsUrl();
 
-            if (metadata.githubReleasesUrl != null && metadata.githubReleasesUrl.matches(githubReleasesRegex)) {
+            if (hasGithubUpdates || hasOffsetsUpdates) {
+                checkForUpdatesLayout.setEnabled(true);
                 checkForUpdatesLayout.setVisibility(View.VISIBLE);
+                textUpdate.setText(R.string.check_for_updates);
+                textUpdate.setTextColor(ContextCompat.getColor(myView.getContext(), R.color.text));
+                imageUpdate.clearColorFilter();
             } else {
                 checkForUpdatesLayout.setEnabled(false);
-                TextView textUpdate = myView.findViewById(R.id.text_update);
                 textUpdate.setText(R.string.no_update_links);
                 textUpdate.setTextColor(ContextCompat.getColor(myView.getContext(), android.R.color.darker_gray));
-                ((ImageView)myView.findViewById(R.id.image_update)).setColorFilter(ContextCompat.getColor(myView.getContext(), android.R.color.darker_gray));
+                imageUpdate.setColorFilter(ContextCompat.getColor(myView.getContext(), android.R.color.darker_gray));
             }
 
             myView.findViewById(R.id.check_for_updates).setOnClickListener(v -> {
                 Log.i("AA", "onClick()");
                 onCheckForUpdates(metadata);
+            });
+            myView.findViewById(R.id.import_offsets).setOnClickListener(v -> {
+                if (loader.activity instanceof ModManagerActivity) {
+                    ((ModManagerActivity) loader.activity).showImportOffsetsDialog(metadata);
+                }
             });
             binding.setItem(metadata);
         }

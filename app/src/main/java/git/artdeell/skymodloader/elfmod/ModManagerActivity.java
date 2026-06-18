@@ -111,6 +111,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         }
         Intent serviceStartIntent = new Intent(this, ModUpdaterService.class);
         serviceStartIntent.putExtra(ModUpdaterService.EXTRA_UPDATE_URL, metadata.getGithubReleasesUrl());
+        serviceStartIntent.putExtra(ModUpdaterService.EXTRA_OFFSETS_URL, metadata.getOffsetsUrl());
         serviceStartIntent.putExtra(ModUpdaterService.EXTRA_LIB_NAME, metadata.name);
         serviceStartIntent.putExtra(ModUpdaterService.EXTRA_VERSION_NUMBER,
             new VersionNumber(metadata.majorVersion, metadata.minorVersion, metadata.patchVersion)
@@ -414,12 +415,8 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         startActivity(new Intent(this, SettingsActivity.class));
     }
 
-    public void onImportOffsetsClick(View view) {
-        if (loader == null || loader.getModsCount() == 0) {
-            Toast.makeText(this, R.string.no_mods_installed, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    public void showImportOffsetsDialog(ElfModUIMetadata metadata) {
+        if (metadata == null) return;
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_import_offsets);
@@ -435,7 +432,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
         dialog.findViewById(R.id.dialog_offsets_import)
             .setOnClickListener(v -> {
                 dialog.dismiss();
-                showModSelectorForOffsets();
+                startOffsetImport(metadata);
             });
 
         dialog.findViewById(R.id.dialog_offsets_discord)
@@ -447,6 +444,14 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
             .setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
+    }
+
+    private void startOffsetImport(ElfModUIMetadata metadata) {
+        pendingOffsetsMod = metadata;
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain"});
+        startActivityForResult(intent, REQUEST_IMPORT_OFFSETS);
     }
 
     private void showModSelectorForOffsets() {

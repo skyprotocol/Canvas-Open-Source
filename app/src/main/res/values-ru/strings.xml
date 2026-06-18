@@ -59,6 +59,9 @@
     <string name="mod_check_updates_installing">Установка обновления…</string>
     <string name="mod_check_updates_complete">Обновление завершено!</string>
     <string name="mod_check_updates_error">Произошла ошибка</string>
+    <string name="mod_check_offsets_found">### **Найдены новые оффсеты**</string>
+    <string name="offsets_version">**Версия:** %1$s</string>
+    <string name="offsets_contributors">**Автор:** %1$s</string>
     <string name="settings_title">НАСТРОЙКИ</string>
 
     <!-- about_dialog -->

@@ -66,6 +66,16 @@
                         android:textStyle="bold"
                         tools:text="ModuleName" />
 
+                    <ImageView
+                        android:id="@+id/import_offsets"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="10dp"
+                        android:clickable="true"
+                        android:contentDescription="@string/import_offsets"
+                        android:focusable="true"
+                        android:src="@drawable/ic_build" />
+
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/module_indicator"
                         android:layout_width="wrap_content"

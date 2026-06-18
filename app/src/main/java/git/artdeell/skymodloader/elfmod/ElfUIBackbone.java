@@ -149,6 +149,7 @@ public class ElfUIBackbone {
                 defaultMeta.patchVersion = jsonConfig.getInt("patchVersion");
                 defaultMeta.displayName = jsonConfig.optString("displayName");
                 defaultMeta.githubReleasesUrl = jsonConfig.optString("githubReleasesUrl");
+                defaultMeta.offsetsUrl = jsonConfig.optString("offsetsUrl");
                 JSONArray jdeps = jsonConfig.getJSONArray("dependencies");
                 ElfModMetadata[] dependencies = new ElfModMetadata[jdeps.length()];
                 for (int i = 0; i < dependencies.length; i++) {

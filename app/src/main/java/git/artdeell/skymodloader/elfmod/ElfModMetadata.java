@@ -19,6 +19,7 @@ public class ElfModMetadata {
     public boolean displaysUI;
     public boolean selfManagedUI;
     public String githubReleasesUrl;
+    public String offsetsUrl;
 
     @Override
     public boolean equals(Object o) {
@@ -35,6 +36,14 @@ public class ElfModMetadata {
 
     public String getGithubReleasesUrl() {
         return this.githubReleasesUrl;
+    }
+
+    public String getOffsetsUrl() {
+        return this.offsetsUrl;
+    }
+
+    public boolean hasOffsetsUrl() {
+        return offsetsUrl != null && !offsetsUrl.isEmpty();
     }
 
     public String getName() {

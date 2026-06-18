@@ -67,7 +67,7 @@ public abstract class AbstractUpdaterService extends Service {
                 return updateChangelog;
             }
             public void downloadUpdate() {
-                new Thread(AbstractUpdaterService.this::downloadUpdate0).start();
+                new Thread(() -> AbstractUpdaterService.this.downloadUpdate0()).start();
             }
             public long getDownloadMaximum() {
                 return mMaximumProgress.get();
@@ -102,7 +102,7 @@ public abstract class AbstractUpdaterService extends Service {
         return START_NOT_STICKY;
     }
 
-    private void downloadUpdate0() {
+    protected void downloadUpdate0() {
         try {
             changeState(SERVICE_STATE_DOWNLOADING);
             HttpURLConnection conn = (HttpURLConnection) new URL(updateURL).openConnection();
@@ -139,12 +139,12 @@ public abstract class AbstractUpdaterService extends Service {
         changeState(SERVICE_STATE_INSTALL_FINISHED);
     }
 
-    private JSONObject pullUpdateInfo() throws IOException, JSONException {
+    protected JSONObject pullUpdateInfo() throws IOException, JSONException {
         // "https://api.github.com/repos/RomanChamelo/Canvas-Open-Source/releases/latest"
         InputStream inputStream = new URL(getUpdateCheckerURL()).openStream();
         return new JSONObject(new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n")));
     }
-    private String getAssetURL(JSONObject release) throws JSONException {
+    protected String getAssetURL(JSONObject release) throws JSONException {
         if(!release.has("assets")) return null;
         JSONArray assets = release.getJSONArray("assets");
         for(int i = 0; i < assets.length(); i++) {
@@ -182,7 +182,7 @@ public abstract class AbstractUpdaterService extends Service {
         }
     }
 
-    private void announceProgressChange() {
+    protected void announceProgressChange() {
         try {
             mUpdaterListener.onProgressBarChanged();
         } catch (RemoteException e) {
@@ -190,7 +190,7 @@ public abstract class AbstractUpdaterService extends Service {
         }
     }
 
-    private void changeState(byte newState) {
+    protected void changeState(byte newState) {
         try {
             serviceState = newState;
             mUpdaterListener.onStateChanged();
@@ -200,7 +200,15 @@ public abstract class AbstractUpdaterService extends Service {
     }
 
     protected final void start() {
-        new Thread(AbstractUpdaterService.this::findUpdates).start();
+        new Thread(this::findUpdates).start();
+    }
+
+    protected final void setDownloadException(Exception exception) {
+        mDownloadException = exception;
+    }
+
+    protected final void setUpdateChangelog(String changelog) {
+        updateChangelog = changelog;
     }
 
     protected final File getDownloadTarget() {

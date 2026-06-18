@@ -67,6 +67,9 @@
     <string name="mod_check_updates_installing">Installing update…</string>
     <string name="mod_check_updates_complete">Update complete!</string>
     <string name="mod_check_updates_error">An error has occurred</string>
+    <string name="mod_check_offsets_found">### **New offsets are available**</string>
+    <string name="offsets_version">**Version:** %1$s</string>
+    <string name="offsets_contributors">**Contributors:** %1$s</string>
     <string name="settings_title">SETTINGS</string>
 
     <!-- about_dialog -->
@@ -169,7 +172,7 @@
     <string name="onboarding_offsets_title">What are Offsets?</string>
     <string name="onboarding_offsets_body">Offsets are memory addresses used by mods to interact with the game. When the game updates, these addresses change.\n\nImporting updated offset files allows your mods to support newer game versions immediately without waiting for a mod update.</string>
     <string name="offsets_note">Not every mod supports this feature</string>
-    <string name="offsets_import_desc">Select a mod and pick an offset file</string>
+    <string name="offsets_import_desc">Pick an offset file for this mod</string>
     <string name="offsets_discord_desc">Get help finding offset files</string>
     <string name="onboarding_offsets_message">Offsets are memory addresses used by mods to interact with the game. When the game updates, these addresses change. Importing updated offset files allows your mods to support newer game versions immediately without waiting for a mod update.\n\n<b>NOTE: NOT EVERY MOD SUPPORTS THIS FEATURE.</b>\n\nIf you need help finding offset files, join our Discord server.</string>
     <string name="join_discord">Join Discord</string>
