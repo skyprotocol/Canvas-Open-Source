@@ -1351,6 +1351,31 @@ public class SystemUI_android {
         return false;
     }
 
+    // Native bridge (CipherUtils::shareFile): open the system share sheet for a
+    // file under the app's FileProvider.  Launched on the UI thread.
+    public boolean shareFile(String path, String mimeType) {
+        this.m_activity.runOnUiThread(() -> {
+            try {
+                Uri uri = FileProvider.getUriForFile(
+                        SystemUI_android.this.m_activity,
+                        "git.artdeell.skymodloader.provider",
+                        new java.io.File(path));
+                Intent send = new Intent(Intent.ACTION_SEND);
+                send.setType(mimeType != null && !mimeType.isEmpty() ? mimeType : "application/octet-stream");
+                send.putExtra(Intent.EXTRA_STREAM, uri);
+                // createChooser copies the ClipData but NOT the EXTRA_STREAM grant,
+                // so set ClipData explicitly or the receiver hits a SecurityException.
+                send.setClipData(ClipData.newRawUri(null, uri));
+                send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                SystemUI_android.this.m_activity.startActivity(
+                        Intent.createChooser(send, null));
+            } catch (Exception e) {
+                Log.e("Canvas", "shareFile failed: " + e);
+            }
+        });
+        return true;
+    }
+
     public boolean HapticFeedbackWarning() {
         if (!this.m_usingGamepad && this.m_enableHaptics) {
             this.m_activity.runOnUiThread(new Runnable() { // from class: com.tgc.sky.SystemUI_android.21

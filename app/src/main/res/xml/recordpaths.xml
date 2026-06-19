@@ -1,4 +1,6 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-path
         name="provider" path="."/>
+    <files-path
+        name="config" path="config/"/>
 </paths>

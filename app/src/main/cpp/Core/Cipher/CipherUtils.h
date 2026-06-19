@@ -110,6 +110,16 @@ public:
      */
     static void performHapticFeedback(HapticFeedbackType _type);
 
+    /**
+     * @brief Open the Android share sheet for a file via the app's FileProvider.
+     * The chooser is launched on the UI thread.  `_path` must live under a
+     * FileProvider-configured directory (e.g. a subdir of get_ConfigsPath()).
+     * @param _path Absolute path of the file to share.
+     * @param _mimeType MIME type, e.g. "text/plain"; empty or null falls back to
+     *        a generic binary type.
+     */
+    static void shareFile(const char *_path, const char *_mimeType);
+
 public:
     /**
      * @brief Converts a pattern string into bytes and a mask for memory scanning.

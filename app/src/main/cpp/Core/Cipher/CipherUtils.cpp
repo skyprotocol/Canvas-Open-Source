@@ -353,3 +353,41 @@ void CipherUtils::performHapticFeedback(HapticFeedbackType _type) {
         Canvas::javaVM->DetachCurrentThread();
     }
 }
+
+void CipherUtils::shareFile(const char *_path, const char *_mimeType) {
+    if (!Canvas::systemUI || !_path) return;
+
+    JNIEnv *env = nullptr;
+    bool needDetach = false;
+
+    int getEnvResult = Canvas::javaVM->GetEnv((void **)&env, JNI_VERSION_1_6);
+    if (getEnvResult == JNI_EDETACHED) {
+        if (Canvas::javaVM->AttachCurrentThread(&env, nullptr) == JNI_OK) {
+            needDetach = true;
+        } else {
+            return;
+        }
+    } else if (getEnvResult != JNI_OK) {
+        return;
+    }
+
+    if (env) {
+        if (env->ExceptionCheck()) env->ExceptionClear();
+        jclass clazz = env->GetObjectClass(Canvas::systemUI);
+        if (clazz) {
+            jmethodID methodID = env->GetMethodID(
+                clazz, "shareFile", "(Ljava/lang/String;Ljava/lang/String;)Z");
+            if (methodID) {
+                jstring jPath = env->NewStringUTF(_path);
+                jstring jMime = env->NewStringUTF(_mimeType ? _mimeType : "");
+                env->CallBooleanMethod(Canvas::systemUI, methodID, jPath, jMime);
+                if (env->ExceptionCheck()) env->ExceptionClear();
+                if (jPath) env->DeleteLocalRef(jPath);
+                if (jMime) env->DeleteLocalRef(jMime);
+            }
+            env->DeleteLocalRef(clazz);
+        }
+    }
+
+    if (needDetach) Canvas::javaVM->DetachCurrentThread();
+}
