@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
-#include "../../Utils/artpatch/artpatch.h"
+#include "artpatch/artpatch.h"
 #include <functional>
 
 /**

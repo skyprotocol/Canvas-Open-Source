@@ -33,6 +33,7 @@ add_library(
 
 target_include_directories(
         ciphered PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Utils
         ${CMAKE_CURRENT_SOURCE_DIR}/Utils/KittyMemory
         ${CMAKE_CURRENT_SOURCE_DIR}/Core/imgui
         ${CMAKE_CURRENT_SOURCE_DIR}/Core
