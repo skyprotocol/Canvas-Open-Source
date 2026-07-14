@@ -7,11 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Insets;
 import android.graphics.PixelFormat;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.hardware.display.DisplayManager;
 import android.hardware.input.InputManager;
 import android.media.AudioManager;
@@ -24,11 +29,13 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowInsets;
@@ -65,7 +72,7 @@ import git.artdeell.skymodloader.SMLApplication;
 import git.artdeell.skymodloader.ImGUITextInput;
 import kotlin.KotlinVersion;
 
-public class GameActivity extends TGCNativeActivity implements View.OnCapturedPointerListener {
+public class GameActivity extends TGCNativeActivity implements View.OnCapturedPointerListener, SensorEventListener {
 
     static final boolean ENABLE_DISPLAY_CUTOUT_MODE = true;
     private static final String TAG = "GameActivity";
@@ -95,6 +102,23 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     private boolean m_rTriggerPressed = false;
     private boolean m_motionEventsDisabled = false;
     private int m_lastDpadDirection = 23;
+
+    // Device motion (accelerometer / gyroscope / rotation), forwarded to native.
+    // Sky 0.34.0 (401861) calls setMotionEnabled(boolean) via JNI; without it the
+    // native code aborts at startup with NoSuchMethodError setMotionEnabled(Z)V.
+    static final float INV_GRAVITY = 0.10197162f; // 1 / SensorManager.GRAVITY_EARTH (m/s^2 -> g)
+    private SensorManager m_sensorManager = null;
+    private Sensor m_gravitySensor = null;
+    private Sensor m_linearAccelSensor = null;
+    private Sensor m_rotationVectorSensor = null;
+    private Sensor m_gyroscopeSensor = null;
+    private boolean m_motionAvailable = false;
+    private boolean m_motionListening = false;
+    private final float[] m_latestGravity = new float[3];
+    private final float[] m_latestLinearAccel = new float[3];
+    private final float[] m_latestRotationRate = new float[3];
+    private final float[] m_quaternion = { 1.0f, 0.0f, 0.0f, 0.0f };
+    private volatile MotionSample m_motionSample = null;
     private PointF m_lastMouseLocation = new PointF();
     SystemIO_android m_systemIO = null;
     SystemUI_android m_systemUI = null;
@@ -155,6 +179,9 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     public native void onSystemScreenshotTakenNative();
     public native void onVolumeChangeNative(float f, float f2);
     public native void onDisplayChangedNative();
+    public native void onAccelerometerNative(float gravityX, float gravityY, float gravityZ, float accelX, float accelY, float accelZ);
+    public native void onOrientationNative(int orientation, float quatX, float quatY, float quatZ, float quatW, float rotX, float rotY, float rotZ);
+    public native void onMotionAvailabilityNative(boolean available);
 
     public int getAppBuildVersion() { return com.tgc.sky.BuildConfig.VERSION_CODE; }
     public String getAppVersion() { return com.tgc.sky.BuildConfig.SKY_VERSION; }
@@ -224,6 +251,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
         SystemSupport_android.getInstance().Initialize(this);
         this.m_systemUI = new SystemUI_android(this);
         git.artdeell.skymodloader.MainActivity.getSysetemUI(this.m_systemUI);
+        setupMotionSensors();
         onCreateNative();
         initGameController();
         logoView = findViewById(R.id.imageView);
@@ -288,6 +316,9 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
 
     @Override
     public void onResume() {
+        if (this.m_sensorManager != null && this.m_motionListening) {
+            this.m_motionListening = registerMotionListeners();
+        }
         if (this.portraitOnResume) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         this.m_systemIO.onResume();
         this.m_systemAccounts.onResume();
@@ -304,7 +335,185 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     public void onPause() {
         if (this.portraitOnResume) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         this.m_systemIO.onPause();
+        if (this.m_sensorManager != null && this.m_motionListening) {
+            this.m_sensorManager.unregisterListener(this);
+        }
         super.onPause();
+    }
+
+    // ==== Device motion sensors (Sky 0.34.0 / 401861) ====================
+    // Restores GameActivity.setMotionEnabled(boolean) and its sensor subsystem.
+    // The game's native code calls setMotionEnabled(boolean) via JNI every frame;
+    // without it startup aborts with:
+    //   NoSuchMethodError: com.tgc.sky.GameActivity.setMotionEnabled(Z)V
+    // Ported to match TGC's own GameActivity so native behavior is identical.
+
+    private static final class MotionSample {
+        final float gravityX, gravityY, gravityZ;
+        final float accelX, accelY, accelZ;
+        final float quatX, quatY, quatZ, quatW;
+        final float rotX, rotY, rotZ;
+        final int orientation;
+
+        MotionSample(float gravityX, float gravityY, float gravityZ,
+                     float accelX, float accelY, float accelZ,
+                     float quatX, float quatY, float quatZ, float quatW,
+                     float rotX, float rotY, float rotZ, int orientation) {
+            this.gravityX = gravityX; this.gravityY = gravityY; this.gravityZ = gravityZ;
+            this.accelX = accelX; this.accelY = accelY; this.accelZ = accelZ;
+            this.quatX = quatX; this.quatY = quatY; this.quatZ = quatZ; this.quatW = quatW;
+            this.rotX = rotX; this.rotY = rotY; this.rotZ = rotZ;
+            this.orientation = orientation;
+        }
+    }
+
+    private void setupMotionSensors() {
+        this.m_sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (this.m_sensorManager != null) {
+            this.m_gravitySensor     = this.m_sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+            this.m_linearAccelSensor = this.m_sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+            // NOTE: TGC registers GAME_ROTATION_VECTOR here but onSensorChanged
+            // matches ROTATION_VECTOR (below), so in the official app the
+            // quaternion stays identity. Kept identical to match native behavior.
+            this.m_rotationVectorSensor = this.m_sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+            this.m_gyroscopeSensor   = this.m_sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        }
+        this.m_motionAvailable = this.m_gravitySensor != null && this.m_linearAccelSensor != null
+                && this.m_rotationVectorSensor != null && this.m_gyroscopeSensor != null;
+    }
+
+    // Called by native every frame to enable/disable device-motion streaming and
+    // to pull the latest sample. Must match the JNI signature setMotionEnabled(Z)V.
+    public void setMotionEnabled(boolean enabled) {
+        onMotionAvailabilityNative(this.m_motionAvailable);
+        if (!this.m_motionAvailable) return;
+        if (enabled != this.m_motionListening) {
+            if (enabled) {
+                this.m_motionListening = registerMotionListeners();
+            } else {
+                this.m_sensorManager.unregisterListener(this);
+                this.m_motionListening = false;
+            }
+        }
+        MotionSample sample = this.m_motionSample;
+        if (!this.m_motionListening || sample == null) return;
+        onAccelerometerNative(sample.gravityX, sample.gravityY, sample.gravityZ,
+                sample.accelX, sample.accelY, sample.accelZ);
+        onOrientationNative(sample.orientation, sample.quatX, sample.quatY, sample.quatZ,
+                sample.quatW, sample.rotX, sample.rotY, sample.rotZ);
+    }
+
+    private boolean registerMotionListeners() {
+        boolean ok = this.m_gravitySensor == null
+                || this.m_sensorManager.registerListener(this, this.m_gravitySensor, SensorManager.SENSOR_DELAY_GAME);
+        if (this.m_linearAccelSensor != null)
+            ok &= this.m_sensorManager.registerListener(this, this.m_linearAccelSensor, SensorManager.SENSOR_DELAY_GAME);
+        if (this.m_rotationVectorSensor != null)
+            ok &= this.m_sensorManager.registerListener(this, this.m_rotationVectorSensor, SensorManager.SENSOR_DELAY_GAME);
+        if (this.m_gyroscopeSensor != null)
+            ok &= this.m_sensorManager.registerListener(this, this.m_gyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
+        if (!ok) {
+            Log.w(TAG, "One or more motion sensors failed to register; disabling motion availability");
+            this.m_sensorManager.unregisterListener(this);
+            this.m_motionAvailable = false;
+        }
+        return ok;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_GRAVITY:
+                this.m_latestGravity[0] = -event.values[0] * INV_GRAVITY;
+                this.m_latestGravity[1] = -event.values[1] * INV_GRAVITY;
+                this.m_latestGravity[2] = -event.values[2] * INV_GRAVITY;
+                break;
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                this.m_latestLinearAccel[0] = event.values[0] * INV_GRAVITY;
+                this.m_latestLinearAccel[1] = event.values[1] * INV_GRAVITY;
+                this.m_latestLinearAccel[2] = event.values[2] * INV_GRAVITY;
+                break;
+            case Sensor.TYPE_GYROSCOPE:
+                this.m_latestRotationRate[0] = event.values[0];
+                this.m_latestRotationRate[1] = event.values[1];
+                this.m_latestRotationRate[2] = event.values[2];
+                break;
+            case Sensor.TYPE_ROTATION_VECTOR:
+                SensorManager.getQuaternionFromVector(this.m_quaternion, event.values);
+                break;
+            default:
+                return;
+        }
+        publishMotionSample();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) { }
+
+    private void publishMotionSample() {
+        float gx = this.m_latestGravity[0], gy = this.m_latestGravity[1], gz = this.m_latestGravity[2];
+        float ax = this.m_latestLinearAccel[0], ay = this.m_latestLinearAccel[1], az = this.m_latestLinearAccel[2];
+        float rx = this.m_latestRotationRate[0], ry = this.m_latestRotationRate[1], rz = this.m_latestRotationRate[2];
+        float qw = this.m_quaternion[0], qx = this.m_quaternion[1], qy = this.m_quaternion[2], qz = this.m_quaternion[3];
+
+        float outGravityX, outGravityY, outAccelX, outAccelY, outRotX, outRotY;
+        float outQuatX, outQuatY, outQuatZ, outQuatW;
+        if (isNaturalLandscape()) {
+            // Remap device frame -> game's natural-landscape frame: (x, y) -> (y, -x)
+            // for the vectors, and rotate the orientation quaternion by 45 degrees
+            // (0.70710677 = cos 45deg = sqrt(1/2)).
+            final float c = 0.70710677f;
+            outGravityX =  gy; outGravityY = -gx;
+            outAccelX   =  ay; outAccelY   = -ax;
+            outRotX     =  ry; outRotY     = -rx;
+            outQuatX = c * (qx + qy);
+            outQuatY = c * (qy - qx);
+            outQuatZ = c * (qz - qw);
+            outQuatW = c * (qw + qz);
+        } else {
+            outGravityX = gx; outGravityY = gy;
+            outAccelX   = ax; outAccelY   = ay;
+            outRotX     = rx; outRotY     = ry;
+            outQuatX = qx; outQuatY = qy; outQuatZ = qz; outQuatW = qw;
+        }
+        this.m_motionSample = new MotionSample(
+                outGravityX, outGravityY, gz,
+                outAccelX, outAccelY, az,
+                outQuatX, outQuatY, outQuatZ, outQuatW,
+                outRotX, outRotY, rz,
+                getMotionDeviceOrientation());
+    }
+
+    private int getDisplayRotation() {
+        Display display = Build.VERSION.SDK_INT >= 30 ? getDisplay() : getWindowManager().getDefaultDisplay();
+        return display != null ? display.getRotation() : Surface.ROTATION_0;
+    }
+
+    private boolean isNaturalLandscape() {
+        int rotation = getDisplayRotation();
+        int orientation = getResources().getConfiguration().orientation;
+        return ((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
+                    && orientation == Configuration.ORIENTATION_LANDSCAPE)
+            || ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270)
+                    && orientation == Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    private int getMotionDeviceOrientation() {
+        int rotation = getDisplayRotation();
+        if (isNaturalLandscape()) {
+            switch (rotation) {
+                case Surface.ROTATION_90:  return 2;
+                case Surface.ROTATION_180: return 4;
+                case Surface.ROTATION_270: return 1;
+                default:                   return 3; // ROTATION_0
+            }
+        }
+        switch (rotation) {
+            case Surface.ROTATION_90:  return 3;
+            case Surface.ROTATION_180: return 2;
+            case Surface.ROTATION_270: return 4;
+            default:                   return 1; // ROTATION_0
+        }
     }
 
     @Override
