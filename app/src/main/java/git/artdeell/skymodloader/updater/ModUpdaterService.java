@@ -22,6 +22,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import git.artdeell.skymodloader.R;
@@ -44,6 +45,27 @@ public class ModUpdaterService extends AbstractUpdaterService {
     private boolean mOffsetsUpdateAvailable;
     private String mModDownloadURL;
     private String mPendingOffsetsJson;
+
+    private static final class HttpRequestException extends IOException {
+        private final int responseCode;
+        private final String rateLimitRemaining;
+        private final String responseBody;
+
+        private HttpRequestException(int responseCode, String rateLimitRemaining,
+                                     String responseBody, String message) {
+            super(message);
+            this.responseCode = responseCode;
+            this.rateLimitRemaining = rateLimitRemaining;
+            this.responseBody = responseBody == null ? "" : responseBody;
+        }
+
+        private boolean isGithubRateLimit() {
+            if(responseCode != 403) return false;
+            String normalizedBody = responseBody.toLowerCase(Locale.ROOT);
+            return "0".equals(rateLimitRemaining)
+                || normalizedBody.contains("rate limit");
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -208,16 +230,15 @@ public class ModUpdaterService extends AbstractUpdaterService {
     private JSONObject readJsonObject(String url) throws IOException, JSONException {
         try {
             return new JSONObject(readUrl(url));
-        } catch(IOException error) {
-            String message = error.getMessage();
-            boolean rateLimited = url.startsWith(GITHUB_API_REPOS_PREFIX)
-                && message != null
-                && (message.contains("API rate limit exceeded")
-                    || message.contains("RateLimit-Remaining: 0"));
-            if(!rateLimited) throw error;
+        } catch(HttpRequestException error) {
+            if(!url.startsWith(GITHUB_API_REPOS_PREFIX) || !error.isGithubRateLimit()) {
+                throw error;
+            }
 
             Log.w("ModUpdaterService", "GitHub API quota exhausted; using public release fallback");
             return readLatestReleaseWithoutApi(url);
+        } catch(IOException error) {
+            throw error;
         }
     }
 
@@ -250,32 +271,50 @@ public class ModUpdaterService extends AbstractUpdaterService {
         int cursor = 0;
 
         while(cursor < html.length()) {
-            int start = html.indexOf(marker, cursor);
-            if(start < 0) break;
-
-            int end = start;
-            while(end < html.length()) {
-                char character = html.charAt(end);
-                if(character == '"' || character == '\'' || character == '<'
-                    || Character.isWhitespace(character) || character == '?' || character == '&') {
-                    break;
-                }
-                end++;
+            int anchorStart = html.indexOf("<a", cursor);
+            if(anchorStart < 0) break;
+            if(anchorStart + 2 < html.length()
+                && !Character.isWhitespace(html.charAt(anchorStart + 2))
+                && html.charAt(anchorStart + 2) != '>') {
+                cursor = anchorStart + 2;
+                continue;
             }
 
-            String path = html.substring(start, end);
-            String encodedName = path.substring(path.lastIndexOf('/') + 1);
-            if(!encodedName.isEmpty() && !path.contains("..")) {
-                String assetName = URLDecoder.decode(encodedName, StandardCharsets.UTF_8.name());
-                String downloadUrl = GITHUB_WEB_PREFIX + path;
-                if(seenUrls.add(downloadUrl)) {
-                    JSONObject asset = new JSONObject();
-                    asset.put("name", assetName);
-                    asset.put("browser_download_url", downloadUrl);
-                    assets.put(asset);
+            int anchorEnd = html.indexOf('>', anchorStart);
+            if(anchorEnd < 0) break;
+
+            int doubleQuoteHref = html.indexOf("href=\"", anchorStart);
+            int singleQuoteHref = html.indexOf("href='", anchorStart);
+            int hrefStart = -1;
+            char quote = '"';
+            if(doubleQuoteHref >= 0 && doubleQuoteHref < anchorEnd) {
+                hrefStart = doubleQuoteHref + "href=\"".length();
+            } else if(singleQuoteHref >= 0 && singleQuoteHref < anchorEnd) {
+                hrefStart = singleQuoteHref + "href='".length();
+                quote = '\'';
+            }
+            if(hrefStart < 0) {
+                cursor = anchorEnd + 1;
+                continue;
+            }
+
+            int hrefEnd = html.indexOf(quote, hrefStart);
+            if(hrefEnd < 0) break;
+            String path = html.substring(hrefStart, hrefEnd);
+            if(path.startsWith(marker) && !path.contains("/../") && !path.contains("\\")) {
+                String encodedName = path.substring(path.lastIndexOf('/') + 1);
+                if(!encodedName.isEmpty()) {
+                    String assetName = URLDecoder.decode(encodedName, StandardCharsets.UTF_8.name());
+                    String downloadUrl = GITHUB_WEB_PREFIX + path;
+                    if(seenUrls.add(downloadUrl)) {
+                        JSONObject asset = new JSONObject();
+                        asset.put("name", assetName);
+                        asset.put("browser_download_url", downloadUrl);
+                        assets.put(asset);
+                    }
                 }
             }
-            cursor = end;
+            cursor = anchorEnd + 1;
         }
 
         return assets;
@@ -313,45 +352,49 @@ public class ModUpdaterService extends AbstractUpdaterService {
                     || !"github.com".equalsIgnoreCase(redirectUrl.getHost())) {
                     throw new IOException("GitHub latest release redirected to an unexpected host");
                 }
-                return extractLatestReleaseTag(redirectUrl.getPath(), repository);
+                return extractReleaseTagFromRedirectPath(redirectUrl.getPath(), repository);
             }
 
-            InputStream inputStream = responseCode >= 200 && responseCode < 300
-                ? connection.getInputStream()
-                : connection.getErrorStream();
-            String response = readStream(inputStream);
-            if(responseCode < 200 || responseCode >= 300) {
-                throw new IOException("GitHub release fallback failed: HTTP " + responseCode);
-            }
-            return extractLatestReleaseTag(response, repository);
+            throw new IOException("GitHub latest release did not return a redirect: HTTP "
+                + responseCode);
         } finally {
             connection.disconnect();
         }
     }
 
-    private String extractLatestReleaseTag(String source, String repository) throws IOException {
+    private String extractReleaseTagFromRedirectPath(String path, String repository)
+        throws IOException {
         String marker = "/" + repository + "/releases/tag/";
-        int start = source.indexOf(marker);
-        if(start < 0) {
-            throw new IOException("GitHub latest release tag was not found");
+        if(!path.startsWith(marker)) {
+            throw new IOException("GitHub latest release redirect path is unexpected");
         }
-        start += marker.length();
-
-        int end = start;
-        while(end < source.length()) {
-            char character = source.charAt(end);
-            if(!Character.isLetterOrDigit(character)
-                && character != '.' && character != '_' && character != '-') {
-                break;
-            }
-            end++;
-        }
-
-        String tag = source.substring(start, end);
-        if(tag.isEmpty() || !tag.matches("[A-Za-z0-9._-]+")) {
+        String tag = path.substring(marker.length());
+        if(!isValidReleaseTag(tag)) {
             throw new IOException("GitHub latest release tag is invalid");
         }
         return tag;
+    }
+
+    private boolean isValidReleaseTag(String tag) {
+        if(tag.isEmpty() || tag.endsWith("/") || tag.contains("..")) return false;
+        for(int i = 0; i < tag.length(); i++) {
+            char character = tag.charAt(i);
+            if(Character.isLetterOrDigit(character) || character == '.' || character == '_'
+                || character == '-' || character == '+' || character == '/') {
+                continue;
+            }
+            if(character == '%' && i + 2 < tag.length()
+                && isHexDigit(tag.charAt(i + 1)) && isHexDigit(tag.charAt(i + 2))) {
+                i += 2;
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isHexDigit(char character) {
+        return Character.digit(character, 16) >= 0;
     }
 
     private String readUrl(String url) throws IOException {
@@ -385,7 +428,8 @@ public class ModUpdaterService extends AbstractUpdaterService {
                     + " | GitHub-Request-Id: " + requestId
                     + " | Body: " + responsePreview;
                 Log.e("ModUpdaterService", errorMessage);
-                throw new IOException(errorMessage);
+                throw new HttpRequestException(
+                    responseCode, rateLimitRemaining, response, errorMessage);
             }
             return response;
         } finally {
