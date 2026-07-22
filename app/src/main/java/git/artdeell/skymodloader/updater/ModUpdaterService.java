@@ -24,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import git.artdeell.skymodloader.R;
 import git.artdeell.skymodloader.elfmod.ElfModMetadata;
@@ -33,6 +35,8 @@ public class ModUpdaterService extends AbstractUpdaterService {
     private static final String GITHUB_USER_AGENT = "Canvas-ModUpdater/1.8.0";
     private static final String GITHUB_API_REPOS_PREFIX = "https://api.github.com/repos/";
     private static final String GITHUB_WEB_PREFIX = "https://github.com/";
+    private static final Pattern HREF_ATTRIBUTE_PATTERN = Pattern.compile(
+        "\\shref\\s*=\\s*([\"'])([^\"']*)\\1", Pattern.CASE_INSENSITIVE);
     public static final String EXTRA_UPDATE_URL = "update_url";
     public static final String EXTRA_OFFSETS_URL = "offsets_url";
     public static final String EXTRA_LIB_NAME = "lib_name";
@@ -283,34 +287,31 @@ public class ModUpdaterService extends AbstractUpdaterService {
             int anchorEnd = html.indexOf('>', anchorStart);
             if(anchorEnd < 0) break;
 
-            int doubleQuoteHref = html.indexOf("href=\"", anchorStart);
-            int singleQuoteHref = html.indexOf("href='", anchorStart);
-            int hrefStart = -1;
-            char quote = '"';
-            if(doubleQuoteHref >= 0 && doubleQuoteHref < anchorEnd) {
-                hrefStart = doubleQuoteHref + "href=\"".length();
-            } else if(singleQuoteHref >= 0 && singleQuoteHref < anchorEnd) {
-                hrefStart = singleQuoteHref + "href='".length();
-                quote = '\'';
-            }
-            if(hrefStart < 0) {
+            String anchor = html.substring(anchorStart, anchorEnd + 1);
+            Matcher hrefMatcher = HREF_ATTRIBUTE_PATTERN.matcher(anchor);
+            if(!hrefMatcher.find()) {
                 cursor = anchorEnd + 1;
                 continue;
             }
 
-            int hrefEnd = html.indexOf(quote, hrefStart);
-            if(hrefEnd < 0) break;
-            String path = html.substring(hrefStart, hrefEnd);
-            if(path.startsWith(marker) && !path.contains("/../") && !path.contains("\\")) {
-                String encodedName = path.substring(path.lastIndexOf('/') + 1);
-                if(!encodedName.isEmpty()) {
+            String path = hrefMatcher.group(2);
+            if(path.startsWith(marker)) {
+                String encodedName = path.substring(marker.length());
+                if(!encodedName.isEmpty() && !encodedName.contains("/")
+                    && !encodedName.contains("\\") && !encodedName.contains("?")
+                    && !encodedName.contains("#") && !encodedName.equals(".")
+                    && !encodedName.equals("..")) {
                     String assetName = URLDecoder.decode(encodedName, StandardCharsets.UTF_8.name());
-                    String downloadUrl = GITHUB_WEB_PREFIX + path;
-                    if(seenUrls.add(downloadUrl)) {
-                        JSONObject asset = new JSONObject();
-                        asset.put("name", assetName);
-                        asset.put("browser_download_url", downloadUrl);
-                        assets.put(asset);
+                    if(!assetName.isEmpty() && !assetName.contains("/")
+                        && !assetName.contains("\\") && !assetName.equals(".")
+                        && !assetName.equals("..")) {
+                        String downloadUrl = GITHUB_WEB_PREFIX + path;
+                        if(seenUrls.add(downloadUrl)) {
+                            JSONObject asset = new JSONObject();
+                            asset.put("name", assetName);
+                            asset.put("browser_download_url", downloadUrl);
+                            assets.put(asset);
+                        }
                     }
                 }
             }
@@ -342,7 +343,7 @@ public class ModUpdaterService extends AbstractUpdaterService {
         connection.setRequestProperty("User-Agent", GITHUB_USER_AGENT);
         try {
             int responseCode = connection.getResponseCode();
-            if(responseCode >= 300 && responseCode <= 308) {
+            if(isRedirectResponse(responseCode)) {
                 String location = connection.getHeaderField("Location");
                 if(location == null || location.isEmpty()) {
                     throw new IOException("GitHub latest release redirect has no Location header");
@@ -360,6 +361,11 @@ public class ModUpdaterService extends AbstractUpdaterService {
         } finally {
             connection.disconnect();
         }
+    }
+
+    private boolean isRedirectResponse(int responseCode) {
+        return responseCode == 301 || responseCode == 302 || responseCode == 303
+            || responseCode == 307 || responseCode == 308;
     }
 
     private String extractReleaseTagFromRedirectPath(String path, String repository)
