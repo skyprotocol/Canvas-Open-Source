@@ -15,6 +15,8 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 /**
  * This class is intended for sending characters used in chat via the virtual keyboard
@@ -46,6 +48,9 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
     }
     private final InputMethodManager imm;
 
+    /** Last IME visibility seen by the inset listener; see installImeVisibilityListener(). */
+    private boolean imeWasVisible = false;
+
     /**
      * When we change from app to app, the keyboard gets disabled.
      * So, we disable the object
@@ -73,6 +78,7 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
         InputConnection inputConnection = super.onCreateInputConnection(outAttrs);
         outAttrs.inputType = INPUT_TYPE;
         outAttrs.imeOptions |= EditorInfo.IME_FLAG_NO_EXTRACT_UI
+                | EditorInfo.IME_FLAG_NO_FULLSCREEN
                 | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING;
         if (inputConnection == null) {
             return null;
@@ -299,14 +305,50 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
     /** This function deals with anything that has to be executed when the constructor is called */
     private void setup(){
         setRawInputType(INPUT_TYPE);
-        setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
+        // NO_FULLSCREEN matters here beyond cosmetics: the host activity is
+        // landscape-only, and a fullscreen (extract-mode) IME stops the window
+        // from dispatching inset changes at all, which would leave the listener
+        // below permanently silent.  NO_EXTRACT_UI alone does not prevent that -
+        // it only suppresses the extracted-text editor.
+        setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI
+                | EditorInfo.IME_FLAG_NO_FULLSCREEN
+                | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
         setOnEditorActionListener((textView, i, keyEvent) -> {
             sendEnter();
             clear();
             disable();
             return false;
         });
+        installImeVisibilityListener();
         clear();
         disable();
+    }
+
+    /**
+     * The only reliable way to learn that the IME went away.
+     *
+     * An IME can close itself without ever dispatching a key event to us - the
+     * "hide keyboard" control in Gboard and friends does exactly that, and under
+     * gesture navigation there is no BACK key in the picture at all.  Google
+     * closed issuetracker.google.com/issues/242222756 as intended behaviour for
+     * this very reason ("an IME can close itself without going through all of
+     * that path") and points at the ime() inset as the supported signal.
+     *
+     * Without this, the view stays enabled while the IME is gone, the ImGui
+     * InputText stays active, io.WantTextInput stays true, and GameActivity's
+     * imguiKeybaordShowing latch never re-raises the keyboard - so tapping a text
+     * field afterwards only moves the caret.
+     */
+    private void installImeVisibilityListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(this, (v, insets) -> {
+            final boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
+            if (imeWasVisible && !imeVisible) {
+                // Posted, not inline: disable() flips visibility and clears focus,
+                // neither of which may happen during an inset dispatch.
+                post(this::disable);
+            }
+            imeWasVisible = imeVisible;
+            return insets;
+        });
     }
 }
