@@ -273,6 +273,20 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
         setVisibility(GONE);
         clearFocus();
         setEnabled(false);
+        // End the ImGui editing session in lockstep.  Hiding this view alone
+        // leaves the InputText active and io.WantTextInput stuck true, which
+        // desynchronises GameActivity's imguiKeybaordShowing latch: it believes
+        // the keyboard is already up and never re-shows it, so tapping a text
+        // field afterwards only moves the caret.
+        // Placed here rather than at the individual dismissal sites so the view
+        // state and the ImGui session cannot diverge - every route that hides
+        // the IME (BACK key, window focus change, IME "done" on a multiline
+        // field, GameActivity lowering the keyboard) passes through here.
+        // Safe to call unconditionally: the native side only acts when the
+        // ImGui item being edited is the one holding ActiveId, so this is a
+        // no-op when ImGui has already deactivated the field or is busy with
+        // some other widget.
+        ImGUI.clearTextFocus();
     }
 
     /** Send the enter key. */

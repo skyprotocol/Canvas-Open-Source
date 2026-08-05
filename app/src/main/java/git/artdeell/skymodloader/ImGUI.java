@@ -47,6 +47,8 @@ public class ImGUI implements SurfaceHolder.Callback{
     public static native void submitButtonEvent(int btn, boolean pressed);
     public static native void submitUnicodeEvent(char codepoint);
     public static native void submitKeyEvent(int key, boolean down);
+    /** End the active ImGui text-editing session, keeping whatever was typed. */
+    public static native void clearTextFocus();
     public static native boolean wantsKeyboard();
     public static native boolean wantsMouse();
 
