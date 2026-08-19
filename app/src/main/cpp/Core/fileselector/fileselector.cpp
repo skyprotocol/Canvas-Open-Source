@@ -12,6 +12,7 @@ jclass class_FileSelector;
 jclass class_String;
 jmethodID method_nselectFile;
 jmethodID method_nselectFileMulti;
+jmethodID method_nselectFileMultiNamed;
 jmethodID method_nselectFiles;
 
 
@@ -20,6 +21,7 @@ PRIVATE_API void fsel_setup(JNIEnv* env) {
     class_String       = (jclass)env->NewGlobalRef(env->FindClass("java/lang/String"));
     method_nselectFile      = env->GetStaticMethodID(class_FileSelector, "nselectFile",      "(Ljava/lang/String;JZ)Z");
     method_nselectFileMulti = env->GetStaticMethodID(class_FileSelector, "nselectFileMulti", "([Ljava/lang/String;JZ)Z");
+    method_nselectFileMultiNamed = env->GetStaticMethodID(class_FileSelector, "nselectFileMultiNamed", "([Ljava/lang/String;JZLjava/lang/String;)Z");
     method_nselectFiles     = env->GetStaticMethodID(class_FileSelector, "nselectFiles",     "([Ljava/lang/String;J)Z");
 }
 extern "C"
@@ -91,8 +93,9 @@ static jobjectArray fsel_build_mime_array(JNIEnv* env,
     return arr;
 }
 
-bool requestFileMulti(const char* const* mime_types, size_t mime_type_count,
-                      callback_function callback, bool save) {
+bool requestFileMultiNamed(const char* const* mime_types, size_t mime_type_count,
+                           callback_function callback, bool save,
+                           const char* suggested_name) {
     if (!mime_types || mime_type_count == 0) return false;
 
     JNIEnv* env;
@@ -104,15 +107,36 @@ bool requestFileMulti(const char* const* mime_types, size_t mime_type_count,
     jobjectArray mimeArr = fsel_build_mime_array(env, mime_types, mime_type_count);
     if (!mimeArr) return false;
 
+    // Null stays null all the way into the Java side, where it means "leave the
+    // name field as it was" - the pre-EXTRA_TITLE behaviour, and what
+    // requestFileMulti below still asks for.
+    jstring nameStr = nullptr;
+    if (suggested_name && suggested_name[0] != '\0') {
+        nameStr = env->NewStringUTF(suggested_name);
+        if (!nameStr || fsel_check_exception(env, "NewStringUTF(name)")) {
+            env->DeleteLocalRef(mimeArr);
+            return false;
+        }
+    }
+
     jboolean result = env->CallStaticBooleanMethod(
-        class_FileSelector, method_nselectFileMulti,
-        mimeArr, (jlong)callback, save);
+        class_FileSelector, method_nselectFileMultiNamed,
+        mimeArr, (jlong)callback, save, nameStr);
     const bool exceptionRaised = fsel_check_exception(env, "CallStaticBooleanMethod");
 
+    if (nameStr) env->DeleteLocalRef(nameStr);
     env->DeleteLocalRef(mimeArr);
 
     if (exceptionRaised) return false;
     return result == JNI_TRUE;
+}
+
+// Kept as a delegate rather than a second copy of the body: this symbol is
+// linked by every mod already built against this header, so it has to stay -
+// but two JNI bodies to keep in step is how the two forms drift apart.
+bool requestFileMulti(const char* const* mime_types, size_t mime_type_count,
+                      callback_function callback, bool save) {
+    return requestFileMultiNamed(mime_types, mime_type_count, callback, save, nullptr);
 }
 
 bool requestFiles(const char* const* mime_types, size_t mime_type_count,

@@ -46,7 +46,26 @@ public class FileSelector implements GameActivity.OnActivityResultListener {
     public static boolean nselectFileMulti(String[] mimeTypes, long callbackFunction, boolean save) {
         return selector.selectFileMulti(mimeTypes, callbackFunction, save);
     }
+
+    // Save mode with a proposed file name.
+    //
+    // Kept as a SEPARATE entry point rather than a fourth argument on the one
+    // above: nselectFileMulti is resolved from native by its exact signature
+    // ([Ljava/lang/String;JZ)Z, so every mod built against the old Canvas would
+    // fail to find it the moment that changed.
+    public static boolean nselectFileMultiNamed(String[] mimeTypes, long callbackFunction,
+                                                boolean save, String suggestedName) {
+        return selector.selectFileMulti(mimeTypes, callbackFunction, save, suggestedName);
+    }
+
     public boolean selectFileMulti(String[] mimeTypes, long callbackFunction, boolean save) {
+        return selectFileMulti(mimeTypes, callbackFunction, save, null);
+    }
+
+    // suggestedName - initial name for the save picker, or null to leave the
+    //   field empty as before. May include the extension; see buildPickerIntent.
+    public boolean selectFileMulti(String[] mimeTypes, long callbackFunction, boolean save,
+                                   String suggestedName) {
         if(this.callbackFunction != 0) return false;
         if(mimeTypes == null || mimeTypes.length == 0) return false;
 
@@ -65,7 +84,7 @@ public class FileSelector implements GameActivity.OnActivityResultListener {
             this.isSaveMode = save;
             this.isMultiFilesMode = false;
             gameActivity.startActivityForResult(
-                buildPickerIntent(types, save, /*allowMultiple=*/false),
+                buildPickerIntent(types, save, /*allowMultiple=*/false, suggestedName),
                 SELECTING_FILE);
         });
         return true;
@@ -85,13 +104,15 @@ public class FileSelector implements GameActivity.OnActivityResultListener {
             this.isSaveMode = false;
             this.isMultiFilesMode = true;
             gameActivity.startActivityForResult(
-                buildPickerIntent(types, /*save=*/false, /*allowMultiple=*/true),
+                buildPickerIntent(types, /*save=*/false, /*allowMultiple=*/true,
+                                  /*suggestedName=*/null),
                 SELECTING_FILE);
         });
         return true;
     }
 
-    private static Intent buildPickerIntent(String[] types, boolean save, boolean allowMultiple) {
+    private static Intent buildPickerIntent(String[] types, boolean save, boolean allowMultiple,
+                                            String suggestedName) {
         Intent i = new Intent(save ? Intent.ACTION_CREATE_DOCUMENT : Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
         if(allowMultiple) i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -100,6 +121,22 @@ public class FileSelector implements GameActivity.OnActivityResultListener {
         } else {
             i.setType("*/*");
             i.putExtra(Intent.EXTRA_MIME_TYPES, types);
+        }
+        // ACTION_CREATE_DOCUMENT reads its initial file name from EXTRA_TITLE;
+        // the user can still change it before saving. Without it the name field
+        // opens empty, and an empty display name is NOT left empty by the
+        // platform - FileUtils.buildValidFatFilename substitutes the literal
+        // "(invalid)", so saved files arrive as "(invalid).json".
+        //
+        // The name may carry its extension. FileUtils.splitFileName keeps the
+        // caller's extension when it maps back to the requested MIME type and
+        // replaces it otherwise, so "sheet.json" + "application/json" stays
+        // "sheet.json" rather than gaining a second suffix. Illegal characters
+        // and over-long names are sanitized by the provider, so nothing here has
+        // to - only the empty case needs guarding, since that is the one
+        // buildValidFatFilename cannot rescue.
+        if(save && suggestedName != null && !suggestedName.isEmpty()) {
+            i.putExtra(Intent.EXTRA_TITLE, suggestedName);
         }
         return i;
     }

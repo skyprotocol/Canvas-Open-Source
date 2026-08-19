@@ -45,6 +45,29 @@ bool requestFileMulti(const char* const* mime_types,
                       bool save);
 
 /**
+ * requestFileMulti, plus a proposed file name for save mode.
+ * suggested_name - initial name shown in the picker, or nullptr/"" for none.
+ *                  Ignored when save is false; the user can always change it.
+ *
+ * Pass this whenever save is true. ACTION_CREATE_DOCUMENT takes its initial
+ * name from EXTRA_TITLE, and with no name the picker's field opens empty - which
+ * the platform does not leave empty: an empty display name comes back as the
+ * literal "(invalid)" from FileUtils.buildValidFatFilename, so the file is
+ * created as "(invalid).<ext>".
+ *
+ * Include the extension. FileUtils.splitFileName keeps it when it maps back to
+ * mime_types[0] and swaps it for the type's own otherwise, so there is no
+ * double-suffix case to avoid. Illegal characters, over-long names and
+ * collisions are all handled by the provider - it appends "(1)" rather than
+ * overwriting.
+ */
+bool requestFileMultiNamed(const char* const* mime_types,
+                           size_t mime_type_count,
+                           callback_function callback,
+                           bool save,
+                           const char* suggested_name);
+
+/**
  * Callback for requestFiles.
  * count - number of file descriptors; 0 on cancel or all-failed
  * fds - valid only during the callback; callee owns the fds and must close
