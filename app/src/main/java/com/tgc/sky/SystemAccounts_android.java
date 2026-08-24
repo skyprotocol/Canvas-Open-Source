@@ -9,6 +9,7 @@ import git.artdeell.skymodloader.auth.Nintendo;
 import git.artdeell.skymodloader.auth.Sony;
 import git.artdeell.skymodloader.auth.Steam;
 import git.artdeell.skymodloader.auth.Twitch;
+import git.artdeell.skymodloader.SkyAuthIntegration;
 
 import com.tgc.sky.accounts.SystemAccountClientInfo;
 import com.tgc.sky.accounts.SystemAccountClientRequestState;
@@ -138,6 +139,12 @@ public class SystemAccounts_android implements SystemAccountInterface.UpdateClie
     }
 
     public void SignOut(int i) {
+        if (SkyAuthIntegration.isEnabled(m_activity)) {
+            // SKYAuth owns the game authorization. Keep the borrowed platform
+            // account intact and replace only the authorization file.
+            m_activity.refreshFreeSkyAuthorization();
+            return;
+        }
         SystemAccountInterface GetSystemAccount = GetSystemAccount(SystemAccountType.values()[i]);
         if (GetSystemAccount != null) {
             GetSystemAccount.SignOut();

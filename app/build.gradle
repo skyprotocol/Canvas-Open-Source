@@ -7,6 +7,7 @@ android {
     packagingOptions {
         jniLibs {
             useLegacyPackaging true
+            pickFirsts += 'lib/arm64-v8a/libshadowhook.so'
         }
     }
 
@@ -25,6 +26,10 @@ android {
         targetSdk 34
         versionCode 70
         versionName "1.8.4"
+
+        ndk {
+            abiFilters "arm64-v8a"
+        }
 
         externalNativeBuild {
             cmake {
@@ -67,6 +72,8 @@ android {
 dependencies {
 
     implementation( platform 'org.jetbrains.kotlin:kotlin-bom:1.8.0')
+    implementation files('libs/sky-auth.aar')
+    implementation files('libs/sky-auth-localization.aar')
 
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'net.fornwall:jelf:0.9.0'

@@ -194,14 +194,12 @@
 
     <!-- server switch -->
     <string name="approved_servers">APPROVED SERVERS</string>
-    <string name="radiance_official_private_server">Radiance Official Private Server</string>
-    <string name="server_radiance_connected" translatable="false">Connected · sky.thatskyradiance.duckdns.org</string>
-    <string name="server_disconnected_live">Not Connected · Using Live (TGC Official)</string>
-    <string name="server_disconnected_custom">Not Connected · Using Custom (%s)</string>
-    <string name="server_connected_radiance">Connected to Radiance Official Private Server</string>
     <string name="server_connected_live">Connected to Live Official Server</string>
     <string name="server_connected_to">Connected to %s</string>
-    <string name="server_live">Live (TGC Official)</string>
-    <string name="dialog_server_title">Select Server</string>
-    <string name="dialog_server_subtitle">Choose an approved server or connect to official Live</string>
+    <string name="sky_auth_session_preparing_accessibility">Preparing account session</string>
+    <string name="sky_auth_session_welcome">Welcome, %1$s!</string>
+    <string name="sky_auth_session_welcome_generic">Welcome to the game!</string>
+    <string name="sky_auth_network_title">Authentication unavailable</string>
+    <string name="sky_auth_network_message">Cannot connect to the authentication service. Check your network and try again.</string>
+    <string name="sky_auth_retry">Retry</string>
 </resources>

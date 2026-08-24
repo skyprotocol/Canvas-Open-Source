@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sky_auth_session_preparing_accessibility">正在准备账号会话</string>
+    <string name="sky_auth_session_welcome">欢迎，%1$s！</string>
+    <string name="sky_auth_session_welcome_generic">欢迎进入游戏！</string>
+    <string name="sky_auth_network_title">认证服务不可用</string>
+    <string name="sky_auth_network_message">无法连接认证服务，请检查网络后重试。</string>
+    <string name="sky_auth_retry">重试</string>
+</resources>

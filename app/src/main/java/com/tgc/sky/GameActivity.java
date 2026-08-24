@@ -70,9 +70,12 @@ import git.artdeell.skymodloader.ImGUI;
 import git.artdeell.skymodloader.R;
 import git.artdeell.skymodloader.SMLApplication;
 import git.artdeell.skymodloader.ImGUITextInput;
+import git.artdeell.skymodloader.SkyAuthIntegration;
 import kotlin.KotlinVersion;
+import me.fengwu.skyauth.SkyAuth;
 
-public class GameActivity extends TGCNativeActivity implements View.OnCapturedPointerListener, SensorEventListener {
+public class GameActivity extends TGCNativeActivity implements View.OnCapturedPointerListener,
+    SensorEventListener, SkyAuth.AuthorizationRefreshHost {
 
     static final boolean ENABLE_DISPLAY_CUTOUT_MODE = true;
     private static final String TAG = "GameActivity";
@@ -102,6 +105,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     private boolean m_rTriggerPressed = false;
     private boolean m_motionEventsDisabled = false;
     private int m_lastDpadDirection = 23;
+    private final SkyAuthIntegration skyAuthIntegration = new SkyAuthIntegration(this);
 
     // Device motion (accelerometer / gyroscope / rotation), forwarded to native.
     // Sky 0.34.0 (401861) calls setMotionEnabled(boolean) via JNI; without it the
@@ -286,6 +290,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
             }
         });
         if (Build.VERSION.SDK_INT >= 30) setupDisplayListener();
+        skyAuthIntegration.onCreate();
     }
 
     @Override
@@ -311,6 +316,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
 
     @Override
     public void onDestroy() {
+        skyAuthIntegration.onDestroy();
         FMOD.close();
         FileSelector.unsetActivity();
         this.m_systemIO.onDestroy();
@@ -326,12 +332,18 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
         this.m_systemIO.onResume();
         this.m_systemAccounts.onResume();
         super.onResume();
+        skyAuthIntegration.onResume();
         if (this.portraitOnResume) {
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 if (GameActivity.this.portraitOnResume)
                     GameActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             }, 1000L);
         }
+    }
+
+    @Override
+    public void refreshFreeSkyAuthorization() {
+        skyAuthIntegration.refreshAuthorization();
     }
 
     @Override
