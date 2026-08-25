@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,6 +22,7 @@ import android.webkit.WebViewClient;
 
 import com.tgc.sky.commerce.ProductInfo;
 import com.tgc.sky.commerce.Receipt;
+import com.tgc.sky.commerce.ReceiptItem;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,6 +35,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -46,13 +49,19 @@ public class SystemCommerce_android
     private static final String SKY_STORE_URL = "https://store.thatskygame.com/";
     private static final String XSOLLA_CATALOG_URL = "https://store.xsolla.com/api/v2/project/207830/items/virtual_items";
     private static final String XSOLLA_SKU_PREFIX = "xsolla.sky.";
+    private static final String PLACEHOLDER_PURCHASE_VALUE = "";
+    private static final long IMMEDIATE_PURCHASE_CALLBACK_DELAY_MS = 16L;
 
     private static volatile SystemCommerce_android sInstance;
     private final GameActivity mActivity;
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
     private final HashMap<String, ProductInfo> mProductInfo = new HashMap<>();
+    private final Object mReceiptLock = new Object();
     private boolean mProductsInitialized;
     private String mPendingExternalProductId;
+    private ReceiptItem mPendingPurchase;
+    private boolean mHasReceipt;
+    private String mError;
 
     SystemCommerce_android(final GameActivity activity) {
         mActivity = activity;
@@ -68,6 +77,24 @@ public class SystemCommerce_android
     }
 
     public boolean FinishPurchase(String productIdToSystemProductId, final String s) {
+        if (ServerManager.isCustomServerEnabled(mActivity)) {
+            ReceiptItem deliveredPurchase;
+            synchronized (mReceiptLock) {
+                String systemProductId = toSystemProductId(productIdToSystemProductId);
+                if (mPendingPurchase == null
+                        || !systemProductId.equalsIgnoreCase(mPendingPurchase.systemProductId)) {
+                    return false;
+                }
+                mPendingPurchase.wasDelivered = true;
+                deliveredPurchase = mPendingPurchase;
+                mPendingPurchase = null;
+                mHasReceipt = false;
+            }
+            SystemAnalytics_android.getInstance().OnFinishPurchase(
+                    deliveredPurchase,
+                    mProductInfo.get(deliveredPurchase.systemProductId));
+            return true;
+        }
         return false;
     }
 
@@ -83,10 +110,45 @@ public class SystemCommerce_android
     }
 
     public Receipt GetReceipt() {
-        return null;
+        if (!ServerManager.isCustomServerEnabled(mActivity)) {
+            return null;
+        }
+
+        synchronized (mReceiptLock) {
+            if (!mHasReceipt || mPendingPurchase == null) {
+                mHasReceipt = false;
+                return null;
+            }
+
+            JSONArray purchases = new JSONArray();
+            JSONArray signatures = new JSONArray();
+            purchases.put(mPendingPurchase.info);
+            signatures.put(mPendingPurchase.signature);
+
+            try {
+                JSONObject payload = new JSONObject();
+                payload.put("purchases", purchases);
+                payload.put("signatures", signatures);
+
+                Receipt receipt = new Receipt();
+                receipt.base64payload = Base64.encodeToString(
+                        payload.toString().getBytes(StandardCharsets.UTF_8),
+                        Base64.NO_WRAP);
+                receipt.type = receipt.base64payload.length() > 0xBFFF ? -1 : 0;
+                mHasReceipt = false;
+                return receipt;
+            } catch (Exception e) {
+                mError = e.getMessage();
+                mHasReceipt = false;
+                return null;
+            }
+        }
     }
 
     public boolean IsPurchasePending(String productIdToSystemProductId) {
+        if (ServerManager.isCustomServerEnabled(mActivity)) {
+            return false;
+        }
         return mPendingExternalProductId != null
                 && toXsollaSku(mPendingExternalProductId).equals(toXsollaSku(productIdToSystemProductId));
     }
@@ -109,7 +171,27 @@ public class SystemCommerce_android
 
     public boolean MakePurchase(String productIdToSystemProductId, String accountId, String profileId) {
         if (ServerManager.isCustomServerEnabled(mActivity)) {
-            return false;
+            String systemProductId = toSystemProductId(productIdToSystemProductId);
+            if (systemProductId.isEmpty()) {
+                return false;
+            }
+
+            ReceiptItem purchase;
+            synchronized (mReceiptLock) {
+                if (mPendingPurchase != null) {
+                    return false;
+                }
+                try {
+                    purchase = createImmediatePurchase(systemProductId);
+                } catch (Exception e) {
+                    mError = e.getMessage();
+                    return false;
+                }
+                mPendingPurchase = purchase;
+                mHasReceipt = true;
+            }
+            postPurchaseUpdate(true);
+            return true;
         }
 
         String systemProductId = toSystemProductId(productIdToSystemProductId);
@@ -127,14 +209,22 @@ public class SystemCommerce_android
     }
 
     public boolean RefreshReceipt() {
+        if (ServerManager.isCustomServerEnabled(mActivity)) {
+            notifyPendingPurchase();
+        }
         return true;
     }
 
     String GetErrorMessage() {
-        return null;
+        String error = mError;
+        mError = null;
+        return error;
     }
 
     public boolean RestorePurchases() {
+        if (ServerManager.isCustomServerEnabled(mActivity)) {
+            notifyPendingPurchase();
+        }
         return true;
     }
 
@@ -145,6 +235,42 @@ public class SystemCommerce_android
     }
 
     void onResume() {
+    }
+
+    private void notifyPendingPurchase() {
+        boolean hasReceipt;
+        synchronized (mReceiptLock) {
+            mHasReceipt = mPendingPurchase != null;
+            hasReceipt = mHasReceipt;
+        }
+        postPurchaseUpdate(hasReceipt);
+    }
+
+    private void postPurchaseUpdate(boolean hasReceipt) {
+        mMainHandler.postDelayed(
+                () -> mActivity.onCommerceUpdate(false, true, hasReceipt),
+                IMMEDIATE_PURCHASE_CALLBACK_DELAY_MS);
+    }
+
+    private ReceiptItem createImmediatePurchase(String systemProductId) throws Exception {
+        JSONObject purchaseInfo = new JSONObject();
+        purchaseInfo.put("orderId", PLACEHOLDER_PURCHASE_VALUE);
+        purchaseInfo.put("packageName", PLACEHOLDER_PURCHASE_VALUE);
+        purchaseInfo.put("productId", systemProductId);
+        purchaseInfo.put("purchaseTime", 0);
+        purchaseInfo.put("purchaseState", 0);
+        purchaseInfo.put("purchaseToken", PLACEHOLDER_PURCHASE_VALUE);
+        purchaseInfo.put("quantity", 1);
+        purchaseInfo.put("acknowledged", false);
+
+        ReceiptItem purchase = new ReceiptItem();
+        purchase.systemProductId = systemProductId;
+        purchase.orderId = PLACEHOLDER_PURCHASE_VALUE;
+        purchase.quantity = 1;
+        purchase.info = purchaseInfo.toString();
+        purchase.signature = "";
+        purchase.wasDelivered = false;
+        return purchase;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
