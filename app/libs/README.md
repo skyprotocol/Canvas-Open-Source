@@ -3,7 +3,7 @@
 `sky-auth.aar` is the minified Android release library and
 `sky-auth-localization.aar` is its local AAR transitive dependency. Both are based on
 [`fengwu726/sky-auth`](https://github.com/fengwu726/sky-auth) commit
-`218aef3d29e5b51b53d1d88bbc9fe61eaf2ce2d6`. The bundled authentication AAR removes
+`7e4e781d206731e7e584ec69318cb7ffb51153b5`. The bundled authentication AAR removes
 its private certificate anchors and uses Android's system CA trust for HTTPS instead;
 cleartext transport remains disabled.
 
