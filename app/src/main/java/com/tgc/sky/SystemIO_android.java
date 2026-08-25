@@ -21,6 +21,8 @@ import com.tgc.sky.io.DeviceKey;
 import com.tgc.sky.io.NFCSessionManager;
 import com.tgc.sky.ui.NtVideoRecorder;
 
+import git.artdeell.skymodloader.server.ServerManager;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -896,6 +898,10 @@ public class SystemIO_android {
     }
 
     public String GetUserPreferenceString(int i) {
+        if (i == UserPreferenceStringKey.kUserPreference_LastPlayedAccountType.ordinal()
+                && ServerManager.isFreeSkyActive(m_activity)) {
+            return "Local";
+        }
         return mUserPrefs.getString(getKeyName(KEY_TYPE_STRING, i), null);
     }
 
