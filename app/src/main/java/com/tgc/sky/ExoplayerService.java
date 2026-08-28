@@ -236,18 +236,18 @@ class ExoplayerService {
         return this.m_player.isCurrentMediaItemLive() ? 1 : 0;
     }
 
-    // Player.STATE_* (1 idle, 2 buffering, 3 ready, 4 ended), or -1 with no
-    // player. m_state is written by VideoListener.onPlaybackStateChanged.
-    public int GetPlaybackState() {
-        return this.m_player == null ? -1 : this.m_state;
-    }
-
     public int GetSeekableState() {
         if (this.m_player == null
                 || !this.m_player.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM)) {
             return -1;
         }
         return this.m_player.isCurrentMediaItemSeekable() ? 1 : 0;
+    }
+
+    // Player.STATE_* (1 idle, 2 buffering, 3 ready, 4 ended), or -1 with no
+    // player. m_state is written by VideoListener.onPlaybackStateChanged.
+    public int GetPlaybackState() {
+        return this.m_player == null ? -1 : this.m_state;
     }
     // ---- end Canvas addition -------------------------------------------
 

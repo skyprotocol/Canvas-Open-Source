@@ -433,10 +433,9 @@ Java_git_artdeell_skymodloader_MainActivity_nativeSetStarwatchAllowed(
 // A key prefixed `is_` is a boolean: 1 or 0, never any other value.
 // Read those through the typed wrappers rather than as raw numbers, and
 // do not introduce an unprefixed boolean key alongside them.
-// Absence is stored as NaN, never as a magic number: the query cannot know a
-// key's legal range, so a negative sentinel would swallow any future signed
-// value. The query reports absence as false and leaves the caller's out
-// parameter untouched, rather than handing back something it might render.
+// A key with no value right now reports false and leaves the caller's out
+// parameter untouched - never a sentinel a caller might render.  See kAbsent
+// below for how absence is stored.
 namespace {
     // NaN, not a negative number, means "no value right now".  The query cannot
     // know a given key's legal range, so a negative sentinel would silently
