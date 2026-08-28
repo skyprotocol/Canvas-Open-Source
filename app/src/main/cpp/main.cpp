@@ -9,6 +9,10 @@
 #include "Core/imgui/imgui.h"
 #include "Utils/imgui_androidbk/androidbk.h"
 #include "include/misc/Vector3.h"
+#include <atomic>
+#include <cmath>
+#include <cstring>
+#include <limits>
 #include <vector>
 #include "Canvas/Canvas.h"
 #include "Cipher/CipherUtils.h"
@@ -382,4 +386,118 @@ Java_git_artdeell_skymodloader_MainActivity_nativeSetStarwatchAllowed(
         jboolean allowed
 ) {
     starwatch_block_set_allowed(allowed == JNI_TRUE);
+}
+
+// ---------------------------------------------------------------------------
+// Host value channel for user libs.
+//
+// One weak-linked entry point instead of one exported symbol per capability:
+// a mod gates on this ONCE and every future key costs a string rather than an
+// ABI addition and a Canvas release cycle.
+//
+// extern "C" on purpose.  A C++ static would tie both sides to an exact mangled
+// name, and any signature drift would make the mod's weak symbol resolve null -
+// which is indistinguishable from "this Canvas is too old", permanently.
+//
+// CONTRACT (mods rely on all three):
+//   - callable from ANY thread, including a mod's ImGui thread
+//   - never blocks: no JNI, no I/O, no lock.  Values are snapshots Canvas
+//     already sampled on the thread that owns them.  ExoPlayer in particular
+//     must only be touched on its application looper, so the video keys are
+//     pushed down from UpdateMediaPlayer rather than pulled on demand.
+//   - cheap enough to call per frame
+//
+// KEY REGISTRY - this comment is the source of truth, and the table in
+// CanvasQueryHostNumber must match it exactly:
+//
+//   video.duration_ms    total length of the playing video.
+//                        Absent for live streams, before the player reaches
+//                        STATE_READY, and for containers that carry no
+//                        duration at all (MPEG-TS).  "absent" therefore does
+//                        NOT imply live - query video.is_live for that.
+//   video.position_ms    current playback position.  For live content this is
+//                        relative to the start of the live window, which moves.
+//   video.is_live        1 / 0.  From Player.isCurrentMediaItemLive().
+//   video.is_seekable    1 / 0.  From Player.isCurrentMediaItemSeekable().
+//                        Having a duration does NOT imply being seekable.
+//   video.is_buffering   1 while the player is stalled fetching data, else 0.
+//                        Distinct from is_ended and from position simply not
+//                        advancing, so a mod can show a spinner without guessing.
+//   video.is_ended       1 when the player has reached the end of the video,
+//                        else 0.  A looping mod should watch this rather than
+//                        compare position against duration, which need not land
+//                        exactly on it.  Kept a boolean, not the raw
+//                        Player.STATE_* enum, so the channel does not marry a
+//                        backend's state numbering.
+//
+// A key prefixed `is_` is a boolean: 1 or 0, never any other value.
+// Read those through the typed wrappers rather than as raw numbers, and
+// do not introduce an unprefixed boolean key alongside them.
+// Absence is stored as NaN, never as a magic number: the query cannot know a
+// key's legal range, so a negative sentinel would swallow any future signed
+// value. The query reports absence as false and leaves the caller's out
+// parameter untouched, rather than handing back something it might render.
+namespace {
+    // NaN, not a negative number, means "no value right now".  The query cannot
+    // know a given key's legal range, so a negative sentinel would silently
+    // swallow any future signed value - an audio balance, a live-edge offset -
+    // at exactly the values it most needed to report, and would do it quietly:
+    // the caller just sees "unavailable", which is a legal answer.  Deciding
+    // absence belongs to each push site, which does know the range.
+    constexpr double kAbsent = std::numeric_limits<double>::quiet_NaN();
+    std::atomic<double> g_videoDurationMs{kAbsent};
+    std::atomic<double> g_videoPositionMs{kAbsent};
+    std::atomic<double> g_videoIsLive{kAbsent};
+    std::atomic<double> g_videoIsSeekable{kAbsent};
+    std::atomic<double> g_videoIsBuffering{kAbsent};
+    std::atomic<double> g_videoIsEnded{kAbsent};
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_git_artdeell_skymodloader_MainActivity_nativeSetVideoStats(
+        JNIEnv *env,
+        jclass clazz,
+        jlong durationMs,
+        jlong positionMs,
+        jint isLive,
+        jint isSeekable,
+        jint playbackState
+) {
+    // Java signals absence with -1 for all of these, none of which can
+    // legitimately be negative.  Translate here, at the push site, so the stored
+    // form stays range-agnostic.
+    const auto put = [](std::atomic<double> &cell, long long v) {
+        cell.store(v < 0 ? kAbsent : static_cast<double>(v),
+                   std::memory_order_relaxed);
+    };
+    put(g_videoDurationMs, durationMs);
+    put(g_videoPositionMs, positionMs);
+    put(g_videoIsLive, isLive);
+    put(g_videoIsSeekable, isSeekable);
+    // Player.STATE_BUFFERING == 2, STATE_ENDED == 4.  A negative state means no
+    // player, which stays absent; otherwise each collapses to its one bit.
+    put(g_videoIsBuffering, playbackState < 0 ? -1 : (playbackState == 2));
+    put(g_videoIsEnded, playbackState < 0 ? -1 : (playbackState == 4));
+}
+
+extern "C"
+bool CanvasQueryHostNumber(const char *_key, double *_out) {
+    if (_key == nullptr || _out == nullptr) return false;
+    const struct { const char *key; std::atomic<double> *cell; } table[] = {
+        {"video.duration_ms", &g_videoDurationMs},
+        {"video.position_ms", &g_videoPositionMs},
+        {"video.is_live",     &g_videoIsLive},
+        {"video.is_seekable", &g_videoIsSeekable},
+        {"video.is_buffering", &g_videoIsBuffering},
+        {"video.is_ended",    &g_videoIsEnded},
+    };
+    for (const auto &e : table) {
+        if (std::strcmp(_key, e.key) != 0) continue;
+        const double v = e.cell->load(std::memory_order_relaxed);
+        if (std::isnan(v)) return false;  // known key, no value right now
+        *_out = v;
+        return true;
+    }
+    return false;                    // unknown key: this Canvas is older
 }

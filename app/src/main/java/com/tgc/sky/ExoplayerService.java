@@ -8,16 +8,23 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.util.Log;
+import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
 import androidx.media3.datasource.DefaultDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.hls.HlsMediaSource;
+import androidx.media3.exoplayer.mediacodec.MediaCodecInfo;
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector;
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil;
 import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -29,6 +36,13 @@ class ExoplayerService {
     Image m_image1;
     ImageReader m_imageReader;
     ExoPlayer m_player;
+    // Decoders that have already failed on this device. VideoListener adds to
+    // it on a decoder error; the MediaCodecSelector below filters against it so
+    // the retry picks a different decoder. Matches TGC 0.34.5.
+    List<String> codecBlackList = new ArrayList<>();
+    // Written by VideoListener.onPlaybackStateChanged. TGC stores it but never
+    // reads it; kept for parity.
+    int m_state;
 
     public void Initialize(Context context) {
         if (this.m_player == null) {
@@ -37,9 +51,29 @@ class ExoplayerService {
             DefaultBandwidthMeter build = new DefaultBandwidthMeter.Builder(context).build();
             DefaultTrackSelector defaultTrackSelector = new DefaultTrackSelector(context, new AdaptiveTrackSelection.Factory());
             this.m_hlsMediaFactory = new HlsMediaSource.Factory(new DefaultDataSource.Factory(context));
-            ExoPlayer build2 = new ExoPlayer.Builder(context).setBandwidthMeter(build).setTrackSelector(defaultTrackSelector).setLoadControl(defaultLoadControl).build();
+            DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(context);
+            defaultRenderersFactory.setMediaCodecSelector(new MediaCodecSelector() {
+                @Override
+                public List<MediaCodecInfo> getDecoderInfos(String str, boolean z, boolean z2)
+                        throws MediaCodecUtil.DecoderQueryException {
+                    List<MediaCodecInfo> decoderInfos = MediaCodecUtil.getDecoderInfos(str, z, z2);
+                    List<MediaCodecInfo> allowed = new ArrayList<>();
+                    for (MediaCodecInfo mediaCodecInfo : decoderInfos) {
+                        if (!ExoplayerService.this.codecBlackList.contains(mediaCodecInfo.name)) {
+                            allowed.add(mediaCodecInfo);
+                        }
+                    }
+                    // If every decoder is blacklisted, fall back to the last one
+                    // rather than returning an empty list and failing outright.
+                    if (allowed.isEmpty() && !decoderInfos.isEmpty()) {
+                        allowed.add(decoderInfos.get(decoderInfos.size() - 1));
+                    }
+                    return allowed;
+                }
+            });
+            ExoPlayer build2 = new ExoPlayer.Builder(context).setRenderersFactory(defaultRenderersFactory).setBandwidthMeter(build).setTrackSelector(defaultTrackSelector).setLoadControl(defaultLoadControl).build();
             this.m_player = build2;
-            build2.addListener(new VideoListener());
+            build2.addListener(new VideoListener(this));
         }
     }
 
@@ -167,6 +201,55 @@ class ExoplayerService {
             this.m_player.pause();
         }
     }
+
+    // ---- Canvas addition, NOT part of TGC parity ----------------------
+    // Sky exposes seek but never a duration, so a mod can jump to a timestamp
+    // yet cannot draw a timeline. These feed the host value channel.
+    // All guarded by COMMAND_GET_CURRENT_MEDIA_ITEM, which is what the Media3
+    // javadoc requires for every one of them.
+    public long GetDurationMs() {
+        if (this.m_player == null
+                || !this.m_player.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM)) {
+            return -1L;
+        }
+        long duration = this.m_player.getDuration();
+        // Live streams and duration-less containers report TIME_UNSET.
+        return duration == C.TIME_UNSET ? -1L : duration;
+    }
+
+    public long GetPositionMs() {
+        if (this.m_player == null
+                || !this.m_player.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM)) {
+            return -1L;
+        }
+        return this.m_player.getCurrentPosition();
+    }
+
+    // -1 unknown, 0 no, 1 yes. Deliberately separate from GetDurationMs:
+    // "no duration" does not imply live, and having a duration does not imply
+    // being seekable.
+    public int GetLiveState() {
+        if (this.m_player == null
+                || !this.m_player.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM)) {
+            return -1;
+        }
+        return this.m_player.isCurrentMediaItemLive() ? 1 : 0;
+    }
+
+    // Player.STATE_* (1 idle, 2 buffering, 3 ready, 4 ended), or -1 with no
+    // player. m_state is written by VideoListener.onPlaybackStateChanged.
+    public int GetPlaybackState() {
+        return this.m_player == null ? -1 : this.m_state;
+    }
+
+    public int GetSeekableState() {
+        if (this.m_player == null
+                || !this.m_player.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM)) {
+            return -1;
+        }
+        return this.m_player.isCurrentMediaItemSeekable() ? 1 : 0;
+    }
+    // ---- end Canvas addition -------------------------------------------
 
     public void Seek(long j) {
         if (this.m_player.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) {

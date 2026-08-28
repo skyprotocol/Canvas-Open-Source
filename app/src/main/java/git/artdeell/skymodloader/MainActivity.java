@@ -534,6 +534,15 @@ public class MainActivity extends Activity {
     private static native void nativeSetSkyBuildKey(String key);
     private static native void nativeSetStarwatchAllowed(boolean allowed);
 
+    // Video stats pushed down from SystemIO_android.UpdateMediaPlayer, which
+    // already runs per frame on the thread that owns the ExoPlayer instance.
+    // Mods read these through CanvasQueryHostNumber; see the key registry in
+    // main.cpp. Pass -1 for a value that is not available - none of these can
+    // legitimately be negative, and the native side translates it.
+    public static native void nativeSetVideoStats(long durationMs, long positionMs,
+                                                  int isLive, int isSeekable,
+                                                  int playbackState);
+
     public static class DeviceInfo {
         public float xdpi;
         public float ydpi;

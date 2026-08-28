@@ -1135,6 +1135,16 @@ public class SystemIO_android {
                 if (GetMetadata != null) {
                     SystemIO_android.this.ReceiveVideoMetadataNative(GetMetadata.width, GetMetadata.height, GetMetadata.framesPerSecond);
                 }
+                // Canvas addition: publish video stats for user libs. This runnable
+                // already runs per frame on the ExoPlayer application looper, which
+                // is the only thread allowed to touch the player - hence pushing
+                // the values down rather than letting mods pull them.
+                git.artdeell.skymodloader.MainActivity.nativeSetVideoStats(
+                        SystemIO_android.this.mExoplayer.GetDurationMs(),
+                        SystemIO_android.this.mExoplayer.GetPositionMs(),
+                        SystemIO_android.this.mExoplayer.GetLiveState(),
+                        SystemIO_android.this.mExoplayer.GetSeekableState(),
+                        SystemIO_android.this.mExoplayer.GetPlaybackState());
                 double GetPlaybackPositionMs = SystemIO_android.this.mExoplayer.GetPlaybackPositionMs() / 1000.0d;
                 HardwareBuffer GetNextHardwareBuffer = SystemIO_android.this.mExoplayer.GetNextHardwareBuffer();
                 if (GetNextHardwareBuffer != null) {
@@ -1153,6 +1163,12 @@ public class SystemIO_android {
         this.mSubtitleRequest = null;
     }
 
+
+    // Canvas addition: reset the published stats so a finished video does not
+    // leave a stale duration visible to mods.
+    static void clearVideoStats() {
+        git.artdeell.skymodloader.MainActivity.nativeSetVideoStats(-1L, -1L, -1, -1, -1);
+    }
 
     void PauseMediaPlayer() {
         this.m_activity.runOnUiThread(new Runnable() {
@@ -1186,6 +1202,7 @@ public class SystemIO_android {
             @Override
             public void run() {
                 SystemIO_android.this.mExoplayer.EndVideo();
+                clearVideoStats(); // Canvas addition
             }
         });
     }
