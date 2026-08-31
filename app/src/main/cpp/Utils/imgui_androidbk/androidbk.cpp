@@ -196,7 +196,7 @@ PRIVATE_API void initContext() {
 namespace CanvasInput {
 
 struct Event {
-    enum Kind { MousePos, MouseButton, Key, Char };
+    enum Kind { MousePos, MouseButton, MouseWheel, Key, Char };
     Kind     kind;
     float    x = 0.0f, y = 0.0f;
     int      code = 0;      // mouse button index, or Android keycode
@@ -230,6 +230,15 @@ static void PushMousePos(float x, float y) {
     Event e; e.kind = Event::MousePos; e.x = x; e.y = y;
     s_queue.push_back(e);
     s_lastX = x; s_lastY = y;
+}
+
+// Hardware-mouse wheel. Values arrive in Android axis convention straight
+// from GameActivity's ACTION_SCROLL case; the sign conversion to ImGui's
+// convention happens at replay time.
+static void PushMouseWheel(float x, float y) {
+    std::lock_guard<std::mutex> lk(s_queueMutex);
+    Event e; e.kind = Event::MouseWheel; e.x = x; e.y = y;
+    s_queue.push_back(e);
 }
 
 static void PushMouseButton(int button, bool down) {
@@ -346,6 +355,14 @@ static void Drain() {
             break;
         case Event::MouseButton:
             io.AddMouseButtonEvent(e.code, e.down);
+            break;
+        case Event::MouseWheel:
+            // Android AXIS_VSCROLL is positive scrolling up, matching
+            // AddMouseWheelEvent's wheel_y. AXIS_HSCROLL is positive to the
+            // right, while ImGui's wheel_x is positive scrolling LEFT - the
+            // same negation every desktop backend applies (imgui_impl_win32
+            // feeds WM_MOUSEHWHEEL as -delta).
+            io.AddMouseWheelEvent(-e.x, e.y);
             break;
         case Event::Key:
             io.AddKeyEvent(ImGui_ImplAndroid_KeyCodeToImGuiKey(e.code), e.down);
@@ -609,6 +626,11 @@ PRIVATE_API static void loadFonts(ImGuiIO& io, jfloat fontsize, AAssetManager *m
     io.Fonts->Build();
     if(fontBufferDroidSans != nullptr) free(fontBufferDroidSans);
 }
+
+// Defined in scroll.cpp: registers drag-to-scroll as an EndFramePre context
+// hook (why a context hook and not an inline hook: see scroll.cpp).
+PRIVATE_API void register_do_scroll(ImGuiContext *ctx);
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_git_artdeell_skymodloader_ImGUI_init(JNIEnv *env, jclass clazz, jobject surface, jfloat fontsize, jfloat scale, jobject assetManager, jboolean enable_droid_sans) {
@@ -619,6 +641,10 @@ Java_git_artdeell_skymodloader_ImGUI_init(JNIEnv *env, jclass clazz, jobject sur
     method_setClipboard = env->GetStaticMethodID(clazz, "setClipboard", "(Ljava/lang/String;)V");
     method_getClipboard = env->GetStaticMethodID(clazz, "getClipboard", "()Ljava/lang/String;");
     ImGui::CreateContext();
+    // Needs the live context, and must precede renderloop() so no frame runs
+    // without it. Deliberately NOT in resurface(): that path reuses this
+    // context, and re-registering would double the hook.
+    register_do_scroll(ImGui::GetCurrentContext());
     ImGuiIO& io = ImGui::GetIO();
     io.IniFilename = nullptr;
     io.BackendPlatformName = "imgui4canvas";
@@ -653,6 +679,12 @@ JNIEXPORT void JNICALL
 Java_git_artdeell_skymodloader_ImGUI_submitButtonEvent(JNIEnv *env, jclass clazz, jint btn,
                                                        jboolean pressed) {
     CanvasInput::PushMouseButton(btn, pressed);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_git_artdeell_skymodloader_ImGUI_submitScrollEvent(JNIEnv *env, jclass clazz, jfloat x,
+                                                       jfloat y) {
+    CanvasInput::PushMouseWheel(x, y);
 }
 extern "C"
 JNIEXPORT jboolean JNICALL

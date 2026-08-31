@@ -292,11 +292,27 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
         if (Build.VERSION.SDK_INT >= 30) setupDisplayListener();
     }
 
+    // Parity with stock Sky 0.34.5 (410941): the captured-pointer callback
+    // exists ONLY for Sony gamepad touchpads (button taps forwarded as key
+    // 0x6d at inputSource 1; touchpad MOTION is dropped, as in stock). ANY
+    // other captured device - a hardware mouse above all - releases capture
+    // immediately, so a mouse can never get stuck in relative mode: captured
+    // input bypasses the whole view tree, which would leave it click-dead
+    // and delta-driven for as long as capture held.
     @Override
     public boolean onCapturedPointer(View view, MotionEvent event) {
-        float dx = event.getX();
-        float dy = event.getY();
-        onMouseDeltaNative((int) dx, (int) -(dy));
+        if (isGamepadWithTouchpadEvent(event)) {
+            int vendorId = getDeviceVendorId(event);
+            int productId = getDeviceProductId(event);
+            int action = event.getAction();
+            if (action == MotionEvent.ACTION_BUTTON_PRESS) {
+                onButtonPress(0x6d, 1, true, vendorId, productId);
+            } else if (action == MotionEvent.ACTION_BUTTON_RELEASE) {
+                onButtonPress(0x6d, 1, false, vendorId, productId);
+            }
+        } else {
+            setPointerCapture(false);
+        }
         return true;
     }
 
@@ -681,6 +697,22 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
             motionEvent.getX(actionIndex), motionEvent.getY(actionIndex));
     }
 
+    // Hardware-mouse input for the ImGui overlay (no stock counterpart -
+    // stock has no overlay): feed the pointer exactly the way onTouchEvent
+    // feeds touches - bridge-view-relative coordinates into the same
+    // submitPositionEvent path, with ImGUI.wantsMouse() deciding whether the
+    // game sees the event at all.
+    private void submitImGuiMousePosition(MotionEvent motionEvent) {
+        float x = motionEvent.getX();
+        float y = motionEvent.getY();
+        if (imguiView != null) {
+            imguiView.getLocationOnScreen(m_imguiViewLocation);
+            x = motionEvent.getRawX() - m_imguiViewLocation[0];
+            y = motionEvent.getRawY() - m_imguiViewLocation[1];
+        }
+        ImGUI.submitPositionEvent(x, y);
+    }
+
     private PointF transformPointToProgram(float x, float y) {
         PointF p = new PointF();
         p.x = transformWidthToProgram(x);
@@ -709,6 +741,27 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
         if (isHardwareMouseEvent(motionEvent)) {
             if (isGamepadWithTouchpadEvent(motionEvent)) return true;
             PointF point = transformPointToProgram(motionEvent.getX(), motionEvent.getY());
+            // Mouse-to-ImGui: primary-button gestures mirror the touch path
+            // - position plus button 0 - and wantsMouse() then arbitrates
+            // ownership just like onTouchEvent does for touches. The
+            // backend's MouseDownOwned logic keeps a drag that began on the
+            // game out of ImGui and vice versa.
+            int actionMasked = motionEvent.getActionMasked();
+            if (actionMasked == MotionEvent.ACTION_DOWN
+                    || actionMasked == MotionEvent.ACTION_MOVE
+                    || actionMasked == MotionEvent.ACTION_UP) {
+                submitImGuiMousePosition(motionEvent);
+                if (actionMasked == MotionEvent.ACTION_DOWN) ImGUI.submitButtonEvent(0, true);
+                if (actionMasked == MotionEvent.ACTION_UP) ImGUI.submitButtonEvent(0, false);
+            }
+            if (ImGUI.wantsMouse()) {
+                // ImGui owns this gesture: the game sees neither the camera
+                // delta nor the cursor move. Still advance the delta anchor
+                // so the first game-owned event afterwards computes no
+                // spurious camera jump.
+                m_lastMouseLocation = point;
+                return true;
+            }
             if (motionEvent.getButtonState() == 1) {
                 float dx = (point.x - m_lastMouseLocation.x) * 3.0f;
                 float dy = -(point.y - m_lastMouseLocation.y) * 3.0f;
@@ -998,18 +1051,73 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     public boolean onGenericMotionEvent(MotionEvent motionEvent) {
         if (this.m_motionEventsDisabled) return true;
         if (isHardwareMouseEvent(motionEvent)) {
-            int action = motionEvent.getActionMasked();
-            if (action == MotionEvent.ACTION_HOVER_MOVE
-                    || action == MotionEvent.ACTION_HOVER_ENTER
-                    || action == MotionEvent.ACTION_HOVER_EXIT) {
-                PointF point = transformPointToProgram(motionEvent.getX(), motionEvent.getY());
-                onMouseMoved((int) point.x, (int) point.y);
-                m_lastMouseLocation = point;
+            // Hardware-mouse dispatch, parity with stock Sky 0.34.5
+            // (410941): stock dispatches on the action and forwards mouse
+            // BUTTONS to the game (onButtonPress at inputSource 3) and one
+            // synthesized key tap per wheel notch, alongside hover and the
+            // scroll delta. Dropping the button cases means no
+            // hardware-mouse click ever reaches the game.
+            int vendorId = getDeviceVendorId(motionEvent);
+            int productId = getDeviceProductId(motionEvent);
+            if (isGamepadWithTouchpadEvent(motionEvent)) {
+                onGamepadConnected(vendorId, productId);
+                if (Build.VERSION.SDK_INT < 31) {
+                    onCapturedPointer(getBridgeView(), motionEvent);
+                }
                 return true;
             }
-            float scrollX = motionEvent.getAxisValue(MotionEvent.AXIS_HSCROLL);
-            float scrollY = motionEvent.getAxisValue(MotionEvent.AXIS_VSCROLL);
-            onMouseScrollingDelta(scrollX, scrollY);
+            // Mouse-to-ImGui: keep the overlay's pointer position fresh - it
+            // powers ImGui hover and the wantsMouse() ownership checks
+            // below. Button 0 itself is submitted from dispatchTouchEvent's
+            // DOWN/UP, which Android delivers alongside
+            // ACTION_BUTTON_PRESS/RELEASE for the primary button, so it is
+            // not repeated here.
+            submitImGuiMousePosition(motionEvent);
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_HOVER_MOVE:
+                case MotionEvent.ACTION_HOVER_ENTER:
+                case MotionEvent.ACTION_HOVER_EXIT: {
+                    PointF point = transformPointToProgram(motionEvent.getX(), motionEvent.getY());
+                    onMouseMoved((int) point.x, (int) point.y);
+                    m_lastMouseLocation = point;
+                    break;
+                }
+                case MotionEvent.ACTION_SCROLL: {
+                    float scrollX = motionEvent.getAxisValue(MotionEvent.AXIS_HSCROLL);
+                    float scrollY = motionEvent.getAxisValue(MotionEvent.AXIS_VSCROLL);
+                    if (ImGUI.wantsMouse()) {
+                        // Over the overlay the wheel scrolls ImGui and never
+                        // reaches the game - no camera zoom behind the menu.
+                        ImGUI.submitScrollEvent(scrollX, scrollY);
+                        break;
+                    }
+                    // One synthesized key tap per notch, exactly as stock:
+                    // wheel down -> key 11, wheel up -> key 10, inputSource 3.
+                    int key = scrollY < 0.0f ? 11 : (scrollY > 0.0f ? 10 : 0);
+                    if (key != 0) {
+                        onButtonPress(key, 3, true, vendorId, productId);
+                        onButtonPress(key, 3, false, vendorId, productId);
+                    }
+                    onMouseScrollingDelta(scrollX, scrollY);
+                    break;
+                }
+                case MotionEvent.ACTION_BUTTON_PRESS:
+                    // wantsMouse() keeps clicks over the overlay away from
+                    // the game; a press that began on the game keeps its
+                    // release too (MouseDownOwned makes wantsMouse() stay
+                    // false for that whole drag, even ending over ImGui).
+                    if (!ImGUI.wantsMouse() && !isEventInTextField(motionEvent)) {
+                        onButtonPress(motionEvent.getActionButton(), 3, true, vendorId, productId);
+                    }
+                    break;
+                case MotionEvent.ACTION_BUTTON_RELEASE:
+                    if (!ImGUI.wantsMouse() && !isEventInTextField(motionEvent)) {
+                        onButtonPress(motionEvent.getActionButton(), 3, false, vendorId, productId);
+                    }
+                    break;
+                default:
+                    break;
+            }
             return true;
         }
         if (isGamepadEvent(motionEvent)) {

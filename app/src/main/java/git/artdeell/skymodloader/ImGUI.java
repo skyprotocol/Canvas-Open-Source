@@ -45,6 +45,8 @@ public class ImGUI implements SurfaceHolder.Callback{
     public static native void shutdown();
     public static native void submitPositionEvent(float x, float y);
     public static native void submitButtonEvent(int btn, boolean pressed);
+    /** Mouse wheel notches, in Android axis convention (AXIS_HSCROLL/AXIS_VSCROLL). */
+    public static native void submitScrollEvent(float x, float y);
     public static native void submitUnicodeEvent(char codepoint);
     public static native void submitKeyEvent(int key, boolean down);
     /** End the active ImGui text-editing session, keeping whatever was typed. */

@@ -30,7 +30,6 @@ extern "C" {
 
 static std::string g_skyBuildKey;
 
-void do_scroll();
 void fsel_setup(JNIEnv*);
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -176,12 +175,6 @@ PRIVATE_API void Canvas::CanvasMenu() {
     //SystemsTest();
 }
 
-void (*ImGuiEnd)();
-void ImGuiEndHook() {
-    do_scroll();
-    return ImGuiEnd();
-}
-
 // Chat Record Constructor Hook (Sky 0.34.5) to fix blue messages bug without breaking permissions
 static void* (*orig_ChatRecordConstructor)(void*, void*, void*, void*, void*, void*, void*, void*) = nullptr;
 static void* g_chatRecordStub = nullptr;
@@ -244,10 +237,11 @@ int main() {
     do {
         sleep(1);
     } while (!Canvas::isLibLoaded(Canvas::libName));
-    (new CipherHook)->set_Hook((std::uintptr_t)ImGuiEndHook)
-    ->set_Callback((std::uintptr_t)&ImGuiEnd)
-    ->set_Address("_ZN5ImGui3EndEv")
-    ->Fire();
+    // Nothing below this wait depends on it any more (the ImGui::End inline
+    // hook it used to gate is gone; drag-to-scroll registers itself in
+    // androidbk's ImGUI_init - see scroll.cpp). It is kept because this
+    // constructor has always blocked until libBootloader is loaded, and
+    // changing that timing is a separate decision from moving the hook.
 
     install_chat_fix();
 
