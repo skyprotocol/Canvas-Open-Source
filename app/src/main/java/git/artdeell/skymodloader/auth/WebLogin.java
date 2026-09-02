@@ -49,6 +49,7 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
     private static final String USER_AGENT = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36";
     private final SystemAccountType accountType;
     private final String webLoginType;
+    private final String explicitToken;
     private Dialog dialog;
     private WebView webView;
     private SystemAccountClientInfo m_accountClientInfo;
@@ -56,9 +57,11 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
     private GameActivity m_activity;
     private SystemAccountInterface.UpdateClientInfoCallback m_callback;
     private boolean m_signedInSuccessfully = false;
+    private volatile boolean m_resultPending = false;
 
     public WebLogin(String webLoginType, String token, SystemAccountType systemAccountType) {
         this.webLoginType = webLoginType;
+        this.explicitToken = token;
         this.accountType = systemAccountType;
     }
 
@@ -75,9 +78,13 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
         }
         String token = "";
         try {
-            SystemIO_android sysIO = SystemIO_android.getInstance();
-            if (sysIO != null && sysIO.GetPushNotificationToken() != null) {
-                token = URLEncoder.encode(sysIO.GetPushNotificationToken(), StandardCharsets.UTF_8.name());
+            String raw = explicitToken;
+            if (raw == null || raw.isEmpty()) {
+                SystemIO_android sysIO = SystemIO_android.getInstance();
+                if (sysIO != null) raw = sysIO.GetPushNotificationToken();
+            }
+            if (raw != null && !raw.isEmpty()) {
+                token = URLEncoder.encode(raw, StandardCharsets.UTF_8.name());
             }
         } catch (UnsupportedEncodingException ignored) {}
         return String.format("https://%s/account/auth/oauth_signin?type=%s&token=%s", host, webLoginType, token);
@@ -125,6 +132,7 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
     public void SignIn() {
         m_activity.runOnUiThread(() -> {
             m_signedInSuccessfully = false;
+            m_resultPending = false;
             m_accountClientInfo.state = SystemAccountClientState.kSystemAccountClientState_SigningIn;
             m_callback.UpdateClientInfo(m_accountClientInfo);
             startSignIn();
@@ -152,7 +160,7 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
         dialog.setCanceledOnTouchOutside(false);
         dialog.setOnDismissListener(dialog1 -> {
             restoreGameImmersiveFocus();
-            if (!m_signedInSuccessfully) {
+            if (!m_signedInSuccessfully && !m_resultPending) {
                 submitSignOutState();
             }
         });
@@ -242,6 +250,7 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
         // Check if the current URL itself (not query params) is the oauth_redirect endpoint
         if (urlWithoutQuery.equalsIgnoreCase(redirectUrl) || url.startsWith(redirectUrl + "?") || url.equals(redirectUrl)) {
             Log.i(TAG, "Real OAuth redirect reached: " + url);
+            m_resultPending = true;
             m_activity.runOnUiThread(() -> {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
@@ -271,7 +280,8 @@ public class WebLogin extends WebViewClient implements SystemAccountInterface {
             } catch (Exception e) {
                 Log.w(TAG, "Failed to resolve intent for: " + url, e);
             }
-            return true;
+            Log.w(TAG, "No handler for scheme, not consuming: " + url);
+            return false;
         }
 
         return false;
