@@ -20,7 +20,10 @@
 #include <mutex>
 #include <vector>
 #include "Canvas/Canvas.h"
+#include "androidbk.h"
 #include "../../include/misc/visibility.h"
+
+PRIVATE_API ImGuiStyle canvasBaseStyle;
 
 #define g_LogTag "imgui4ca"
 
@@ -660,6 +663,7 @@ Java_git_artdeell_skymodloader_ImGUI_init(JNIEnv *env, jclass clazz, jobject sur
     ImGui::StyleColorsDark();
     ImGui_ImplOpenGL3_Init("#version 300 es");
     ImGui::GetStyle().ScaleAllSizes(scale);
+    canvasBaseStyle = ImGui::GetStyle();
     renderloop();
 }
 

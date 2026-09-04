@@ -6,6 +6,7 @@
 #include <android/asset_manager_jni.h>
 
 #include <KittyMemory/KittyInclude.hpp>
+#include "imgui/imgui.h"
 
 namespace Canvas {
     struct UserLib {
@@ -19,6 +20,8 @@ namespace Canvas {
         void (*InitLate)();
         void (*Draw)(bool*);
         void (*Start)();
+        ImGuiStyle Style;
+        bool StyleSeeded = false;
     };
 
     struct DeviceInfo {

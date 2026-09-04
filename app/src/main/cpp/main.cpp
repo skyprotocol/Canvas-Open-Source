@@ -7,6 +7,7 @@
 #include "include/misc/Logger.h"
 #include "main.h"
 #include "Core/imgui/imgui.h"
+#include "Core/imgui/imgui_internal.h"
 #include "Utils/imgui_androidbk/androidbk.h"
 #include "include/misc/Vector3.h"
 #include <atomic>
@@ -107,28 +108,70 @@ PRIVATE_API static void HelpMarker(const Canvas::UserLib& userLib)
     }
 }
 
+namespace {
+
+struct ModStyleScope {
+    Canvas::UserLib &lib;
+    int colorStack;
+    int varStack;
+    short disabledStack;
+
+    explicit ModStyleScope(Canvas::UserLib &userLib) : lib(userLib) {
+        if (!lib.StyleSeeded) {
+            lib.Style = canvasBaseStyle;
+            lib.StyleSeeded = true;
+        }
+        const ImGuiContext &g = *ImGui::GetCurrentContext();
+        colorStack = g.ColorStack.Size;
+        varStack = g.StyleVarStack.Size;
+        disabledStack = g.DisabledStackSize;
+        ImGui::GetStyle() = lib.Style;
+    }
+
+    ~ModStyleScope() {
+        const ImGuiContext &g = *ImGui::GetCurrentContext();
+        if (g.ColorStack.Size == colorStack
+            && g.StyleVarStack.Size == varStack
+            && g.DisabledStackSize == disabledStack) {
+            lib.Style = ImGui::GetStyle();
+        }
+        ImGui::GetStyle() = canvasBaseStyle;
+    }
+
+    ModStyleScope(const ModStyleScope &) = delete;
+    ModStyleScope &operator=(const ModStyleScope &) = delete;
+};
+
+}
+
 PRIVATE_API void DrawMods() {
     // SystemsTest();
     for (auto &userLib: Canvas::userLibs) {
-        if (userLib.UIEnabled) {
-            if (userLib.UISelfManaged) {
-                ImGui::PushID(userLib.Name.c_str());
-            } else {
-                ImGui::Begin(userLib.Name.c_str());
-            }
+        if (!userLib.UIEnabled) {
+            continue;
+        }
 
-            userLib.Draw(&userLib.UIEnabled);
+        ModStyleScope styleScope(userLib);
 
-            if (userLib.UISelfManaged) {
-                ImGui::PopID();
-            } else {
-                ImGui::End();
-            }
+        if (userLib.UISelfManaged) {
+            ImGui::PushID(userLib.Name.c_str());
+        } else {
+            ImGui::Begin(userLib.Name.c_str());
+        }
+
+        userLib.Draw(&userLib.UIEnabled);
+
+        if (userLib.UISelfManaged) {
+            ImGui::PopID();
+        } else {
+            ImGui::End();
         }
     }
 }
 
 PRIVATE_API void Canvas::CanvasMenu() {
+    ImGui::GetStyle() = canvasBaseStyle;
+
     if(Canvas::hideCanvasMenu) {
         DrawMods();
         return;
