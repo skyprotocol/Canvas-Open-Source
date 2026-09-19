@@ -637,12 +637,35 @@ public class SystemIO_android {
         }
     }
 
-    boolean StartRecording(String str, int i, int i2, int i3, boolean z, int i4, boolean z2, int i5, boolean z3) {
-    this.m_isGameRecorder = true;
-    String str2 = C115312.$SwitchMap$com$tgc$sky$SystemIO_android$VideoCodec[VideoCodec.values()[i3].ordinal()] != 2 ? "video/avc" : "video/hevc";
-    this.m_isRecording = true;
-    return this.m_videoRecorder.startRecordingWithFilename(str, i, i2, str2, i4, z2, i5, z3);
-	}
+    public boolean StartRecording(String str, int i, int i2, int i3, boolean z, int i4, boolean z2, int i5, boolean z3, boolean z4) {
+        this.m_isGameRecorder = true;
+        String str2 = "video/avc";
+        if (i3 >= 0 && i3 < VideoCodec.values().length) {
+            str2 = C115312.$SwitchMap$com$tgc$sky$SystemIO_android$VideoCodec[VideoCodec.values()[i3].ordinal()] != 2 ? "video/avc" : "video/hevc";
+        }
+        this.m_isRecording = true;
+        if (this.m_videoRecorder == null) {
+            return false;
+        }
+        return this.m_videoRecorder.startRecordingWithFilename(str, i, i2, str2, i4, z2, i5, z3);
+    }
+
+    public boolean StartRecording(String str, int i, int i2, int i3, boolean z, int i4, boolean z2, int i5, boolean z3) {
+        return StartRecording(str, i, i2, i3, z, i4, z2, i5, z3, false);
+    }
+
+    public boolean StartRecording(String str, int i, int i2, int i3, int i4, boolean z, int i5, boolean z2) {
+        this.m_isGameRecorder = true;
+        String str2 = "video/avc";
+        if (i3 >= 0 && i3 < VideoCodec.values().length) {
+            str2 = C115312.$SwitchMap$com$tgc$sky$SystemIO_android$VideoCodec[VideoCodec.values()[i3].ordinal()] != 2 ? "video/avc" : "video/hevc";
+        }
+        this.m_isRecording = true;
+        if (this.m_videoRecorder == null) {
+            return false;
+        }
+        return this.m_videoRecorder.startRecordingWithFilename(str, i, i2, str2, i4, z, i5, z2);
+    }
 
 
     static /* synthetic */ class C115312 {
@@ -662,12 +685,12 @@ public class SystemIO_android {
         }
     }
 
-    boolean StopRecording() {
-        return this.m_videoRecorder.stopRecording();
+    public boolean StopRecording() {
+        return this.m_videoRecorder != null && this.m_videoRecorder.stopRecording();
     }
 
-    boolean IsRecording() {
-        return this.m_videoRecorder.isRecording();
+    public boolean IsRecording() {
+        return this.m_videoRecorder != null && this.m_videoRecorder.isRecording();
     }
 
     // TODO: Implement speech recognition
@@ -1026,8 +1049,11 @@ public class SystemIO_android {
         return this.mNFCSessionManager.WriteNFCTag(str);
     }
 
-    VideoFrameResultRef BeginWriteVideoFrame() {
+    public VideoFrameResultRef BeginWriteVideoFrame() {
         this.m_VFRRef.outBytesPerRow = 0;
+        if (this.m_videoRecorder == null) {
+            return this.m_VFRRef;
+        }
         ByteBuffer beginWriteVideoFrame = this.m_videoRecorder.beginWriteVideoFrame();
         VideoFrameResultRef videoFrameResultRef = this.m_VFRRef;
         videoFrameResultRef.isBufferChange = videoFrameResultRef.returnByteBuffer != beginWriteVideoFrame;
@@ -1035,12 +1061,17 @@ public class SystemIO_android {
         return this.m_VFRRef;
     }
 
-    void EndWriteVideoFrame() {
-        this.m_videoRecorder.endWriteVideoFrame();
+    public void EndWriteVideoFrame() {
+        if (this.m_videoRecorder != null) {
+            this.m_videoRecorder.endWriteVideoFrame();
+        }
     }
 
-    AudioFrameResultRef BeginWriteAudioFrame() {
+    public AudioFrameResultRef BeginWriteAudioFrame() {
         this.m_AFRRef.outBytesPerRow = 0;
+        if (this.m_videoRecorder == null) {
+            return this.m_AFRRef;
+        }
         ByteBuffer beginWriteAudioFrame = this.m_videoRecorder.beginWriteAudioFrame();
         AudioFrameResultRef audioFrameResultRef = this.m_AFRRef;
         audioFrameResultRef.isBufferChange = audioFrameResultRef.returnByteBuffer != beginWriteAudioFrame;
@@ -1048,11 +1079,13 @@ public class SystemIO_android {
         return this.m_AFRRef;
     }
 
-    void EndWriteAudioFrame() {
-        this.m_videoRecorder.endWriteAudioFrame();
+    public void EndWriteAudioFrame() {
+        if (this.m_videoRecorder != null) {
+            this.m_videoRecorder.endWriteAudioFrame();
+        }
     }
 
-    boolean SupportsVideoPlayback() {
+    public boolean SupportsVideoPlayback() {
         return Build.VERSION.SDK_INT >= 28;
     }
 
