@@ -53,6 +53,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            jvmArgs '--add-opens=java.base/jdk.internal.access=ALL-UNNAMED'
+        }
+    }
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
@@ -70,6 +76,9 @@ android {
 }
 
 dependencies {
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.17'
 
     implementation( platform 'org.jetbrains.kotlin:kotlin-bom:1.8.0')
 

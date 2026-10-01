@@ -48,8 +48,8 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
     }
     private final InputMethodManager imm;
 
-    /** Last IME visibility seen by the inset listener; see installImeVisibilityListener(). */
     private boolean imeWasVisible = false;
+    private long keyboardStateGeneration = 0;
 
     /**
      * When we change from app to app, the keyboard gets disabled.
@@ -266,6 +266,7 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
 
     /** Regain ability to exist, take focus and have some text being input */
     public void enable(){
+        keyboardStateGeneration++;
         setEnabled(true);
         setFocusable(true);
         setVisibility(VISIBLE);
@@ -275,23 +276,11 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
 
     /** Lose ability to exist, take focus and have some text being input */
     public void disable(){
+        keyboardStateGeneration++;
         clear();
         setVisibility(GONE);
         clearFocus();
         setEnabled(false);
-        // End the ImGui editing session in lockstep.  Hiding this view alone
-        // leaves the InputText active and io.WantTextInput stuck true, which
-        // desynchronises GameActivity's imguiKeybaordShowing latch: it believes
-        // the keyboard is already up and never re-shows it, so tapping a text
-        // field afterwards only moves the caret.
-        // Placed here rather than at the individual dismissal sites so the view
-        // state and the ImGui session cannot diverge - every route that hides
-        // the IME (BACK key, window focus change, IME "done" on a multiline
-        // field, GameActivity lowering the keyboard) passes through here.
-        // Safe to call unconditionally: the native side only acts when the
-        // ImGui item being edited is the one holding ActiveId, so this is a
-        // no-op when ImGui has already deactivated the field or is busy with
-        // some other widget.
         ImGUI.clearTextFocus();
     }
 
@@ -305,11 +294,6 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
     /** This function deals with anything that has to be executed when the constructor is called */
     private void setup(){
         setRawInputType(INPUT_TYPE);
-        // NO_FULLSCREEN matters here beyond cosmetics: the host activity is
-        // landscape-only, and a fullscreen (extract-mode) IME stops the window
-        // from dispatching inset changes at all, which would leave the listener
-        // below permanently silent.  NO_EXTRACT_UI alone does not prevent that -
-        // it only suppresses the extracted-text editor.
         setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI
                 | EditorInfo.IME_FLAG_NO_FULLSCREEN
                 | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
@@ -324,30 +308,21 @@ public class ImGUITextInput extends androidx.appcompat.widget.AppCompatEditText 
         disable();
     }
 
-    /**
-     * The only reliable way to learn that the IME went away.
-     *
-     * An IME can close itself without ever dispatching a key event to us - the
-     * "hide keyboard" control in Gboard and friends does exactly that, and under
-     * gesture navigation there is no BACK key in the picture at all.  Google
-     * closed issuetracker.google.com/issues/242222756 as intended behaviour for
-     * this very reason ("an IME can close itself without going through all of
-     * that path") and points at the ime() inset as the supported signal.
-     *
-     * Without this, the view stays enabled while the IME is gone, the ImGui
-     * InputText stays active, io.WantTextInput stays true, and GameActivity's
-     * imguiKeybaordShowing latch never re-raises the keyboard - so tapping a text
-     * field afterwards only moves the caret.
-     */
     private void installImeVisibilityListener() {
         ViewCompat.setOnApplyWindowInsetsListener(this, (v, insets) -> {
             final boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-            if (imeWasVisible && !imeVisible) {
-                // Posted, not inline: disable() flips visibility and clears focus,
-                // neither of which may happen during an inset dispatch.
-                post(this::disable);
+            if (imeWasVisible != imeVisible) {
+                imeWasVisible = imeVisible;
+                final long generation = ++keyboardStateGeneration;
+                if (!imeVisible && isEnabled()) {
+                    post(() -> {
+                        if (generation == keyboardStateGeneration
+                                && !imeWasVisible && isEnabled()) {
+                            disable();
+                        }
+                    });
+                }
             }
-            imeWasVisible = imeVisible;
             return insets;
         });
     }
