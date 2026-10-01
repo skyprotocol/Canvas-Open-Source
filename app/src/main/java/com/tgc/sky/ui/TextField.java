@@ -45,6 +45,7 @@ public class TextField {
     private int m_selectPosProgram = -1;
 
     private boolean m_submitted = false;
+    private boolean m_hiding = false;
     private State m_state = State.kTextFieldState_Hidden;
     private boolean m_init = false;
 
@@ -149,17 +150,11 @@ public class TextField {
         this.m_activity.getBridgeView().addView(this.m_textField);
 
         this.m_activity.addOnKeyboardListener((visible, kbHeight) -> {
-            if (visible) {
-                TextField.this.resizeTextField(false, kbHeight);
-                return;
+            TextField.this.resizeTextField(false, kbHeight);
+            if (!visible && TextField.this.isVirtualKeyboard()
+                    && TextField.this.getState() == State.kTextFieldState_Showing) {
+                TextField.this.hideTextField();
             }
-            if (!TextField.this.m_submitted) {
-                if (TextField.this.m_isDraftEnabled) {
-                    TextField.sChatDraft = TextField.this.m_textField.getText().toString();
-                }
-                TextField.this.m_activity.onKeyboardCompleteNative("", TextField.this.m_isCallbackTextfield, true);
-            }
-            TextField.this.hideTextField();
         });
 
         this.m_init = true;
@@ -222,10 +217,17 @@ public class TextField {
     }
 
     public void hideTextField() {
-        if (!this.m_submitted) {
-            this.m_activity.onKeyboardCompleteNative("", this.m_isCallbackTextfield, true);
+        if (getState() == State.kTextFieldState_Hidden || this.m_hiding) {
+            return;
         }
-        if (getState() != State.kTextFieldState_Hidden) {
+        this.m_hiding = true;
+        try {
+            if (!this.m_submitted) {
+                if (this.m_isDraftEnabled) {
+                    sChatDraft = this.m_textField.getText().toString();
+                }
+                this.m_activity.onKeyboardCompleteNative("", this.m_isCallbackTextfield, true);
+            }
             ((InputMethodManager) this.m_activity.getSystemService(Context.INPUT_METHOD_SERVICE))
                     .hideSoftInputFromWindow(this.m_textField.getWindowToken(), 0);
             GameActivity.hideNavigationFullScreen(this.m_activity.getBridgeView());
@@ -238,9 +240,11 @@ public class TextField {
             this.m_textField.setVisibility(View.GONE);
             this.m_activity.getBridgeView().requestFocus();
             this.m_activity.getBridgeView().requestFocusFromTouch();
+            clearId();
             setState(State.kTextFieldState_Hidden);
+        } finally {
+            this.m_hiding = false;
         }
-        clearId();
     }
 
     public void resizeTextField(boolean top, int keyboardHeight) {
