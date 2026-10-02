@@ -24,8 +24,8 @@ android {
         applicationId "git.artdeell.skymodloader"
         minSdk 26
         targetSdk 34
-        versionCode 75
-        versionName "1.8.9"
+        versionCode 76
+        versionName "1.9.0"
 
         ndk {
             abiFilters "arm64-v8a"
