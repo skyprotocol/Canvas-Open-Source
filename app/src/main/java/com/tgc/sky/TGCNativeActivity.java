@@ -11,6 +11,7 @@ import android.view.ViewTreeObserver;
 import java.io.File;
 
 import git.artdeell.skymodloader.SMLApplication;
+import git.artdeell.skymodloader.GameRuntime;
 
 /* loaded from: classes2.dex */
 public abstract class TGCNativeActivity extends Activity implements SurfaceHolder.Callback2, ViewTreeObserver.OnGlobalLayoutListener {
@@ -21,6 +22,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
     int m_lastContentX;
     int m_lastContentY;
     private boolean m_destroyed = false;
+    private boolean m_nativeCreated = false;
     private long m_handle = 0;
     final int[] m_location = new int[2];
 
@@ -57,12 +59,27 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
     @Override // android.app.Activity
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        if (!GameRuntime.isReady()) {
+            GameRuntime.returnToManager(this);
+            return;
+        }
         findViewById(android.R.id.content).getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
         this.m_handle = onCreateNative(getAbsolutePath(getFilesDir()), getAbsolutePath(getObbDir()), getAbsolutePath(getExternalFilesDir(null)), Build.VERSION.SDK_INT, SMLApplication.skyRes.getAssets(), bundle != null ? bundle.getByteArray(KEY_NATIVE_SAVED_STATE) : null);
+        m_nativeCreated = true;
+    }
+
+    protected final boolean hasNativeActivity() {
+        return m_nativeCreated && !m_destroyed;
     }
 
     @Override
     public void onDestroy() {
+        if (!hasNativeActivity()) {
+            m_destroyed = true;
+            super.onDestroy();
+            return;
+        }
+        findViewById(android.R.id.content).getRootView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
         git.artdeell.skymodloader.AccountStorage.saveActive(this);
         this.m_destroyed = true;
         SurfaceHolder surfaceHolder = this.m_currentSurfaceHolder;
@@ -71,25 +88,28 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
             this.m_currentSurfaceHolder = null;
         }
         onDestroyNative(this.m_handle);
+        m_nativeCreated = false;
+        m_handle = 0;
         super.onDestroy();
     }
 
     @Override
     public void onPause() {
-        git.artdeell.skymodloader.AccountStorage.saveActive(this);
+        if (hasNativeActivity()) git.artdeell.skymodloader.AccountStorage.saveActive(this);
         super.onPause();
-        onPauseNative(this.m_handle);
+        if (hasNativeActivity()) onPauseNative(this.m_handle);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        onResumeNative(this.m_handle);
+        if (hasNativeActivity()) onResumeNative(this.m_handle);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
+        if (!hasNativeActivity()) return;
         byte[] onSaveInstanceStateNative = onSaveInstanceStateNative(this.m_handle);
         if (onSaveInstanceStateNative != null) {
             bundle.putByteArray(KEY_NATIVE_SAVED_STATE, onSaveInstanceStateNative);
@@ -99,20 +119,20 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
     @Override
     protected void onStart() {
         super.onStart();
-        onStartNative(this.m_handle);
+        if (hasNativeActivity()) onStartNative(this.m_handle);
     }
 
     @Override
     protected void onStop() {
-        git.artdeell.skymodloader.AccountStorage.saveActive(this);
+        if (hasNativeActivity()) git.artdeell.skymodloader.AccountStorage.saveActive(this);
         super.onStop();
-        onStopNative(this.m_handle);
+        if (hasNativeActivity()) onStopNative(this.m_handle);
     }
 
     @Override // android.app.Activity, android.content.ComponentCallbacks
     public void onConfigurationChanged(Configuration configuration) {
         super.onConfigurationChanged(configuration);
-        if (this.m_destroyed) {
+        if (!hasNativeActivity()) {
             return;
         }
         onConfigurationChangedNative(this.m_handle);
@@ -121,7 +141,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
     @Override // android.app.Activity, android.content.ComponentCallbacks
     public void onLowMemory() {
         super.onLowMemory();
-        if (this.m_destroyed) {
+        if (!hasNativeActivity()) {
             return;
         }
         onLowMemoryNative(this.m_handle);
@@ -130,7 +150,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
     @Override // android.app.Activity, android.view.Window.Callback
     public void onWindowFocusChanged(boolean z) {
         super.onWindowFocusChanged(z);
-        if (this.m_destroyed) {
+        if (!hasNativeActivity()) {
             return;
         }
         onWindowFocusChangedNative(this.m_handle, z);
@@ -138,7 +158,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
 
     @Override // android.view.SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if (this.m_destroyed) {
+        if (!hasNativeActivity()) {
             return;
         }
         this.m_currentSurfaceHolder = surfaceHolder;
@@ -147,7 +167,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
 
     @Override // android.view.SurfaceHolder.Callback
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-        if (this.m_destroyed) {
+        if (!hasNativeActivity()) {
             return;
         }
         this.m_currentSurfaceHolder = surfaceHolder;
@@ -156,7 +176,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
 
     @Override // android.view.SurfaceHolder.Callback2
     public void surfaceRedrawNeeded(SurfaceHolder surfaceHolder) {
-        if (this.m_destroyed) {
+        if (!hasNativeActivity()) {
             return;
         }
         this.m_currentSurfaceHolder = surfaceHolder;
@@ -166,7 +186,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
     @Override // android.view.SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         this.m_currentSurfaceHolder = null;
-        if (this.m_destroyed) {
+        if (!hasNativeActivity()) {
             return;
         }
         onSurfaceDestroyedNative(this.m_handle, surfaceHolder.getSurface());
@@ -186,7 +206,7 @@ public abstract class TGCNativeActivity extends Activity implements SurfaceHolde
             this.m_lastContentY = i2;
             this.m_lastContentWidth = width;
             this.m_lastContentHeight = height;
-            if (!this.m_destroyed) {
+            if (hasNativeActivity()) {
                 onContentRectChangedNative(this.m_handle, i, i2, width, height);
             }
         }
