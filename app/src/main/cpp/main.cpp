@@ -16,6 +16,7 @@
 #include <limits>
 #include <vector>
 #include "Canvas/Canvas.h"
+#include "Canvas/InitializationGate.h"
 #include "Cipher/CipherUtils.h"
 #include "Cipher/Cipher.h"
 #include "include/misc/visibility.h"
@@ -31,6 +32,7 @@ extern "C" {
 }
 
 static std::string g_skyBuildKey;
+static Canvas::InitializationGate g_modInitialization;
 
 void fsel_setup(JNIEnv*);
 
@@ -171,6 +173,7 @@ PRIVATE_API void DrawMods() {
 }
 
 PRIVATE_API void Canvas::CanvasMenu() {
+    if (!g_modInitialization.isReady()) return;
     ImGui::GetStyle() = canvasBaseStyle;
 
     if(Canvas::hideCanvasMenu) {
@@ -256,8 +259,12 @@ Java_git_artdeell_skymodloader_MainActivity_settle(
         jboolean _ceserver_enabled,
         jboolean _hideCanvasMenu
         ) {
+    if (!g_modInitialization.begin()) {
+        jclass error = env->FindClass("java/lang/IllegalStateException");
+        if (error != nullptr) env->ThrowNew(error, "Native game initialization already started");
+        return;
+    }
     fsel_setup(env);
-    Canvas::userLibs.clear();
     Canvas::MainActivity = clazz;
     Canvas::CeserverEnabled = _ceserver_enabled;
     Canvas::hideCanvasMenu = _hideCanvasMenu;
@@ -293,7 +300,7 @@ PRIVATE_API void *UserThread(Canvas::UserLib *pUserLib){
     return nullptr;
 }
 
-PRIVATE_API void crash(JNIEnv *env, char* crashReason) {
+PRIVATE_API void crash(JNIEnv *env, const char* crashReason) {
     jclass exception =  env->FindClass("java/lang/Exception");
     if(exception != nullptr) {
         env->ThrowNew(exception, crashReason);
@@ -313,7 +320,10 @@ Java_git_artdeell_skymodloader_LibrarySelectorListener_onModLibrary(
         jstring _version,
         jboolean _selfManagedUI
 ) {
-
+    if (!g_modInitialization.isLoading()) {
+        crash(env, "Mod registration outside initialization");
+        return;
+    }
     const char *temp = env->GetStringUTFChars(_path, 0);
     void *dl_entry = dlopen(temp, RTLD_LOCAL);
     if(dl_entry == nullptr) {
@@ -378,7 +388,16 @@ Java_git_artdeell_skymodloader_MainActivity_setDeviceInfoNative(
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_git_artdeell_skymodloader_MainActivity_completeModInitialization(JNIEnv *env, jclass clazz) {
+    if (!g_modInitialization.publish()) {
+        crash(env, "Invalid native initialization state");
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_git_artdeell_skymodloader_MainActivity_lateInitUserLibs(JNIEnv *env, jclass clazz) {
+    if (!g_modInitialization.isReady()) return;
     std::thread lateInitThread([]() -> void {
         for (auto& userlib : Canvas::userLibs) {
             if (userlib.InitLate != nullptr) {
@@ -395,8 +414,8 @@ Java_git_artdeell_skymodloader_MainActivity_lateInitUserLibs(JNIEnv *env, jclass
 extern "C"
 JNIEXPORT void JNICALL
 Java_git_artdeell_skymodloader_MainActivity_customServer(JNIEnv *env, jclass clazz, jstring url) {
-    uintptr_t ssl = (new CipherUtils())->CipherScan("\\x00\\x00\\x00\\x52\\xE2\\x03\\x1F\\xAA\\x00\\x00\\x00\\x94\\x00\\x00\\x00\\xF9\\x00\\x00\\x00\\x52", "???xxxxx???x???x???x");
-    LOGD("scanner %p", ssl);
+    uintptr_t ssl = CipherUtils::CipherScan("\\x00\\x00\\x00\\x52\\xE2\\x03\\x1F\\xAA\\x00\\x00\\x00\\x94\\x00\\x00\\x00\\xF9\\x00\\x00\\x00\\x52", "???xxxxx???x???x???x");
+    LOGD("scanner %p", reinterpret_cast<void*>(ssl));
 }
 
 extern "C"

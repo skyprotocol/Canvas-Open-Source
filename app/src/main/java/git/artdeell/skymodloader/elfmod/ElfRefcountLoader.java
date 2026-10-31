@@ -10,8 +10,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,18 +26,27 @@ import git.artdeell.skymodloader.LibrarySelectorListener;
 public class ElfRefcountLoader extends ElfLoader{
     private final List<ElfFileReference> elfFileReferences = new ArrayList<>();
     private final Map<String, ElfModMetadata> metadataByName = new ArrayMap<>();
+    private final Map<String, File> filesByName = new ArrayMap<>();
     private final File modsFolder;
     public ElfRefcountLoader(String defaultPaths, File modsFolder) throws IOException {
-        super(defaultPaths+":"+modsFolder.getAbsolutePath());
-        this.modsFolder = modsFolder;
-        if(!modsFolder.exists()) {
-            modsFolder.mkdirs();
+        this(preparePaths(defaultPaths, modsFolder), modsFolder, new FileReader("/proc/self/maps"));
+    }
+
+    ElfRefcountLoader(String preparedPaths, File modsFolder, Reader processMaps) throws IOException {
+        super(preparedPaths, processMaps);
+        this.modsFolder = modsFolder.getCanonicalFile();
+    }
+
+    static String preparePaths(String defaultPaths, File modsFolder) throws IOException {
+        if (!modsFolder.isDirectory() && !modsFolder.mkdirs()) {
+            throw new IOException("Cannot create mod directory: " + modsFolder);
         }
+        return defaultPaths + File.pathSeparator + modsFolder.getAbsolutePath();
     }
 
     public void load() throws Exception {
-        File[] modFiles = modsFolder.listFiles(new SharedObjectFileFilter());
-        if(modFiles == null) return;
+        File[] modFiles = listRequiredFiles(modsFolder, "MOD_ENUMERATION_FAILED",
+                new SharedObjectFileFilter());
         for(File f : modFiles) {
             try {
                 if (f.getName().endsWith(".so")&&(!new File(f.getPath() + "_invalid.txt").exists())) {
@@ -48,13 +59,29 @@ public class ElfRefcountLoader extends ElfLoader{
         scanDeps();
         Collections.sort(elfFileReferences);
         for(ElfFileReference ref : elfFileReferences) {
-            loadLib(ref.modMeta.name);
+            loadLib(filesByName.get(ref.modMeta.name));
         }
     }
 
     @Override
+    public File getLibrary(String name) {
+        File mod = filesByName.get(name);
+        return mod != null ? mod : super.getLibrary(name);
+    }
+
+    @Override
+    protected boolean isModLibrary(File library) throws IOException {
+        return modsFolder.equals(library.getCanonicalFile().getParentFile());
+    }
+
+    @Override
+    protected boolean isMappedLibrary(File library) throws IOException {
+        return !isModLibrary(library) && super.isMappedLibrary(library);
+    }
+
+    @Override
     public void loadNative(String absolutePath, String name) {
-        if (absolutePath.startsWith(modsFolder.getAbsolutePath())) {
+        if (modsFolder.equals(new File(absolutePath).getParentFile())) {
             ElfModMetadata metadata = metadataByName.get(name);
             if (metadata == null) {
                 throw new IllegalStateException("WTF? No saved metadata for mod library " + name);
@@ -78,6 +105,7 @@ public class ElfRefcountLoader extends ElfLoader{
         ElfModMetadata metadata = loadMetadata(file);
         elfFileReferences.add(new ElfFileReference(metadata));
         metadataByName.put(metadata.name, metadata);
+        filesByName.put(metadata.name, file);
     }
 
     public static ElfModMetadata loadMetadata(File file) throws Exception {

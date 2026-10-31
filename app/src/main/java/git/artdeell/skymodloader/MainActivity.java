@@ -47,7 +47,21 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!GameRuntime.isCurrentLaunch(getIntent())) {
+            GameRuntime.returnToManager(this);
+            return;
+        }
+        try {
+            GameRuntime.initialize(this::initializeGame);
+            startActivity(new Intent(this, GameActivity.class));
+        } catch (PackageManager.NameNotFoundException e) {
+            alertDialog(getString(R.string.sky_not_installed));
+        } catch (Throwable e) {
+            alertDialog(e);
+        }
+    }
 
+    private void initializeGame() throws Exception {
         deviceInfo = getDeviceInfo();
         sharedPreferences = getSharedPreferences("package_configs", Context.MODE_PRIVATE);
 
@@ -127,135 +141,128 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void loadGame() {
+    private void loadGame() throws Exception {
         PackageManager pm = getPackageManager();
-        try {
-            PackageInfo info = pm.getPackageInfo(SKY_PACKAGE_NAME, PackageManager.GET_SHARED_LIBRARY_FILES);
-            SMLApplication.skyPName = info.packageName;
-            SMLApplication.skyRes = pm.getResourcesForApplication(info.packageName);
-            SMLApplication.smlRes = getResources();
-            String versionName = info.versionName;
-            BuildConfig.SKY_VERSION = versionName.substring(0, versionName.indexOf(' ')).trim();
-            BuildConfig.VERSION_CODE = info.versionCode;
+        PackageInfo info = pm.getPackageInfo(SKY_PACKAGE_NAME, PackageManager.GET_SHARED_LIBRARY_FILES);
+        SMLApplication.skyPName = info.packageName;
+        SMLApplication.skyRes = pm.getResourcesForApplication(info.packageName);
+        SMLApplication.smlRes = getResources();
+        String versionName = info.versionName;
+        BuildConfig.SKY_VERSION = versionName.substring(0, versionName.indexOf(' ')).trim();
+        BuildConfig.VERSION_CODE = info.versionCode;
 
-            String libPath = resolveLibPath(info.applicationInfo);
-            String elfLibPath = resolveElfLibPath(info.applicationInfo, libPath);
-            Log.i("MainActivity", "elfLibPath: " + elfLibPath);
+        String libPath = resolveLibPath(info.applicationInfo);
+        String elfLibPath = resolveElfLibPath(info.applicationInfo, libPath);
+        Log.i("MainActivity", "elfLibPath: " + elfLibPath);
 
-            File modsDir = new File(getFilesDir(), "mods");
-            File configDir = new File(getFilesDir(), "config");
-            if (!configDir.isDirectory() && !configDir.mkdirs())
-                throw new IOException("Failed to create mod configuration directory");
+        File modsDir = new File(getFilesDir(), "mods");
+        File configDir = new File(getFilesDir(), "config");
+        if (!configDir.isDirectory() && !configDir.mkdirs())
+            throw new IOException("Failed to create mod configuration directory");
 
-            Log.i("MainActivity", "Pre-loading FMOD dependencies from: " + libPath);
-            org.fmod.FMOD.init(this);
+        Log.i("MainActivity", "Pre-loading FMOD dependencies from: " + libPath);
+        org.fmod.FMOD.init(this);
 
-            if (!libPath.contains("!/lib")) {
-                File fmodLibDir = new File(libPath);
-                Log.i("MainActivity", "Listing all files in: " + libPath);
-                File[] allFiles = fmodLibDir.listFiles();
-                if (allFiles != null) {
-                    for (File f : allFiles) {
-                        Log.i("MainActivity", "Found file: " + f.getName());
-                    }
-                } else {
-                    Log.e("MainActivity", "Directory is empty or doesn't exist!");
+        if (!libPath.contains("!/lib")) {
+            File fmodLibDir = new File(libPath);
+            Log.i("MainActivity", "Listing all files in: " + libPath);
+            File[] allFiles = fmodLibDir.listFiles();
+            if (allFiles != null) {
+                for (File f : allFiles) {
+                    Log.i("MainActivity", "Found file: " + f.getName());
                 }
             } else {
-                Log.i("MainActivity", "Loading libs directly from APK (no extraction)");
+                Log.e("MainActivity", "Directory is empty or doesn't exist!");
             }
-
-            loadCppShared(libPath);
-
-            String[] libsToLoad = {
-                "libOpenSLES.so",
-                "libfmod.so",
-                "libfmodstudio.so"
-            };
-
-            for (String libName : libsToLoad) {
-                try {
-                    if (libPath.contains("!/lib")) {
-                        String fullApkLibPath = libPath + "/" + libName;
-                        Log.i("MainActivity", "Loading from APK: " + fullApkLibPath);
-                        System.load(fullApkLibPath);
-                    } else {
-                        File lib = new File(libPath, libName);
-                        if (!lib.exists()) {
-                            Log.w("MainActivity", "Not found: " + libName + " at " + lib.getAbsolutePath());
-                            continue;
-                        }
-                        Log.i("MainActivity", "Loading: " + libName);
-                        System.load(lib.getAbsolutePath());
-                    }
-                    Log.i("MainActivity", "Successfully loaded: " + libName);
-                } catch (Throwable e) {
-                    Log.e("MainActivity", "Failed to load " + libName + ": " + e.getMessage());
-                }
-            }
-
-            ElfLoader loader = new ElfLoader(elfLibPath);
-            loader.loadLib("libBootloader.so");
-            System.loadLibrary("ciphered");
-            if (getSharedPreferences("daybreaker_configs", MODE_PRIVATE).getBoolean("enable_daybreaker", false)) {
-                try {
-                    System.loadLibrary("DayBreaker");
-                } catch (Throwable ignored) {
-                }
-            }
-
-            String buildKey = getSkyBuildAccessKey();
-            if (buildKey != null) {
-                BuildConfig.SKY_BUILD_ACCESS_KEY = buildKey;
-                nativeSetSkyBuildKey(buildKey);
-                Log.i("MainActivity", "BuildKey applied: " + buildKey.substring(0, Math.min(20, buildKey.length())) + "...");
-            } else {
-                Log.w("MainActivity", "NOT FOUND, DEFAULT INSTEAD: " + BuildConfig.SKY_BUILD_ACCESS_KEY);
-            }
-
-            setDeviceInfoNative(
-                deviceInfo.xdpi,
-                deviceInfo.ydpi,
-                deviceInfo.density,
-                Optional.ofNullable(deviceInfo.deviceName).orElse(""),
-                Optional.ofNullable(deviceInfo.deviceManufacturer).orElse(""),
-                Optional.ofNullable(deviceInfo.deviceModel).orElse(""));
-            IconLoader.findIcons();
-            BuildConfig.VERSION_CODE = sharedPreferences.getBoolean("skip_updates", false) ? 0x99999 : info.versionCode;
-            Integer gameType = skyPackages.getOrDefault(SKY_PACKAGE_NAME, 0);
-            if (sharedPreferences.getBoolean("custom_server", false)) {
-                String customHost = sharedPreferences.getString("server_host", ServerManager.getDefaultHost());
-                if (customHost != null) {
-                    customHost = ServerManager.sanitizeHost(customHost);
-                    if (!customHost.isEmpty()) {
-                        BuildConfig.SKY_SERVER_HOSTNAME = customHost;
-                        Log.i("MainActivity", "Custom server hostname configured: " + BuildConfig.SKY_SERVER_HOSTNAME);
-                    } else {
-                        Log.w("MainActivity", "Custom server is enabled but server_host is empty");
-                    }
-                }
-                MainActivity.customServer(BuildConfig.SKY_SERVER_HOSTNAME);
-            }
-            MainActivity.settle(
-                info.versionCode,
-                gameType == null ? 0 : gameType,
-                BuildConfig.SKY_SERVER_HOSTNAME,
-                configDir.getAbsolutePath(),
-                SMLApplication.skyRes.getAssets(),
-                ceserverEnabled,
-                hideCanvasMenu
-            );
-            AccountStorage.sync(this);
-
-            new ElfRefcountLoader(elfLibPath, modsDir).load();
-            BuildConfig.APPLICATION_ID = SKY_PACKAGE_NAME;
-            startActivity(new Intent(this, GameActivity.class));
-
-        } catch (PackageManager.NameNotFoundException e) {
-            alertDialog(getString(R.string.sky_not_installed));
-        } catch (Throwable e) {
-            alertDialog(e);
+        } else {
+            Log.i("MainActivity", "Loading libs directly from APK (no extraction)");
         }
+
+        loadCppShared(libPath);
+
+        String[] libsToLoad = {
+            "libOpenSLES.so",
+            "libfmod.so",
+            "libfmodstudio.so"
+        };
+
+        for (String libName : libsToLoad) {
+            try {
+                if (libPath.contains("!/lib")) {
+                    String fullApkLibPath = libPath + "/" + libName;
+                    Log.i("MainActivity", "Loading from APK: " + fullApkLibPath);
+                    System.load(fullApkLibPath);
+                } else {
+                    File lib = new File(libPath, libName);
+                    if (!lib.exists()) {
+                        Log.w("MainActivity", "Not found: " + libName + " at " + lib.getAbsolutePath());
+                        continue;
+                    }
+                    Log.i("MainActivity", "Loading: " + libName);
+                    System.load(lib.getAbsolutePath());
+                }
+                Log.i("MainActivity", "Successfully loaded: " + libName);
+            } catch (Throwable e) {
+                Log.e("MainActivity", "Failed to load " + libName + ": " + e.getMessage());
+            }
+        }
+
+        ElfLoader loader = new ElfLoader(elfLibPath);
+        loader.loadLib("libBootloader.so");
+        System.loadLibrary("ciphered");
+        if (getSharedPreferences("daybreaker_configs", MODE_PRIVATE).getBoolean("enable_daybreaker", false)) {
+            try {
+                System.loadLibrary("DayBreaker");
+            } catch (Throwable ignored) {
+            }
+        }
+
+        String buildKey = getSkyBuildAccessKey();
+        if (buildKey != null) {
+            BuildConfig.SKY_BUILD_ACCESS_KEY = buildKey;
+            nativeSetSkyBuildKey(buildKey);
+            Log.i("MainActivity", "BuildKey applied: " + buildKey.substring(0, Math.min(20, buildKey.length())) + "...");
+        } else {
+            Log.w("MainActivity", "NOT FOUND, DEFAULT INSTEAD: " + BuildConfig.SKY_BUILD_ACCESS_KEY);
+        }
+
+        setDeviceInfoNative(
+            deviceInfo.xdpi,
+            deviceInfo.ydpi,
+            deviceInfo.density,
+            Optional.ofNullable(deviceInfo.deviceName).orElse(""),
+            Optional.ofNullable(deviceInfo.deviceManufacturer).orElse(""),
+            Optional.ofNullable(deviceInfo.deviceModel).orElse(""));
+        IconLoader.findIcons();
+        BuildConfig.VERSION_CODE = sharedPreferences.getBoolean("skip_updates", false) ? 0x99999 : info.versionCode;
+        Integer gameType = skyPackages.getOrDefault(SKY_PACKAGE_NAME, 0);
+        if (sharedPreferences.getBoolean("custom_server", false)) {
+            String customHost = sharedPreferences.getString("server_host", ServerManager.getDefaultHost());
+            if (customHost != null) {
+                customHost = ServerManager.sanitizeHost(customHost);
+                if (!customHost.isEmpty()) {
+                    BuildConfig.SKY_SERVER_HOSTNAME = customHost;
+                    Log.i("MainActivity", "Custom server hostname configured: " + BuildConfig.SKY_SERVER_HOSTNAME);
+                } else {
+                    Log.w("MainActivity", "Custom server is enabled but server_host is empty");
+                }
+            }
+            MainActivity.customServer(BuildConfig.SKY_SERVER_HOSTNAME);
+        }
+        MainActivity.settle(
+            info.versionCode,
+            gameType == null ? 0 : gameType,
+            BuildConfig.SKY_SERVER_HOSTNAME,
+            configDir.getAbsolutePath(),
+            SMLApplication.skyRes.getAssets(),
+            ceserverEnabled,
+            hideCanvasMenu
+        );
+        AccountStorage.sync(this);
+
+        new ElfRefcountLoader(elfLibPath, modsDir).load();
+        completeModInitialization();
+        BuildConfig.APPLICATION_ID = SKY_PACKAGE_NAME;
     }
 
     private String resolveLibPath(ApplicationInfo appInfo) throws IOException {
@@ -536,6 +543,7 @@ public class MainActivity extends Activity {
     public static native void onKeyboardCompleteNative(String message);
     public static native void customServer(String url);
     public static native void lateInitUserLibs();
+    private static native void completeModInitialization();
     public static native void getSysetemUI(Object systemUI);
     private static native void nativeSetSkyBuildKey(String key);
 

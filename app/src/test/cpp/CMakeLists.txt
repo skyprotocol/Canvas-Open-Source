@@ -7,6 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
 
+find_package(Threads REQUIRED)
+add_executable(initialization_gate_test InitializationGateTest.cpp)
+target_include_directories(initialization_gate_test PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../main/cpp/Core)
+target_compile_options(initialization_gate_test PRIVATE -Wall -Wextra -Werror -UNDEBUG)
+target_link_libraries(initialization_gate_test PRIVATE Threads::Threads)
+add_test(NAME initialization_gate_test COMMAND initialization_gate_test)
+
 add_executable(chat_flag_fix_test ChatFlagFixTest.cpp)
 target_include_directories(chat_flag_fix_test PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}

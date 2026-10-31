@@ -77,9 +77,9 @@ bool isLibraryLoaded(const char *libraryName) {
     FILE *fp = fopen(OBFUSCATE("/proc/self/maps"), OBFUSCATE("rt"));
     if (fp != NULL) {
         while (fgets(line, sizeof(line), fp)) {
-            std::string a = line;
             if (strstr(line, libraryName)) {
                 libLoaded = true;
+                fclose(fp);
                 return true;
             }
         }

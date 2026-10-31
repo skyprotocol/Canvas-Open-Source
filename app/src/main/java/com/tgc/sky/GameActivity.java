@@ -231,6 +231,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        if (!hasNativeActivity()) return;
         DialogJNI.setActivity(this);
         hideNavigationFullScreen(getWindow().getDecorView());
         getWindow().addFlags(2097280);
@@ -319,7 +320,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
             @Override public void onDisplayAdded(int i) {}
             @Override public void onDisplayRemoved(int i) {}
             @Override public void onDisplayChanged(int i) {
-                if (displayManager.getDisplay(i) != null) GameActivity.this.onDisplayChangedNative();
+                if (hasNativeActivity() && displayManager.getDisplay(i) != null) GameActivity.this.onDisplayChangedNative();
             }
         }, null);
     }
@@ -328,14 +329,20 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
 
     @Override
     public void onDestroy() {
-        FMOD.close();
-        FileSelector.unsetActivity();
-        this.m_systemIO.onDestroy();
+        if (hasNativeActivity()) {
+            FMOD.close();
+            FileSelector.unsetActivity();
+        }
+        if (this.m_systemIO != null) this.m_systemIO.onDestroy();
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
+        if (!hasNativeActivity()) {
+            super.onResume();
+            return;
+        }
         if (this.m_sensorManager != null && this.m_motionListening) {
             this.m_motionListening = registerMotionListeners();
         }
@@ -353,6 +360,10 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
 
     @Override
     public void onPause() {
+        if (!hasNativeActivity()) {
+            super.onPause();
+            return;
+        }
         if (this.portraitOnResume) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         this.m_systemIO.onPause();
         if (this.m_sensorManager != null && this.m_motionListening) {
@@ -530,7 +541,10 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     }
 
     @Override
-    public void onBackPressed() { onBackPressedNative(); }
+    public void onBackPressed() {
+        if (hasNativeActivity()) onBackPressedNative();
+        else super.onBackPressed();
+    }
 
     public void AddOnActivityIntentListener(OnActivityIntentListener l) {
         if (this.mOnActivityIntentListeners == null) this.mOnActivityIntentListeners = new ArrayList<>();
@@ -544,6 +558,8 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
 
     @Override
     public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (!hasNativeActivity()) return;
         ArrayList<OnActivityIntentListener> a = this.mOnActivityIntentListeners;
         if (a != null) {
             Iterator<OnActivityIntentListener> it = a.iterator();

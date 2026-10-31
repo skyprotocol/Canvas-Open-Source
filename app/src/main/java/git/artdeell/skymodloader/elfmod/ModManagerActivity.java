@@ -650,7 +650,7 @@ public class ModManagerActivity extends Activity implements LoadingListener, Mod
     public void launchGame() {
         if (findPackage(skyPackageName)) {
             setSkyPackageName(skyPackageName);
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(git.artdeell.skymodloader.GameRuntime.launchIntent(this));
         } else {
             Toast.makeText(
                 getApplicationContext(),
