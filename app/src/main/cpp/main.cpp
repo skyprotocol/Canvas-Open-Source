@@ -362,7 +362,12 @@ Java_git_artdeell_skymodloader_MainActivity_onKeyboardCompleteNative(
         jstring message
 ) {
     std::string msg = env->GetStringUTFChars(message, nullptr);
-    for (auto& listener : Canvas::onKeyboardCompleteListeners) {
+    std::vector<void (*)(std::string)> listeners;
+    {
+        std::lock_guard<std::mutex> lock(Canvas::onKeyboardCompleteListenersMutex);
+        listeners = Canvas::onKeyboardCompleteListeners;
+    }
+    for (auto& listener : listeners) {
         listener(msg);
     }
 }

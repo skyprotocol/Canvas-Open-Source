@@ -65,13 +65,14 @@ CipherPatch::~CipherPatch() {
 
     std::lock_guard<std::mutex> lock(cipher_patch_mtx);
 
-    CipherBase::s_InstanceVec.erase(
-        std::find(
-            CipherBase::s_InstanceVec.begin(),
-            CipherBase::s_InstanceVec.end(),
-            (CipherBase *)this
-        )
+    auto it = std::find(
+        CipherBase::s_InstanceVec.begin(),
+        CipherBase::s_InstanceVec.end(),
+        (CipherBase *)this
     );
+    if (it != CipherBase::s_InstanceVec.end()) {
+        CipherBase::s_InstanceVec.erase(it);
+    }
     CipherInternal::ForgetInstall(this);
     artpatch_die(this->patch);
 }

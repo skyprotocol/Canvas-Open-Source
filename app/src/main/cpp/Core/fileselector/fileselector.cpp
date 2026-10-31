@@ -93,17 +93,28 @@ static jobjectArray fsel_build_mime_array(JNIEnv* env,
     return arr;
 }
 
+namespace {
+struct ThreadAttachment {
+    bool attached = false;
+    ~ThreadAttachment() {
+        if (attached) Canvas::javaVM->DetachCurrentThread();
+    }
+};
+}
+
 bool requestFileMultiNamed(const char* const* mime_types, size_t mime_type_count,
                            callback_function callback, bool save,
                            const char* suggested_name) {
     if (!mime_types || mime_type_count == 0) return false;
 
     JNIEnv* env;
+    ThreadAttachment attachment;
     if (Canvas::javaVM->GetEnv((void**)&env, JNI_VERSION_1_6) == JNI_EDETACHED) {
         if (Canvas::javaVM->AttachCurrentThread(&env, nullptr) != JNI_OK) {
             __android_log_print(ANDROID_LOG_ERROR, "fileselector", "Failed to attach thread to JVM");
             return false;
         }
+        attachment.attached = true;
     }
     if (!class_FileSelector || !method_nselectFileMultiNamed) {
         __android_log_print(ANDROID_LOG_ERROR, "fileselector", "FileSelector not initialized");
@@ -113,9 +124,6 @@ bool requestFileMultiNamed(const char* const* mime_types, size_t mime_type_count
     jobjectArray mimeArr = fsel_build_mime_array(env, mime_types, mime_type_count);
     if (!mimeArr) return false;
 
-    // Null stays null all the way into the Java side, where it means "leave the
-    // name field as it was" - the pre-EXTRA_TITLE behaviour, and what
-    // requestFileMulti below still asks for.
     jstring nameStr = nullptr;
     if (suggested_name && suggested_name[0] != '\0') {
         nameStr = env->NewStringUTF(suggested_name);
@@ -150,11 +158,13 @@ bool requestFiles(const char* const* mime_types, size_t mime_type_count,
     if (!mime_types || mime_type_count == 0) return false;
 
     JNIEnv* env;
+    ThreadAttachment attachment;
     if (Canvas::javaVM->GetEnv((void**)&env, JNI_VERSION_1_6) == JNI_EDETACHED) {
         if (Canvas::javaVM->AttachCurrentThread(&env, nullptr) != JNI_OK) {
             __android_log_print(ANDROID_LOG_ERROR, "fileselector", "Failed to attach thread to JVM");
             return false;
         }
+        attachment.attached = true;
     }
     if (!class_FileSelector || !method_nselectFiles) {
         __android_log_print(ANDROID_LOG_ERROR, "fileselector", "FileSelector not initialized");

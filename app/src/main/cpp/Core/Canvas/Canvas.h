@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 #include <jni.h>
 #include <android/asset_manager_jni.h>
 
@@ -63,4 +64,5 @@ namespace Canvas {
     extern const char *configsPath;
 
     extern std::vector<void (*)(std::string)> onKeyboardCompleteListeners;
+    extern std::mutex onKeyboardCompleteListenersMutex;
 }

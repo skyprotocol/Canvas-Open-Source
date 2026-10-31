@@ -44,6 +44,12 @@ __attribute__((visibility ("hidden"))) unsigned char artpatch_decode_hex_digit(c
         case 'D': return 13;
         case 'E': return 14;
         case 'F': return 15;
+        case 'a': return 10;
+        case 'b': return 11;
+        case 'c': return 12;
+        case 'd': return 13;
+        case 'e': return 14;
+        case 'f': return 15;
         default: return 255;
     }
 }
@@ -88,21 +94,23 @@ __attribute__((visibility ("hidden"))) void artpatch_set_hex(patch_t patch, cons
 
 __attribute__((visibility ("hidden"))) void artpatch_apply(patch_t patch) {
     const void* pagestart = (void*)((uintptr_t)patch->patchDestination & -PAGE_SIZE);
+    size_t span = ((uintptr_t)patch->patchDestination + patch->patchLength - (uintptr_t)pagestart + PAGE_SIZE - 1) & -PAGE_SIZE;
     int prot_flags = procutils_read_mprotection(pagestart);
-    if(!mprotect(pagestart, PAGE_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC)) {
+    if(!mprotect(pagestart, span, PROT_READ | PROT_WRITE | PROT_EXEC)) {
         if(!patch->patchApplied) memcpy(patch->backup, patch->patchDestination, patch->patchLength);
         memcpy(patch->patchDestination, patch->patch, patch->patchLength);
-        mprotect(pagestart, PAGE_SIZE, prot_flags);
+        mprotect(pagestart, span, prot_flags);
         patch->patchApplied = true;
     }
 }
 __attribute__((visibility ("hidden"))) void artpatch_restore(patch_t patch) {
     if(!patch->patchApplied) return;
     const void* pagestart = (void*)((uintptr_t)patch->patchDestination & -PAGE_SIZE);
+    size_t span = ((uintptr_t)patch->patchDestination + patch->patchLength - (uintptr_t)pagestart + PAGE_SIZE - 1) & -PAGE_SIZE;
     int prot_flags = procutils_read_mprotection(pagestart);
-    if(!mprotect(pagestart, PAGE_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC)) {
+    if(!mprotect(pagestart, span, PROT_READ | PROT_WRITE | PROT_EXEC)) {
         memcpy(patch->patchDestination, patch->backup, patch->patchLength);
-        mprotect(pagestart, PAGE_SIZE, prot_flags);
+        mprotect(pagestart, span, prot_flags);
         patch->patchApplied = false;
     }else{
         __android_log_print(ANDROID_LOG_FATAL,"artPatch","Unable to change memory protection to restore backup!");
