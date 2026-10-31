@@ -101,6 +101,7 @@ PRIVATE_API SkyImage& IconLoader::uploadImageKtx(const char* name, const bool& i
             else IconLoader::images.insert(std::make_pair(name, image));
             return *image;
         case KTX_UNSUPPORTED_TEXTURE_TYPE:
+        default:
             __android_log_print(ANDROID_LOG_ERROR,"IconLoader", "Unsupported texture type");
             free(assetBuf);
             glDeleteTextures(1, &texid);

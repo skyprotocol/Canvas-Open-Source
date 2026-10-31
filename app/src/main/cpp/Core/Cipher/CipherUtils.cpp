@@ -53,7 +53,7 @@ void CipherUtils::patternToBytes(const std::string _pattern, char* _bytesBuffer,
         }
     }
 
-    if (!(bytes.empty() || mask.empty() || bytes.size() != mask.size())) {
+    if (!(bytes.empty() || mask.empty() || bytes.size() != mask.size() || bytes.size() >= 256)) {
         std::memcpy(_bytesBuffer, bytes.data(), bytes.size());
         _bytesBuffer[bytes.size()] = '\0';
         _maskBuffer = mask;
@@ -272,13 +272,13 @@ char* CipherUtils::readAsset(const char* _assetPath) {
 }
 
 void CipherUtils::addOnKeyboardCompleteListener(void (*_listener)(std::string)) {
+    std::lock_guard<std::mutex> lock(Canvas::onKeyboardCompleteListenersMutex);
     Canvas::onKeyboardCompleteListeners.push_back(_listener);
 }
 
 DeviceInfo CipherUtils::get_DeviceInfo() {
-    DeviceInfo deviceInfo;
-    std::memcpy(&deviceInfo, &Canvas::deviceInfo, sizeof(deviceInfo));
-    return deviceInfo;
+    return {Canvas::deviceInfo.xdpi, Canvas::deviceInfo.ydpi, Canvas::deviceInfo.density,
+            Canvas::deviceInfo.deviceName, Canvas::deviceInfo.deviceManufacturer, Canvas::deviceInfo.deviceModel};
 }
 
 void CipherUtils::performHapticFeedback(HapticFeedbackType _type) {

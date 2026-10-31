@@ -41,4 +41,5 @@ namespace Canvas {
     PRIVATE_API const char *configsPath;
 
     PRIVATE_API std::vector<void (*)(std::string)> onKeyboardCompleteListeners;
+    PRIVATE_API std::mutex onKeyboardCompleteListenersMutex;
 }

@@ -48,7 +48,7 @@ __attribute__((visibility ("hidden"))) int procutils_read_mprotection(void* addr
             unsigned long addr0 = strtoul(b->mem, &end0, 0x10);
             char*end1 = (void*)0;
             unsigned long addr1 = strtoul(end0+1, &end1, 0x10);
-            if ((void*)addr0 <= addr && addr <= (void*)addr1) {
+            if ((void*)addr0 <= addr && addr < (void*)addr1) {
                 res |= (end1+1)[0] == 'r' ? PROT_READ : 0;
                 res |= (end1+1)[1] == 'w' ? PROT_WRITE : 0;
                 res |= (end1+1)[2] == 'x' ? PROT_EXEC : 0;

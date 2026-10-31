@@ -32,7 +32,7 @@ static EGLSurface           g_EglSurface = EGL_NO_SURFACE;
 static EGLContext           g_EglContext = EGL_NO_CONTEXT;
 static EGLConfig egl_config;
 static EGLint egl_format;
-static bool run = true;
+static std::atomic<bool> run{true};
 static ANativeWindow *androidWindow;
 static double g_time = 0;
 
@@ -524,15 +524,17 @@ PRIVATE_API void renderloop()
     g_EglSurface = nullptr;
 }
 
-PRIVATE_API void init_sfc(JNIEnv *env, jobject surface) {
+PRIVATE_API bool init_sfc(JNIEnv *env, jobject surface) {
     if(androidWindow != nullptr) {
         ANativeWindow_release(androidWindow);
     }
     androidWindow = ANativeWindow_fromSurface(env, surface);
+    if (androidWindow == nullptr) return false;
     ANativeWindow_acquire(androidWindow);
     ANativeWindow_setBuffersGeometry(androidWindow, 0, 0, egl_format);
     g_EglSurface = eglCreateWindowSurface(g_EglDisplay, egl_config, androidWindow, nullptr);
     eglMakeCurrent(g_EglDisplay, g_EglSurface, g_EglSurface, g_EglContext);
+    return true;
 }
 
 static jclass class_ImGUI;
@@ -729,8 +731,8 @@ Java_git_artdeell_skymodloader_ImGUI_wantsMouse(JNIEnv *env, jclass clazz) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_git_artdeell_skymodloader_ImGUI_resurface(JNIEnv *env, jclass clazz, jobject surface) {
-    init_sfc(env, surface);
-    eglMakeCurrent(g_EglDisplay, g_EglSurface, g_EglSurface, g_EglContext);
     run = true;
+    if (!init_sfc(env, surface)) return;
+    eglMakeCurrent(g_EglDisplay, g_EglSurface, g_EglSurface, g_EglContext);
     renderloop();
 }
