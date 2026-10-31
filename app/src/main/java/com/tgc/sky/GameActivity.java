@@ -722,7 +722,7 @@ public class GameActivity extends TGCNativeActivity implements View.OnCapturedPo
     private PointF transformPointToProgram(float x, float y) {
         PointF p = new PointF();
         p.x = transformWidthToProgram(x);
-        p.y = transformHeightToProgram(y);
+        p.y = getWindow().getDecorView().getHeight() - transformHeightToProgram(y);
         return p;
     }
 
